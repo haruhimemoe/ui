@@ -1,7 +1,8 @@
 /**
  * @file tests/components/actions/Pagination.test.tsx
  * @desc Component tests for Pagination: single page, first / middle / last page links, labels,
- *       native nav props, className, keyboard order, accessibility.
+ *       native nav props, className, keyboard order, focus kept when an end link goes away,
+ *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -94,6 +95,56 @@ describe("Pagination", () => {
     expect(screen.getByRole("link", { name: "Previous" })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole("link", { name: "Next" })).toHaveFocus();
+  });
+
+  it("moves focus to the status when the used Next link goes away on the last page", () => {
+    const { rerender } = render(<Pagination page={4} pageCount={5} hrefFor={hrefFor} />);
+    screen.getByRole("link", { name: "Next" }).focus();
+    rerender(<Pagination page={5} pageCount={5} hrefFor={hrefFor} />);
+    expect(screen.getByText("Page 5 of 5")).toHaveFocus();
+  });
+
+  it("moves focus to the status when the used Previous link goes away on the first page", () => {
+    const { rerender } = render(<Pagination page={2} pageCount={5} hrefFor={hrefFor} />);
+    screen.getByRole("link", { name: "Previous" }).focus();
+    rerender(<Pagination page={1} pageCount={5} hrefFor={hrefFor} />);
+    expect(screen.getByText("Page 1 of 5")).toHaveFocus();
+  });
+
+  it("leaves focus alone when the link stays or focus is elsewhere", () => {
+    const { rerender } = render(
+      <>
+        <button type="button">Elsewhere</button>
+        <Pagination page={2} pageCount={5} hrefFor={hrefFor} />
+      </>,
+    );
+    const next = screen.getByRole("link", { name: "Next" });
+    next.focus();
+    rerender(
+      <>
+        <button type="button">Elsewhere</button>
+        <Pagination page={3} pageCount={5} hrefFor={hrefFor} />
+      </>,
+    );
+    expect(screen.getByRole("link", { name: "Next" })).toHaveFocus();
+
+    screen.getByRole("button", { name: "Elsewhere" }).focus();
+    rerender(
+      <>
+        <button type="button">Elsewhere</button>
+        <Pagination page={5} pageCount={5} hrefFor={hrefFor} />
+      </>,
+    );
+    expect(screen.getByRole("button", { name: "Elsewhere" })).toHaveFocus();
+  });
+
+  it("keeps the status out of the tab order", async () => {
+    const user = userEvent.setup();
+    render(<Pagination page={3} pageCount={3} hrefFor={hrefFor} />);
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Previous" })).toHaveFocus();
+    await user.tab();
+    expect(document.body).toHaveFocus();
   });
 
   it("has no axe violations on the first, middle and last page", async () => {

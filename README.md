@@ -261,7 +261,7 @@ Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChang
 
 #### `CopyButton` (client)
 
-A button that copies text, with the result in an `<output>` beside it that screen readers announce. If the clipboard is missing or refuses (an insecure page, say), it shows the failure message. Every `Button` prop except `onClick` and `children`; `className` and the native props go on the button.
+A button that copies text, with the result in an `<output>` beside it that screen readers announce. Each press clears the message first, so a second copy is announced too. If the clipboard is missing or refuses (an insecure page, say), it shows the failure message. Every `Button` prop except `onClick` and `children`; `className` and the native props go on the button.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -286,7 +286,7 @@ Previous and next pill links around "Page X of Y". Renders nothing when there is
 | `nextLabel` | `ReactNode` | `"Next"` | Text of the link to the page after. |
 | `formatStatus` | `(page: number, pageCount: number) => ReactNode` | `"Page X of Y"` | The text in the middle. |
 
-The links use `next/link` with `rel="prev"` and `rel="next"`.
+The links use `next/link` with `rel="prev"` and `rel="next"`. On the first and last page one link goes away. If it had keyboard focus (Next pressed on page 4 of 5), focus moves to the "Page X of Y" text instead of falling back to the top of the page. `Pagination` stays a Server Component; that text is a small client component inside it.
 
 #### `JsonLd`
 
@@ -521,7 +521,8 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 - Form fields link their label, hint and error. An error sets `aria-invalid` and is announced.
 - `Chip` uses `aria-pressed`. `ChipGroup`, `RangeSlider` and `FilterRow` are fieldsets named by their label. Inside a `FilterRow`, `hideLabel` leaves the naming to the row, so each row is announced once. `RangeSlider`'s thumbs are native range inputs with `aria-valuetext`, so "10+" reads as it shows.
 - `FilterPanel`'s phone toggle carries `aria-expanded` and `aria-controls`. The result count is a live region. When "Clear filters" disappears after use, focus moves to the panel's heading instead of getting lost.
-- `CopyButton` announces "Copied." (or the failure) through an `<output>`.
+- `CopyButton` announces "Copied." (or the failure) through an `<output>`, on every press.
+- `Pagination` moves focus to its "Page X of Y" text when the link you pressed goes away on the first or last page.
 - `SiteHeader` marks the current page with `aria-current`. `PageShell` starts with a skip link to `<main>`.
 - `GitHubIcon` is always hidden from screen readers: give the link around it an `aria-label`, as `SiteFooter` does.
 - You supply the text, so you also supply labels: give icon-only buttons an `aria-label`, and keep `label` props meaningful.

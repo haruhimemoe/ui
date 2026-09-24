@@ -1,7 +1,9 @@
 /**
  * @file src/components/actions/Pagination.tsx
  * @desc Previous / next links around "Page X of Y". Renders nothing for a single page. The
- *       caller builds each page's URL, so it works with any query string or route shape.
+ *       caller builds each page's URL, so it works with any query string or route shape. When
+ *       the link a keyboard user pressed goes away (Next on the last page), focus moves to the
+ *       status text instead of the page body.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -11,6 +13,7 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
 import { buttonClasses } from "../basics/buttonStyles.js";
+import { PaginationStatus } from "./PaginationStatus.js";
 
 /** Every native `<nav>` prop except children, plus the page state and the link builder. */
 export type PaginationProps = Omit<ComponentProps<"nav">, "children"> & {
@@ -65,9 +68,7 @@ export function Pagination({
       ) : (
         <span />
       )}
-      <span aria-current="page" className="text-c4">
-        {formatStatus(page, pageCount)}
-      </span>
+      <PaginationStatus>{formatStatus(page, pageCount)}</PaginationStatus>
       {page < pageCount ? (
         <Link
           href={hrefFor(page + 1)}

@@ -7,7 +7,7 @@
  * @modified Wed Sep 23, 2026
  */
 
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -47,6 +47,31 @@ describe("CopyButton", () => {
     await user.click(screen.getByRole("button", { name: "Copy" }));
     expect(writeText).toHaveBeenCalledWith("12345");
     expect(status).toHaveTextContent("Copied.");
+  });
+
+  it("clears the status on each press, so a second copy is announced again", async () => {
+    let finish = () => {};
+    const { user } = setup(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    render(<CopyButton text="12345" />);
+    const status = screen.getByRole("status");
+    const button = screen.getByRole("button", { name: "Copy" });
+
+    await user.click(button);
+    await act(async () => finish());
+    expect(status).toHaveTextContent("Copied.");
+    const first = status.firstChild;
+
+    await user.click(button);
+    expect(status).toBeEmptyDOMElement();
+    await act(async () => finish());
+    expect(status).toHaveTextContent("Copied.");
+    // A fresh node, so the live region reports an addition even with the same text.
+    expect(status.firstChild).not.toBe(first);
   });
 
   it("tells the reader to copy by hand when the clipboard refuses", async () => {
