@@ -338,7 +338,7 @@ schema.org structured data in a `<script type="application/ld+json">`. Every `<`
 
 #### `GitHubIcon`
 
-The GitHub mark as an inline SVG in the current text color. Always hidden from screen readers, so put a label on the link around it. Every native `<svg>` prop except `viewBox`.
+The GitHub mark as an inline SVG in the current text color. Hidden from screen readers by default (`aria-hidden="true"`), so put a label on the link around it. Every native `<svg>` prop except `children` and `viewBox`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -346,7 +346,7 @@ The GitHub mark as an inline SVG in the current text color. Always hidden from s
 
 #### `HaruhimeWordmark`
 
-The haruhime.moe wordmark as an inline SVG. It keeps the brand's own white and pink whatever `--hue` is. Every native `<svg>` prop except `viewBox`.
+The haruhime.moe wordmark as an inline SVG. It keeps the brand's own white and pink whatever `--hue` is. Every native `<svg>` prop except `children` and `viewBox`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -515,15 +515,15 @@ The dark top bar: brand on the left, the nav, and an actions slot on the right. 
 
 The link for the current page gets `aria-current="page"` and lights up. A section link gets `aria-current="true"` on pages under it (`/packs` while on `/packs/123`). `/` only matches itself.
 
-Only a path inside the app can be the current page. External URLs, relative hrefs (`#main`, `?page=2`) and text-only entries never are. When no link can be, the nav skips the client list. With only external and text-only entries, it renders on the server alone and nothing in it hydrates. A relative href still renders `next/link`, which hydrates. When a link can be the current page, a small client list marks it.
+Only a path inside the app can be the current page. External URLs, relative hrefs (`#main`, `?page=2`) and text-only entries never are. Since 0.2.0, when no link can be, the nav skips the client list. With only external and text-only entries, it renders on the server alone and nothing in it hydrates. A relative href still renders `next/link`, which hydrates. When a link can be the current page, a small client list marks it. In 0.1.0 the whole nav is a client component, so it always hydrates.
 
-Rendered from a Server Component, `SiteHeader` and `NavLinks` merge the nav's classes on the server, so tailwind-merge stays out of the browser. Rendered inside a Client Component, they merge them in the browser and bring tailwind-merge with them.
+Rendered from a Server Component, `SiteHeader` and `NavLinks` merge the nav's classes on the server, so tailwind-merge stays out of the browser (since 0.2.0; in 0.1.0 the nav always brings tailwind-merge to the browser). Rendered inside a Client Component, they merge them in the browser and bring tailwind-merge with them.
 
 Next bundles every client component a route imports, rendered or not. So a page with `SiteHeader` still downloads the client list's small chunk (mostly `next/link`), even when the nav rendered on the server alone.
 
 #### `NavLinks`
 
-The `<ul>` of links `SiteHeader` uses, for building your own header. Put it inside a `<nav>`. Every native `<ul>` prop. Type: `SiteNavAlign`. It works in Server and Client Components. From a Server Component it behaves like `SiteHeader`'s nav. Inside a Client Component (a header with a menu toggle, say), it renders in the browser with the rest of that component: it merges its classes there, so tailwind-merge ships in that page's bundle.
+The `<ul>` of links `SiteHeader` uses, for building your own header. Put it inside a `<nav>`. Every native `<ul>` prop. Type: `SiteNavAlign`. It works in Server and Client Components. Since 0.2.0 it is a Server Component with a small client part (in 0.1.0 it is a client component). From a Server Component it behaves like `SiteHeader`'s nav. Inside a Client Component (a header with a menu toggle, say), it renders in the browser with the rest of that component: it merges its classes there, so tailwind-merge ships in that page's bundle.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -568,7 +568,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 - `CopyButton` announces "Copied." (or the failure) through an `<output>`, on every press.
 - `Pagination` moves focus to its "Page X of Y" text when the link you pressed goes away on the first or last page.
 - `SiteHeader` marks the current page with `aria-current`. `PageShell` starts with a skip link to `<main>`.
-- `GitHubIcon` is always hidden from screen readers: give the link around it an `aria-label`, as `SiteFooter` does.
+- `GitHubIcon` is hidden from screen readers by default: give the link around it an `aria-label`, as `SiteFooter` does.
 - You supply the text, so you also supply labels: give icon-only buttons an `aria-label`, and keep `label` props meaningful.
 
 ## Compatibility
