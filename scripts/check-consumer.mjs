@@ -304,7 +304,7 @@ try {
   write("postcss.config.mjs", `export default { plugins: { "@tailwindcss/postcss": {} } };\n`);
   write(
     "src/app/globals.css",
-    `@import "tailwindcss";\n@import "@haruhimemoe/ui/theme.css";\n\n:root {\n  --hue: 200;\n}\n`,
+    `@import "tailwindcss";\n@import "@haruhimemoe/ui/theme.css";\n\n:root {\n  --hue: 200;\n  --h2-l: 42%;\n}\n`,
   );
   write("src/app/layout.tsx", LAYOUT);
   write("src/app/page.tsx", PAGE);
@@ -323,6 +323,7 @@ try {
     if (!css.includes(selector)) failures.push(`CSS is missing ${selector} (${from})`);
   }
   if (!css.includes("--hue")) failures.push("CSS is missing the theme's --hue palette");
+  if (!css.includes("--h2-l")) failures.push("CSS is missing the --h2-l lightness override");
 
   const html = path.join(dir, ".next", "server", "app", "index.html");
   if (!existsSync(html)) {

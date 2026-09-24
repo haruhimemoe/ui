@@ -60,8 +60,14 @@ const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: 
 ```css
 :root {
   --hue: 200; /* blue */
+  --h2-l: 42%; /* keeps white text on primary buttons at 4.5:1 */
 }
 ```
+
+At some hues the defaults drop below 4.5:1 contrast, so check yours. Two variables fix it:
+
+- `--h2-l` sets the lightness of `h2` (default `45%`). White text on `h2` (primary buttons, the skip link) is under 4.5:1 for hues from about 23 to 205. Use `42%` at hue 200, `35%` at hue 150, or `31%` for any hue.
+- `--h1-l` sets the lightness of `h1` (default `70%`). `h1` text on `b4` (card links, "Clear filters") is under 4.5:1 for hues from about 222 to 283. Use `77%` there.
 
 The theme is dark only (`color-scheme: dark`).
 

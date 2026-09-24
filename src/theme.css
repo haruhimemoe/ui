@@ -9,8 +9,10 @@
  *         @import "tailwindcss";
  *         @import "@haruhimemoe/ui/theme.css";
  *
- *       Set --hue on :root to recolor everything (default 333, pink). Load Nunito with next/font
- *       as the --font-nunito variable; without it the sans stack falls back to the system font.
+ *       Set --hue on :root to recolor everything (default 333, pink). Some hues need --h2-l
+ *       (h2 lightness, default 45%) or --h1-l (h1 lightness, default 70%) moved to keep text at
+ *       4.5:1; the README lists values. Load Nunito with next/font as the --font-nunito variable;
+ *       without it the sans stack falls back to the system font.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -37,8 +39,8 @@
   --color-c3: hsl(var(--hue) 40% 80%);
   --color-c4: hsl(var(--hue) 40% 70%);
 
-  --color-h1: hsl(var(--hue) 100% 70%);
-  --color-h2: hsl(var(--hue) 50% 45%);
+  --color-h1: hsl(var(--hue) 100% var(--h1-l, 70%));
+  --color-h2: hsl(var(--hue) 50% var(--h2-l, 45%));
 
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 }
