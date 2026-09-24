@@ -194,7 +194,8 @@ The osu!-web panel: rounded, `b4` background, `p-5`. Every native `<section>` pr
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `title` | `ReactNode` | none | Rendered as an `<h2>` at the top. It also names the section (`aria-labelledby`), which makes the card a region landmark. |
+| `title` | `ReactNode` | none | Rendered as a heading at the top (`<h2>` by default). It also names the section (`aria-labelledby`), which makes the card a region landmark. |
+| `headingLevel` | `2 \| 3 \| 4` | `2` | The title's heading level. Use `3` or `4` for a card that sits under another heading, such as a card inside a titled card. |
 
 #### `PageHeader`
 

@@ -1,10 +1,10 @@
 /**
  * @file tests/components/basics/Card.test.tsx
- * @desc Component tests for Card: panel classes, optional h2 title labelling the region, native
- *       props, className, ref, accessibility.
+ * @desc Component tests for Card: panel classes, optional title labelling the region, its heading
+ *       level, native props, className, ref, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -26,6 +26,33 @@ describe("Card", () => {
     expect(region).toHaveAttribute("aria-labelledby", heading.id);
     expect(heading).toHaveClass("mb-2", "font-bold", "text-c1", "text-lg");
     expect(screen.getByText("12 maps")).toBeInTheDocument();
+  });
+
+  it("renders the title at the heading level asked for, still labelling the region", () => {
+    for (const level of [3, 4] as const) {
+      const { unmount } = render(
+        <Card title="Mods" headingLevel={level}>
+          Body
+        </Card>,
+      );
+      const heading = screen.getByRole("heading", { level, name: "Mods" });
+      expect(heading.tagName).toBe(`H${level}`);
+      expect(heading).toHaveClass("mb-2", "font-bold", "text-c1", "text-lg");
+      expect(screen.getByRole("region", { name: "Mods" })).toHaveAttribute(
+        "aria-labelledby",
+        heading.id,
+      );
+      unmount();
+    }
+  });
+
+  it("defaults to an h2 and renders no heading for headingLevel alone", () => {
+    const { container, rerender } = render(<Card title="Stats">Body</Card>);
+    expect(screen.getByRole("heading", { name: "Stats" }).tagName).toBe("H2");
+
+    rerender(<Card headingLevel={3}>Body</Card>);
+    expect(screen.queryByRole("heading")).toBeNull();
+    expect(container.querySelector("section")).not.toHaveAttribute("headinglevel");
   });
 
   it("uses the osu!-web panel classes", () => {
@@ -99,11 +126,14 @@ describe("Card", () => {
     expect(screen.getByRole("region", { name: "Hidden name" })).toBeInTheDocument();
   });
 
-  it("has no axe violations with and without a title", async () => {
+  it("has no axe violations with and without a title, and nested under another card", async () => {
     const { container } = render(
       <main>
         <Card title="Titled">
           <p>Text</p>
+          <Card title="Nested" headingLevel={3}>
+            <p>Inside</p>
+          </Card>
         </Card>
         <Card>
           <p>Untitled</p>
