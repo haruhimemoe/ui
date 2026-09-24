@@ -147,7 +147,8 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider`, `FilterPanel` and `NavLinks` (which `SiteHeader` renders for you). Each file starts with `"use client"`.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`. Each file starts with `"use client"`.
+- **`SiteHeader` and `NavLinks`** are Server Components with a small client part. When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
 A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere.
@@ -492,9 +493,13 @@ The dark top bar: brand on the left, the nav, and an actions slot on the right. 
 
 The link for the current page gets `aria-current="page"` and lights up. A section link gets `aria-current="true"` on pages under it (`/packs` while on `/packs/123`). `/` only matches itself.
 
-#### `NavLinks` (client)
+Only a path inside the app can be the current page. External URLs, relative hrefs (`#main`, `?page=2`) and text-only entries never are. When no link can be, the nav renders on the server alone and nothing in it hydrates. Otherwise a small client list marks the current link. Its classes are merged on the server, so tailwind-merge stays out of the browser either way.
 
-The `<ul>` of links `SiteHeader` uses, for building your own header. Put it inside a `<nav>`. Every native `<ul>` prop. Type: `SiteNavAlign`.
+Next bundles every client component a route imports, rendered or not. So a page with `SiteHeader` still downloads the client list's small chunk (mostly `next/link`), even when the nav rendered on the server alone.
+
+#### `NavLinks`
+
+The `<ul>` of links `SiteHeader` uses, for building your own header. Put it inside a `<nav>`. Every native `<ul>` prop. Type: `SiteNavAlign`. It works in Server and Client Components, with the same server-only path as `SiteHeader` when no link can be the current page.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |

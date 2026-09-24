@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- `SiteHeader` and `NavLinks` no longer send tailwind-merge to the browser on every page. `NavLinks` is now a Server Component: it merges its classes on the server and hands finished class strings to a small client list that only reads the path for `aria-current`. In a Next.js 16 build, the nav's client chunk drops from about 12 KB to 4 KB gzipped. When no link can be the current page (all external or text-only), the list renders on the server alone and nothing in the nav hydrates.
+
 ## [0.1.0] - 2026-09-23
 
 ### Added

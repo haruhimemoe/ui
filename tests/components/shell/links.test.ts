@@ -1,13 +1,18 @@
 /**
  * @file tests/components/shell/links.test.ts
- * @desc Unit tests for the shell's link rules: external href detection and aria-current matching.
+ * @desc Unit tests for the shell's link rules: external href detection, aria-current matching, and
+ *       which hrefs can ever be the current page.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
 import { describe, expect, it } from "vitest";
-import { ariaCurrentFor, isExternalHref } from "../../../src/components/shell/links.js";
+import {
+  ariaCurrentFor,
+  canBeCurrent,
+  isExternalHref,
+} from "../../../src/components/shell/links.js";
 
 describe("isExternalHref", () => {
   it("treats URLs with a scheme and protocol-relative URLs as external", () => {
@@ -56,5 +61,37 @@ describe("ariaCurrentFor", () => {
     expect(ariaCurrentFor("/packs", "https://example.com/packs")).toBeUndefined();
     expect(ariaCurrentFor("/packs", "packs")).toBeUndefined();
     expect(ariaCurrentFor("/packs", "#main")).toBeUndefined();
+  });
+});
+
+describe("canBeCurrent", () => {
+  it("is true for paths in the app, with or without a trailing slash, query or fragment", () => {
+    for (const href of ["/", "/packs", "/packs/", "/guide?tab=1#top", "/#top"]) {
+      expect(canBeCurrent(href), href).toBe(true);
+    }
+  });
+
+  it("is false for external, relative, fragment-only, query-only and empty hrefs", () => {
+    for (const href of [
+      "https://example.com/packs",
+      "//cdn.example.com/packs",
+      "mailto:hi@example.com",
+      "packs",
+      "#main",
+      "?page=2",
+      "",
+    ]) {
+      expect(canBeCurrent(href), href).toBe(false);
+    }
+  });
+
+  it("agrees with ariaCurrentFor: an href it rules out is never marked", () => {
+    const pathnames = ["/", "/packs", "/packs/1", "/guide", "/main"];
+    for (const href of ["https://example.com/packs", "packs", "#main", "?page=2", "main"]) {
+      for (const pathname of pathnames) {
+        expect(ariaCurrentFor(pathname, href), `${href} on ${pathname}`).toBeUndefined();
+      }
+    }
+    expect(pathnames.some((pathname) => ariaCurrentFor(pathname, "/packs"))).toBe(true);
   });
 });

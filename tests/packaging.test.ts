@@ -2,11 +2,13 @@
  * @file tests/packaging.test.ts
  * @desc Checks on what ships: Next subpath imports carry ".js" (next has no exports map, so Node
  *       ESM and Vitest in a consuming app need the file name), every file that uses client hooks
- *       starts with "use client", the Tailwind peer range covers only versions with the utilities
- *       the components use, and no declaration maps point at source that isn't published.
+ *       starts with "use client", the client files that server components render leave
+ *       tailwind-merge out of the browser bundle, the Tailwind peer range covers only versions
+ *       with the utilities the components use, and no declaration maps point at source that isn't
+ *       published.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -23,12 +25,42 @@ const sources = readdirSync(src, { recursive: true, withFileTypes: true })
     return { name: path.relative(root, file), text: readFileSync(file, "utf8") };
   });
 
+const textOf = new Map(sources.map(({ name, text }) => [name, text]));
+
 /** The first statement after the file's header comment. */
 const firstStatement = (text: string): string =>
   text
     .replace(/^\s*\/\*[\s\S]*?\*\/\s*/, "")
     .split("\n")[0]
     ?.trim() ?? "";
+
+const isClient = (name: string): boolean =>
+  firstStatement(textOf.get(name) ?? "") === '"use client";';
+
+/**
+ * The modules a source file loads at runtime, relative ones as source file names. `import type`
+ * is left out: it compiles away. (`import { type X }` stays, since verbatimModuleSyntax keeps it.)
+ */
+const runtimeImports = (name: string): string[] =>
+  [...(textOf.get(name) ?? "").matchAll(/^(?:import|export)\s(?!type\s)[\s\S]*?from "([^"]+)";/gm)]
+    .map((match) => match[1] as string)
+    .map((specifier) => {
+      if (!specifier.startsWith(".")) return specifier;
+      const base = path.join(path.dirname(name), specifier).replace(/\.js$/, "");
+      const file = [`${base}.ts`, `${base}.tsx`].find((candidate) => textOf.has(candidate));
+      if (!file) throw new Error(`${name}: can't resolve ${specifier}`);
+      return file;
+    });
+
+/** Every module a source file loads at runtime, directly or through other source files. */
+const loadsOf = (name: string, seen = new Set<string>()): Set<string> => {
+  for (const target of runtimeImports(name)) {
+    if (seen.has(target)) continue;
+    seen.add(target);
+    if (textOf.has(target)) loadsOf(target, seen);
+  }
+  return seen;
+};
 
 describe("shipped source", () => {
   it("finds the source files", () => {
@@ -57,11 +89,38 @@ describe("shipped source", () => {
       "src/components/actions/PaginationStatus.tsx",
       "src/components/filters/FilterPanel.tsx",
       "src/components/filters/RangeSlider.tsx",
-      "src/components/shell/NavLinks.tsx",
+      "src/components/shell/NavListClient.tsx",
     ]);
     for (const { name, text } of client) {
       expect(firstStatement(text), name).toBe('"use client";');
     }
+  });
+
+  // A client file that a server component renders ships to every page that server component is
+  // on (SiteHeader is on all of them). Such a file takes finished class strings from its server
+  // parent, so tailwind-merge (about 9 KB gzipped) stays on the server.
+  it("keeps tailwind-merge out of the client files that server components render", () => {
+    const rendered = [
+      ...new Set(
+        sources
+          .filter(({ name }) => name !== "src/index.ts" && !isClient(name))
+          .flatMap(({ name }) => runtimeImports(name))
+          .filter(isClient),
+      ),
+    ].sort();
+    for (const name of rendered) {
+      expect([...loadsOf(name)], name).not.toContain("tailwind-merge");
+      expect([...loadsOf(name)], name).not.toContain("src/utils/cx.ts");
+    }
+    expect(rendered).toEqual([
+      "src/components/actions/PaginationStatus.tsx",
+      "src/components/shell/NavListClient.tsx",
+    ]);
+  });
+
+  it("tells a file that pulls in tailwind-merge from one that doesn't", () => {
+    expect(loadsOf("src/components/basics/Card.tsx")).toContain("tailwind-merge");
+    expect(loadsOf("src/components/actions/PaginationStatus.tsx")).not.toContain("tailwind-merge");
   });
 
   it('keeps "use client" on the chip components, which take click handlers', () => {

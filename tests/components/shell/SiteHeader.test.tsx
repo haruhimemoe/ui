@@ -1,10 +1,11 @@
 /**
  * @file tests/components/shell/SiteHeader.test.tsx
- * @desc Component tests for SiteHeader: brand slot, nav from data with aria-current, alignment,
- *       actions slot, native props, keyboard order, accessibility.
+ * @desc Component tests for SiteHeader: brand slot, nav from data with aria-current, a server-only
+ *       nav when no link can be current, alignment, actions slot, native props, keyboard order,
+ *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -16,7 +17,9 @@ import { SiteHeader } from "../../../src/components/shell/SiteHeader.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
 const router = vi.hoisted(() => ({ pathname: "/" as string | null }));
-vi.mock("next/navigation", () => ({ usePathname: () => router.pathname }));
+// The nav's only client hook. No call means the header rendered no client component.
+const usePathname = vi.hoisted(() => vi.fn(() => router.pathname));
+vi.mock("next/navigation", () => ({ usePathname }));
 
 const BRAND = (
   <Link href="/" className="font-extrabold text-c1 text-xl tracking-tight">
@@ -33,6 +36,7 @@ const LINKS = [
 describe("SiteHeader", () => {
   beforeEach(() => {
     router.pathname = "/";
+    usePathname.mockClear();
   });
 
   it("renders a banner with the osu!-web dark bar and the brand first", () => {
@@ -62,6 +66,36 @@ describe("SiteHeader", () => {
     render(<SiteHeader brand={BRAND} links={LINKS} />);
     expect(screen.getByRole("link", { name: "Guides" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "New pack" })).not.toHaveAttribute("aria-current");
+  });
+
+  it("renders the nav on the server alone when no link can be the current page", () => {
+    const offsite = [
+      { href: "https://packs.haruhime.moe", label: "packs" },
+      { href: "mailto:hi@example.com", label: "Mail" },
+      { label: "pools", note: "soon" },
+    ];
+    render(<SiteHeader brand={BRAND} links={offsite} navLabel="Tools" navAlign="center" />);
+    const nav = screen.getByRole("navigation", { name: "Tools" });
+    expect(within(nav).getByRole("list")).toHaveClass("flex-wrap", "justify-center");
+    const packs = within(nav).getByRole("link", { name: "packs" });
+    expect(packs).toHaveAttribute("href", "https://packs.haruhime.moe");
+    expect(packs).toHaveClass("text-c2", "hover:text-c1");
+    expect(packs).not.toHaveAttribute("aria-current");
+    expect(within(nav).getByText("pools")).toHaveAttribute("aria-disabled", "true");
+    expect(usePathname).not.toHaveBeenCalled();
+  });
+
+  it("reads the pathname only once a link can be the current page", () => {
+    render(<SiteHeader brand={BRAND} links={[{ href: "https://osu.ppy.sh", label: "osu!" }]} />);
+    expect(usePathname).not.toHaveBeenCalled();
+
+    render(
+      <SiteHeader
+        brand={BRAND}
+        links={[...LINKS, { href: "https://osu.ppy.sh", label: "osu!" }]}
+      />,
+    );
+    expect(usePathname).toHaveBeenCalled();
   });
 
   it("leaves out the nav when there are no links", () => {

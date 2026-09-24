@@ -1,10 +1,11 @@
 /**
  * @file tests/components/shell/NavLinks.test.tsx
  * @desc Component tests for NavLinks: links from data, aria-current from the pathname, text-only
- *       entries, alignment, keyboard order, accessibility.
+ *       entries, the server-only list when no link can be current, alignment, keyboard order,
+ *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -15,7 +16,9 @@ import { NavLinks } from "../../../src/components/shell/NavLinks.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
 const router = vi.hoisted(() => ({ pathname: "/" as string | null }));
-vi.mock("next/navigation", () => ({ usePathname: () => router.pathname }));
+// The list's only client hook. No call means NavLinks rendered no client component.
+const usePathname = vi.hoisted(() => vi.fn(() => router.pathname));
+vi.mock("next/navigation", () => ({ usePathname }));
 
 const LINKS = [
   { href: "/new", label: "New pack" },
@@ -24,9 +27,17 @@ const LINKS = [
   { label: "pools", note: "soon" },
 ];
 
+// Nothing here can be the current page: external links, a relative one and a text-only entry.
+const OFFSITE = [
+  { href: "https://github.com/haruhimemoe", label: "GitHub" },
+  { href: "#main", label: "Top" },
+  { label: "pools", note: "soon" },
+];
+
 describe("NavLinks", () => {
   beforeEach(() => {
     router.pathname = "/";
+    usePathname.mockClear();
   });
 
   it("renders one list item per entry, links with their hrefs", () => {
@@ -99,6 +110,31 @@ describe("NavLinks", () => {
     expect(ref.current).toBe(list);
     expect(list.className.endsWith(" mt-1")).toBe(true);
     expect(list).toHaveAttribute("data-testid", "nav");
+  });
+
+  it("renders on the server alone, with the same markup, when no link can be the current page", () => {
+    const ref = createRef<HTMLUListElement>();
+    const { container, unmount } = render(
+      <NavLinks ref={ref} links={OFFSITE} align="center" className="mt-1" data-testid="nav" />,
+    );
+    expect(usePathname).not.toHaveBeenCalled();
+    expect(ref.current).toBe(screen.getByTestId("nav"));
+    const serverOnly = container.innerHTML;
+    unmount();
+
+    // The same entries plus one internal link go through the client list. Without that link's
+    // item, the markup matches.
+    const withInternal = render(
+      <NavLinks
+        links={[...OFFSITE, { href: "/new", label: "New pack" }]}
+        align="center"
+        className="mt-1"
+        data-testid="nav"
+      />,
+    ).container;
+    expect(usePathname).toHaveBeenCalled();
+    withInternal.querySelector("li:last-child")?.remove();
+    expect(withInternal.innerHTML).toBe(serverOnly);
   });
 
   it("puts the links in tab order and skips text-only entries", async () => {

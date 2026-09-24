@@ -1,11 +1,12 @@
 /**
  * @file src/components/shell/SiteHeader.tsx
  * @desc Site header, the osu!-web dark bar: a brand slot on the left, nav links from data, and an
- *       actions slot on the right (an account menu, say). A server component; only the nav list
- *       inside is a client component, to mark the current page.
+ *       actions slot on the right (an account menu, say). A server component. The nav list is a
+ *       small client component only when a link can be the current page; with only external or
+ *       text-only links the whole header renders on the server.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";

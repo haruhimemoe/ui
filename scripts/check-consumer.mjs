@@ -6,12 +6,15 @@
  *       It then checks that the build passed, that the emitted CSS holds classes only the library
  *       uses (so the theme's @source line works), and that the page prerendered with client
  *       components inside, including a data-only FilterPanel straight from the Server Component
- *       page. Before the build, plain Node imports the installed package, the way Vitest in a
- *       consuming app does. Usage: `node scripts/check-consumer.mjs [--keep]` (--keep leaves the
- *       app in the temp dir). Needs the npm registry and Google Fonts.
+ *       page, and a NavLinks with no internal link that renders on the server alone. Two
+ *       header-only pages check the nav's bundle: the client list loads no tailwind-merge, and
+ *       with only external links the page never references it. Before the build, plain Node
+ *       imports the installed package, the way Vitest in a consuming app does. Usage:
+ *       `node scripts/check-consumer.mjs [--keep]` (--keep leaves the app in the temp dir). Needs
+ *       the npm registry and Google Fonts.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
 import { execFileSync } from "node:child_process";
@@ -47,6 +50,20 @@ const write = (file, text) => {
   mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
   writeFileSync(path.join(dir, file), text);
 };
+
+/** A prerendered route's HTML and the JavaScript its script tags load, or null if it's missing. */
+const readRoute = (name) => {
+  const file = path.join(dir, ".next", "server", "app", `${name}.html`);
+  if (!existsSync(file)) return null;
+  const html = readFileSync(file, "utf8");
+  const scripts = [...html.matchAll(/<script src="\/_next\/([^"?]+\.js)/g)].map((match) =>
+    readFileSync(path.join(dir, ".next", match[1]), "utf8"),
+  );
+  return { html, scripts };
+};
+
+// A class group name from tailwind-merge's default config: in a chunk, it means tailwind-merge.
+const TAILWIND_MERGE = "fvn-normal";
 
 /** Every CSS file under a directory, read and joined. */
 const readCss = (from) =>
@@ -103,6 +120,12 @@ const LINKS: SiteLinkItem[] = [
   { label: "Pools", note: "soon" },
 ];
 
+// No path in the app, so NavLinks renders these on the server with no client list.
+const OFFSITE: SiteLinkItem[] = [
+  { label: "osu! wiki", href: "https://osu.ppy.sh/wiki" },
+  { label: "Sheets", note: "soon" },
+];
+
 const COLUMNS: SiteFooterColumn[] = [
   { title: "Site", items: [{ label: "Home", href: "/" }, { label: "Sheets", note: "soon" }] },
   { title: "Elsewhere", items: [{ label: "osu!", href: "https://osu.ppy.sh" }] },
@@ -129,6 +152,9 @@ export default function Page() {
       />
       <nav aria-label="Secondary">
         <NavLinks links={LINKS} align="center" />
+      </nav>
+      <nav aria-label="Elsewhere">
+        <NavLinks links={OFFSITE} />
       </nav>
       <Card title="Basics">
         <Button>Primary</Button>
@@ -232,6 +258,14 @@ export function Filters() {
 }
 `;
 
+// A page with nothing but the header, so its scripts are the header's own.
+const headerPage = (links) => `import { SiteHeader } from "@haruhimemoe/ui";
+
+export default function Page() {
+  return <SiteHeader brand={<a href="/">consumer</a>} links={${JSON.stringify(links)}} />;
+}
+`;
+
 const LAYOUT = `import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import type { ReactNode } from "react";
@@ -318,6 +352,20 @@ try {
   write("src/app/layout.tsx", LAYOUT);
   write("src/app/page.tsx", PAGE);
   write("src/app/Filters.tsx", FILTERS);
+  write(
+    "src/app/header/page.tsx",
+    headerPage([
+      { label: "Header", href: "/header" },
+      { label: "osu!", href: "https://osu.ppy.sh" },
+    ]),
+  );
+  write(
+    "src/app/offsite/page.tsx",
+    headerPage([
+      { label: "osu!", href: "https://osu.ppy.sh" },
+      { label: "Pools", note: "soon" },
+    ]),
+  );
 
   console.log(`consumer: installing into ${dir}`);
   run("bun", ["install", "--no-progress"]);
@@ -343,11 +391,11 @@ try {
   if (!css.includes("--hue")) failures.push("CSS is missing the theme's --hue palette");
   if (!css.includes("--h2-l")) failures.push("CSS is missing the --h2-l lightness override");
 
-  const html = path.join(dir, ".next", "server", "app", "index.html");
-  if (!existsSync(html)) {
+  const index = readRoute("index");
+  if (!index) {
     failures.push("/ did not prerender (.next/server/app/index.html is missing)");
   } else {
-    const page = readFileSync(html, "utf8");
+    const page = index.html;
     // Markup only the named component renders: props also show up in the RSC payload, and
     // Pagination's status span carries aria-current too, so plain strings could match elsewhere.
     const expected = [
@@ -362,17 +410,49 @@ try {
         /<a\b(?=[^>]*aria-current="page")(?=[^>]*href="\/")[^>]*>/,
         "NavLinks marking the current page (client)",
       ],
+      [
+        /<a[^>]*href="https:\/\/osu\.ppy\.sh\/wiki"[^>]*>osu! wiki<\/a>/,
+        "NavLinks on the server alone",
+      ],
       [/<script type="application\/ld\+json">/, "JsonLd"],
     ];
     for (const [pattern, from] of expected) {
       if (!pattern.test(page)) failures.push(`prerendered / is missing ${pattern} (${from})`);
     }
+    // CopyButton and the filters merge classes in the browser, so / must show the marker. If it
+    // doesn't, the /header check below can't see tailwind-merge either.
+    if (!index.scripts.some((js) => js.includes(TAILWIND_MERGE))) {
+      failures.push(
+        `/ loads no script with "${TAILWIND_MERGE}"; the tailwind-merge marker is stale`,
+      );
+    }
+  }
+
+  const header = readRoute("header");
+  if (!header) {
+    failures.push("/header did not prerender");
+  } else {
+    if (!/<a\b(?=[^>]*aria-current="page")(?=[^>]*href="\/header")[^>]*>/.test(header.html)) {
+      failures.push("/header is missing its current link (the nav's client list)");
+    }
+    if (header.scripts.some((js) => js.includes(TAILWIND_MERGE))) {
+      failures.push("/header loads tailwind-merge; the nav's client list must not");
+    }
+  }
+
+  const offsite = readRoute("offsite");
+  if (!offsite) {
+    failures.push("/offsite did not prerender");
+  } else if (offsite.html.includes("NavListClient")) {
+    failures.push("/offsite references NavListClient, though none of its links can be current");
   }
 
   if (failures.length > 0) {
     throw new Error(`${failures.join("\n")}\n\nnext build output:\n${build}`);
   }
-  console.log("consumer: ok (next build passed, library CSS generated, / prerendered)");
+  console.log(
+    "consumer: ok (next build passed, library CSS generated, pages prerendered, nav bundle lean)",
+  );
 } catch (error) {
   console.error(`consumer: FAILED\n${error.stdout ?? ""}${error.stderr ?? error.message}`);
   process.exitCode = 1;

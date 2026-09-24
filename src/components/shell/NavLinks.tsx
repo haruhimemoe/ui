@@ -1,19 +1,18 @@
 /**
  * @file src/components/shell/NavLinks.tsx
- * @desc The header's nav list. A client component only so it can read the current path and set
- *       aria-current on the matching link; SiteHeader around it stays a server component.
+ * @desc The header's nav list. Server-safe: it merges the classes here, then renders the list on
+ *       the server when no link can be the current page (all external or text-only), or hands it
+ *       to the small NavListClient, which reads the path to set aria-current.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Thu Sep 24, 2026
  */
 
-"use client";
-
-import { usePathname } from "next/navigation.js";
 import type { ComponentProps } from "react";
 import { cx } from "../../utils/cx.js";
-import { AutoLink } from "./AutoLink.js";
-import { ariaCurrentFor, type SiteLinkItem } from "./links.js";
+import { canBeCurrent, type SiteLinkItem } from "./links.js";
+import { NavItem, navItemKey } from "./NavItem.js";
+import { NavListClient } from "./NavListClient.js";
 
 /** Where the nav sits in the header: after the brand ("start") or centered in the free space. */
 export type SiteNavAlign = "start" | "center";
@@ -40,41 +39,28 @@ const CURRENT = "text-c1 transition-colors";
  * @function NavLinks
  * @param props {NavLinksProps} the links (items without `href` show as dimmed text with their
  *        `note`), the alignment (default "start") and native list props
- * @returns {JSX.Element} a `<ul>` of links, the one for the current path marked aria-current
+ * @returns {JSX.Element} a `<ul>` of links, the one for the current path marked aria-current.
+ *          When no link can be current, the list renders on the server alone: nothing hydrates
+ *          and nothing reads the path.
  */
 export function NavLinks({ links, align = "start", className, ...props }: NavLinksProps) {
-  const pathname = usePathname();
+  const listClassName = cx(LISTS[align], className);
+  if (!links.some((item) => item.href && canBeCurrent(item.href))) {
+    return (
+      <ul className={listClassName} {...props}>
+        {links.map((item) => (
+          <NavItem key={navItemKey(item)} item={item} linkClassName={LINKS[align]} />
+        ))}
+      </ul>
+    );
+  }
   return (
-    <ul className={cx(LISTS[align], className)} {...props}>
-      {links.map((item) => {
-        if (!item.href) {
-          return (
-            <li key={item.label}>
-              <span aria-disabled="true" className="text-c4">
-                {item.label}
-                {item.note ? (
-                  <>
-                    {" "}
-                    <span className="text-xs uppercase tracking-wide">{item.note}</span>
-                  </>
-                ) : null}
-              </span>
-            </li>
-          );
-        }
-        const current = ariaCurrentFor(pathname, item.href);
-        return (
-          <li key={item.href}>
-            <AutoLink
-              href={item.href}
-              aria-current={current}
-              className={current ? CURRENT : LINKS[align]}
-            >
-              {item.label}
-            </AutoLink>
-          </li>
-        );
-      })}
-    </ul>
+    <NavListClient
+      links={links}
+      linkClassName={LINKS[align]}
+      currentClassName={CURRENT}
+      className={listClassName}
+      {...props}
+    />
   );
 }
