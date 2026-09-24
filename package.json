@@ -54,6 +54,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
+    "check:consumer": "node scripts/check-consumer.mjs",
     "prepublishOnly": "bun run check && bun run typecheck && bun run test && bun run build"
   },
   "peerDependencies": {

@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   verify:
-    name: check · typecheck · test · build
+    name: check · typecheck · test · build · consumer
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -43,3 +43,8 @@ jobs:
       # After a build, so the dry run lists what would really ship.
       - name: Build and pack (dry run)
         run: bun run build && npm pack --dry-run
+
+      # Installs the packed tarball into a throwaway Next.js 16 + Tailwind 4 app, renders every
+      # component on one page and runs `next build`.
+      - name: Consumer check
+        run: bun run check:consumer
