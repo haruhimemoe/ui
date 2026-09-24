@@ -4,8 +4,9 @@
  *       ESM and Vitest in a consuming app need the file name), every file that uses client hooks
  *       starts with "use client", the client files that server components render leave
  *       tailwind-merge out of the browser bundle, the Tailwind peer range covers only versions
- *       with the utilities the components use, and no declaration maps point at source that isn't
- *       published.
+ *       with the utilities the components use, no declaration maps point at source that isn't
+ *       published, and the changelog matches the package version, links every release, and
+ *       holds only fixes in a 0.x patch release.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Thu Sep 24, 2026
@@ -142,5 +143,55 @@ describe("package manifest and build", () => {
   it("emits no declaration maps, since src is not published", () => {
     expect(pkg.files).not.toContain("src");
     expect(build.compilerOptions.declarationMap).not.toBe(true);
+  });
+});
+
+describe("changelog", () => {
+  const pkg = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
+  const changelog = readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
+  const releases = [
+    ...changelog.matchAll(/^## \[(\d+)\.(\d+)\.(\d+)\] - \d{4}-\d{2}-\d{2}$/gm),
+  ].map((match) => ({
+    version: `${match[1]}.${match[2]}.${match[3]}`,
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3]),
+    notes: changelog.slice((match.index ?? 0) + match[0].length).split(/^## |^\[/m)[0] ?? "",
+  }));
+  const repo = "https://github.com/haruhimemoe/ui";
+
+  it("heads its newest release with the package version", () => {
+    expect(releases.length).toBeGreaterThan(0);
+    expect(releases[0]?.version).toBe(pkg.version);
+  });
+
+  it("links Unreleased and every release to its diff", () => {
+    const links = [...changelog.matchAll(/^\[([^\]]+)\]: (\S+)$/gm)].map((match) => match.slice(1));
+    const expected = [
+      ["unreleased", `${repo}/compare/v${releases[0]?.version}...HEAD`],
+      ...releases.map(({ version }, i) => {
+        const previous = releases[i + 1];
+        return [
+          version,
+          previous
+            ? `${repo}/compare/v${previous.version}...v${version}`
+            : `${repo}/releases/tag/v${version}`,
+        ];
+      }),
+    ];
+    expect(links).toEqual(expected);
+  });
+
+  // While on 0.x, a new API or a change to how a component looks is a minor version, so a patch
+  // release holds fixes only: an app on ^0.1.0 takes any 0.1.x without asking.
+  it("bumps the minor version, while on 0.x, for a release that adds or changes anything", () => {
+    for (const [i, release] of releases.entries()) {
+      const previous = releases[i + 1];
+      if (!previous || release.major > 0) continue;
+      const sections = [...release.notes.matchAll(/^### (\w+)$/gm)].map((match) => match[1]);
+      if (sections.every((section) => section === "Fixed" || section === "Security")) continue;
+      expect(release.patch, `${release.version} has ${sections.join(", ")}`).toBe(0);
+      expect(release.minor, release.version).toBe(previous.minor + 1);
+    }
   });
 });
