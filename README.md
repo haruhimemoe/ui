@@ -384,7 +384,7 @@ export function PackFilters({ count }: { count: number }) {
 }
 ```
 
-Give the `ChipGroup` or `RangeSlider` inside a `FilterRow` `hideLabel`, so the label shows once.
+Give the `ChipGroup` or `RangeSlider` inside a `FilterRow` `hideLabel`. The row's label then shows once, and screen readers hear the row's name once instead of two nested groups with the same name.
 
 #### `Chip` (client)
 
@@ -405,7 +405,7 @@ A labelled row of chips for picking several values (mods, game modes). A `<field
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `label` | `ReactNode` | required | Names the group. |
-| `hideLabel` | `boolean` | `false` | Keep the label for screen readers only. |
+| `hideLabel` | `boolean` | `false` | For use inside a `FilterRow`, which names the row: the label doesn't render and the fieldset isn't a group of its own (`role="none"`). `disabled` still reaches every chip. |
 | `options` | `readonly ChipOption[]` | required | `{ value: string; label: ReactNode; disabled?: boolean }` for each chip. |
 | `value` | `readonly string[]` | required | The picked values. |
 | `onChange` | `(value: string[]) => void` | required | Gets the new picked values, in the options' order, without duplicates. |
@@ -417,7 +417,7 @@ Two thumbs on one track with an editable box at each end, for star rating, lengt
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `label` | `string` | required | Names the group, and the ends as "Minimum *label*" and "Maximum *label*". |
-| `hideLabel` | `boolean` | `false` | Keep the label for screen readers only. |
+| `hideLabel` | `boolean` | `false` | For use inside a `FilterRow`, which names the row: the label doesn't show and the fieldset isn't a group of its own (`role="none"`). The ends keep their "Minimum *label*" and "Maximum *label*" names. |
 | `min`, `max` | `number` | required | The bounds. |
 | `step` | `number` | `1` | Step between values. Typed values snap to it. |
 | `value` | `readonly [number, number \| null]` | required | The range. A `null` top means no upper limit. |
@@ -518,7 +518,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 - Focus is always visible: the theme draws an `h1` outline on `:focus-visible`. Fields show focus with an `h1` border instead (plus an `h1` ring when invalid), and `RangeSlider` thumbs with a solid `h1` ring. Those keep a transparent outline, so Windows high contrast mode (forced colors) still shows focus.
 - In forced colors mode, a pressed `Chip` takes the system highlight colors, so on and off still look different.
 - Form fields link their label, hint and error. An error sets `aria-invalid` and is announced.
-- `Chip` uses `aria-pressed`. `ChipGroup`, `RangeSlider` and `FilterRow` are fieldsets named by their label. `RangeSlider`'s thumbs are native range inputs with `aria-valuetext`, so "10+" reads as it shows.
+- `Chip` uses `aria-pressed`. `ChipGroup`, `RangeSlider` and `FilterRow` are fieldsets named by their label. Inside a `FilterRow`, `hideLabel` leaves the naming to the row, so each row is announced once. `RangeSlider`'s thumbs are native range inputs with `aria-valuetext`, so "10+" reads as it shows.
 - `FilterPanel`'s phone toggle carries `aria-expanded` and `aria-controls`. The result count is a live region. When "Clear filters" disappears after use, focus moves to the panel's heading instead of getting lost.
 - `CopyButton` announces "Copied." (or the failure) through an `<output>`.
 - `SiteHeader` marks the current page with `aria-current`. `PageShell` starts with a skip link to `<main>`.

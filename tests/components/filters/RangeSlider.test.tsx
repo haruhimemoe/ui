@@ -527,7 +527,7 @@ describe("RangeSlider props and accessibility", () => {
     }
   });
 
-  it("keeps the label for screen readers only with hideLabel", () => {
+  it("leaves the group name to a surrounding FilterRow with hideLabel, keeping the end names", () => {
     render(
       <RangeSlider
         label="BPM"
@@ -536,10 +536,13 @@ describe("RangeSlider props and accessibility", () => {
         max={300}
         value={[60, 300]}
         onChange={() => {}}
+        disabled
       />,
     );
-    expect(screen.getByRole("group", { name: "BPM" })).toBeInTheDocument();
-    expect(screen.getByText("BPM")).toHaveClass("sr-only");
+    expect(screen.queryByRole("group")).toBeNull();
+    expect(screen.queryByText("BPM")).toBeNull();
+    expect(screen.getByRole("slider", { name: "Minimum BPM" })).toBeDisabled();
+    expect(screen.getByRole("textbox", { name: "Maximum BPM" })).toBeDisabled();
   });
 
   it("appends a caller className and passes native props and a ref through", () => {

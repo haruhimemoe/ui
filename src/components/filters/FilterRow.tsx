@@ -21,7 +21,7 @@ export type FilterRowProps = ComponentProps<"fieldset"> & {
  * @param props {FilterRowProps} the label, the row's controls as children, and native fieldset
  *        props
  * @returns {JSX.Element} a `<fieldset>` (role group) labeled by its label column. Give a
- *          ChipGroup or RangeSlider inside it `hideLabel` so the label shows once.
+ *          ChipGroup or RangeSlider inside it `hideLabel`, so the label shows and is read once.
  */
 export function FilterRow({ label, className, children, ...props }: FilterRowProps) {
   const labelId = useId();

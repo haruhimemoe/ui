@@ -27,7 +27,10 @@ export type RangeSliderValue = [number, number | null];
 export type RangeSliderProps = Omit<ComponentProps<"fieldset">, "onChange" | "children"> & {
   /** Names the group, and the ends as "Minimum <label>" and "Maximum <label>". */
   label: string;
-  /** Keep the label for screen readers but hide it on screen (e.g. inside a FilterRow). */
+  /**
+   * Leave the group name to a surrounding FilterRow: no label shows, and the fieldset is not a
+   * group of its own (role none). The ends are still named from `label`.
+   */
   hideLabel?: boolean | undefined;
   min: number;
   max: number;
@@ -89,10 +92,10 @@ const BOX =
  * @param props {RangeSliderProps} label, bounds, step, the current range and a change handler,
  *        plus native fieldset props. `onChange`, `format` and `parse` are functions, so render this
  *        from client code.
- * @returns {JSX.Element} a `<fieldset>` (role group) with a low box, two slider thumbs on one
- *          track, and a high box. Arrow keys move a thumb one step, Page Up/Down ten steps,
- *          Home/End as far as it can go. The boxes commit on blur or Enter; Escape puts the value
- *          back.
+ * @returns {JSX.Element} a `<fieldset>` (role group, or role none with `hideLabel`) with a low
+ *          box, two slider thumbs on one track, and a high box. Arrow keys move a thumb one step,
+ *          Page Up/Down ten steps, Home/End as far as it can go. The boxes commit on blur or
+ *          Enter; Escape puts the value back.
  */
 export function RangeSlider({
   label,
@@ -209,14 +212,18 @@ export function RangeSlider({
 
   return (
     <fieldset
-      aria-labelledby={labelId}
+      // Inside a FilterRow (hideLabel), the row's fieldset is the group; see ChipGroup.
+      role={hideLabel ? "none" : undefined}
+      aria-labelledby={hideLabel ? undefined : labelId}
       disabled={disabled}
       className={cx("flex flex-col gap-2 disabled:opacity-50", className)}
       {...props}
     >
-      <span id={labelId} className={hideLabel ? "sr-only" : "font-bold text-c3 text-sm"}>
-        {label}
-      </span>
+      {hideLabel ? null : (
+        <span id={labelId} className="font-bold text-c3 text-sm">
+          {label}
+        </span>
+      )}
       <div className="flex items-center gap-3">
         {box("low")}
         <div className="relative h-5 min-w-0 flex-1">

@@ -51,10 +51,18 @@ describe("ChipGroup", () => {
     expect(screen.getByText("Mods")).toHaveClass("font-bold", "text-c3", "text-sm");
   });
 
-  it("keeps the label for screen readers only with hideLabel", () => {
+  it("leaves the naming to a surrounding FilterRow with hideLabel: no label, no group", () => {
     render(<ChipGroup label="Mode" hideLabel options={MODS} value={[]} onChange={() => {}} />);
-    expect(screen.getByRole("group", { name: "Mode" })).toBeInTheDocument();
-    expect(screen.getByText("Mode")).toHaveClass("sr-only");
+    expect(screen.queryByRole("group")).toBeNull();
+    expect(screen.queryByText("Mode")).toBeNull();
+    expect(screen.getAllByRole("button")).toHaveLength(MODS.length);
+  });
+
+  it("still disables every chip with hideLabel", () => {
+    render(
+      <ChipGroup label="Mode" hideLabel options={MODS} value={[]} onChange={() => {}} disabled />,
+    );
+    for (const chip of screen.getAllByRole("button")) expect(chip).toBeDisabled();
   });
 
   it("presses the chips whose values are picked", () => {

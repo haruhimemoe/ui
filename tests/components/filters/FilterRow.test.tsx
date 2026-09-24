@@ -36,7 +36,7 @@ describe("FilterRow", () => {
     expect(screen.getByText("controls")).toHaveClass("min-w-0", "flex-1");
   });
 
-  it("holds a ChipGroup and a RangeSlider whose own labels are hidden", async () => {
+  it("holds a ChipGroup and a RangeSlider with hideLabel, naming each row's group once", async () => {
     const user = userEvent.setup();
     render(
       <div>
@@ -61,10 +61,16 @@ describe("FilterRow", () => {
         </FilterRow>
       </div>,
     );
-    const [row, chips] = screen.getAllByRole("group", { name: "Mods" });
-    expect(row).toContainElement(chips as HTMLElement);
-    expect(screen.getAllByText("BPM")).toHaveLength(2);
-    expect(screen.getAllByText("BPM")[1]).toHaveClass("sr-only");
+    // One group per row, so a screen reader says "Mods grouping" once, not twice.
+    const groups = screen.getAllByRole("group");
+    expect(groups).toHaveLength(2);
+    expect(screen.getByRole("group", { name: "Mods" })).toContainElement(
+      screen.getByRole("button", { name: "HD" }),
+    );
+    expect(screen.getByRole("group", { name: "BPM" })).toContainElement(
+      screen.getByRole("slider", { name: "Minimum BPM" }),
+    );
+    expect(screen.getAllByText("BPM")).toHaveLength(1);
 
     await user.tab();
     expect(screen.getByRole("button", { name: "HD" })).toHaveFocus();

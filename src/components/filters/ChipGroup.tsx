@@ -24,7 +24,10 @@ export type ChipOption = {
 export type ChipGroupProps = Omit<ComponentProps<"fieldset">, "onChange" | "children"> & {
   /** Names the group (`role="group"` + `aria-labelledby`). */
   label: ReactNode;
-  /** Keep the label for screen readers but hide it on screen (e.g. inside a FilterRow). */
+  /**
+   * Leave the name to a surrounding FilterRow: no label shows, and the fieldset is not a group
+   * of its own (role none), so screen readers hear the row's name once.
+   */
   hideLabel?: boolean | undefined;
   options: readonly ChipOption[];
   /** The picked values. */
@@ -60,7 +63,8 @@ const toggleValue = (
  * @param props {ChipGroupProps} label, options, picked values and a change handler, plus native
  *        fieldset props (`disabled` turns off every chip). `onChange` is a function, so render
  *        this from client code.
- * @returns {JSX.Element} a `<fieldset>` (role group) labeled by its label, one Chip per option
+ * @returns {JSX.Element} a `<fieldset>` (role group) labeled by its label, one Chip per option.
+ *          With `hideLabel`, the fieldset has role none and no label.
  */
 export function ChipGroup({
   label,
@@ -73,10 +77,19 @@ export function ChipGroup({
 }: ChipGroupProps) {
   const labelId = useId();
   return (
-    <fieldset aria-labelledby={labelId} className={cx("flex flex-col gap-2", className)} {...props}>
-      <span id={labelId} className={hideLabel ? "sr-only" : "font-bold text-c3 text-sm"}>
-        {label}
-      </span>
+    <fieldset
+      // Inside a FilterRow (hideLabel), the row's fieldset is the group. A second group with the
+      // same name would be read twice. The fieldset stays, so `disabled` still reaches every chip.
+      role={hideLabel ? "none" : undefined}
+      aria-labelledby={hideLabel ? undefined : labelId}
+      className={cx("flex flex-col gap-2", className)}
+      {...props}
+    >
+      {hideLabel ? null : (
+        <span id={labelId} className="font-bold text-c3 text-sm">
+          {label}
+        </span>
+      )}
       <div className="flex flex-wrap items-center gap-1">
         {options.map((option) => (
           <Chip
