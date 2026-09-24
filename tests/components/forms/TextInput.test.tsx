@@ -74,6 +74,30 @@ describe("TextInput", () => {
     expect(input).toHaveAttribute("aria-invalid", "true");
   });
 
+  it("takes block content (a list of errors) in the hint and error without invalid nesting", () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    render(
+      <TextInput
+        id="name"
+        label="Name"
+        hint={
+          <ul>
+            <li>Letters and digits</li>
+          </ul>
+        }
+        error={
+          <ul>
+            <li>Too short.</li>
+            <li>No spaces.</li>
+          </ul>
+        }
+      />,
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent("Too short.No spaces.");
+    expect(logged).not.toHaveBeenCalled();
+    logged.mockRestore();
+  });
+
   it("keeps both description ids whatever the control's id looks like", () => {
     render(<TextInput id="text" label="Text" hint="Hint." error="Error." />);
     expect(screen.getByRole("textbox")).toHaveAttribute("aria-describedby", "text-hint text-error");

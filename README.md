@@ -25,7 +25,14 @@ bun add -d tailwindcss @tailwindcss/postcss
 
 ## Setup
 
-**1. Import the theme after Tailwind** in the app's global stylesheet:
+**1. Load Tailwind through PostCSS** (skip this if the app already uses Tailwind 4). Without this file Next generates no utilities, and the components render unstyled with no build error.
+
+```js
+// postcss.config.mjs
+export default { plugins: { "@tailwindcss/postcss": {} } };
+```
+
+**2. Import the theme after Tailwind** in the app's global stylesheet:
 
 ```css
 /* src/app/globals.css */
@@ -45,7 +52,7 @@ The theme does three things:
 | `c1` to `c4` | Text, brightest (`c1`) to most muted (`c4`) |
 | `h1`, `h2` | Highlights: `h1` is the bright accent, `h2` the deeper one (primary buttons) |
 
-**2. Load Nunito** with `next/font` as the `--font-nunito` variable on `<html>`. The theme's `font-sans` uses it, and falls back to the system font without it.
+**3. Load Nunito** with `next/font` as the `--font-nunito` variable on `<html>`. The theme's `font-sans` uses it, and falls back to the system font without it.
 
 ```tsx
 import { Nunito } from "next/font/google";
@@ -55,7 +62,7 @@ const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: 
 // <html lang="en" className={nunito.variable}>
 ```
 
-**3. Pick a hue (optional).** Every color comes from one `--hue` (default 333, pink). Set it on `:root` after the imports to recolor the whole app:
+**4. Pick a hue (optional).** Every color comes from one `--hue` (default 333, pink). Set it on `:root` after the imports to recolor the whole app:
 
 ```css
 :root {
@@ -148,7 +155,7 @@ A Server Component can't pass a function to a Client Component. So callback prop
 ## Props, classes and refs
 
 - Every component takes its element's native props and passes them through (`id`, `aria-*`, `data-*`, event handlers). The tables below list only the extra props.
-- `ref` is a normal prop (React 19). It reaches the main element.
+- `ref` is a normal prop (React 19). Like the native props, it goes on the component's outer element (for `PageShell`, the wrapper `<div>`, not `<main>`).
 - `className` is added after the built-in classes and wins on conflict: a class that sets the same property as a built-in one replaces it (merged with [tailwind-merge](https://github.com/dcastil/tailwind-merge)). `<Select className="w-auto">` drops the built-in `w-full`.
 
 ## Components
@@ -206,8 +213,16 @@ Short status text in one of three tones. Every native `<p>` prop. Type: `NoticeT
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `tone` | `"info" \| "warning" \| "error"` | `"info"` | `text-c3`, `text-amber-300` or `text-rose-300`, at `text-sm`. |
-| `live` | `boolean` | `false` | Announce it when it appears: `role="alert"` for errors, `role="status"` for the others. A `role` you pass wins. |
+| `live` | `boolean` | `false` | Make it a live region: `role="alert"` for errors, `role="status"` for the others. A `role` you pass wins. See below. |
 | `as` | `"p" \| "div"` | `"p"` | Use `"div"` for block content such as a list of errors. |
+
+A `status` region is only reliably announced when its content changes while it is on the page. A `live` info or warning notice that mounts with its text already inside (`{saved && <Notice live>Saved.</Notice>}`) can go unannounced. Keep it mounted and change its children, empty while there is nothing to say:
+
+```tsx
+<Notice live>{saved ? "Saved." : ""}</Notice>
+```
+
+An error notice (`role="alert"`) is announced either way.
 
 #### `Prose`
 
@@ -223,8 +238,8 @@ Shared props (type `FieldProps`), taken by `TextInput`, `Textarea`, `Select` and
 | --- | --- | --- | --- |
 | `id` | `string` | required | The control's id. The label points at it. The hint gets `<id>-hint` and the error `<id>-error`. |
 | `label` | `ReactNode` | required | The visible label. |
-| `hint` | `ReactNode` | none | Help text, linked with `aria-describedby`. |
-| `error` | `ReactNode` | none | Error text in a `role="alert"` paragraph (`text-rose-300`). Sets `aria-invalid` and links the text with `aria-describedby`. |
+| `hint` | `ReactNode` | none | Help text in a `<div>`, linked with `aria-describedby`. On `Checkbox` the hint sits inline inside the label, so keep it to text there. |
+| `error` | `ReactNode` | none | Error text in a `role="alert"` `<div>` (`text-rose-300`), so a list of errors is fine. Sets `aria-invalid` and links the text with `aria-describedby`. |
 | `wrapperClassName` | `string` | none | Classes for the wrapper around the label, control, hint and error, for layout (`min-w-48 flex-1`). |
 
 `className` goes on the control itself. Your own `aria-describedby` is kept after the hint and error ids.
@@ -502,7 +517,7 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark and a GitHub 
 
 #### `PageShell`
 
-The page frame: a skip link, the header, `<main>` and the footer, with the footer held to the bottom on short pages. Every native `<div>` prop.
+The page frame: a skip link, the header, `<main>` and the footer, with the footer held to the bottom on short pages. Every native `<div>` prop; they and `ref` go on the outer wrapper `<div>`. Use `mainId` and `mainClassName` for `<main>`, and `document.getElementById(mainId)` to reach it from script.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |

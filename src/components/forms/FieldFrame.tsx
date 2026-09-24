@@ -2,7 +2,7 @@
  * @file src/components/forms/FieldFrame.tsx
  * @desc Internal layout shared by the form fields: label on top, the control, then the hint and
  *       the error. Ids derive from the control's required id, so the fields need no useId and stay
- *       server components.
+ *       server components. The hint and error sit in `<div>`s, so they can hold a list.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -17,9 +17,9 @@ export type FieldProps = {
   id: string;
   /** Visible label text. */
   label: ReactNode;
-  /** Help text under the control, linked with aria-describedby. */
+  /** Help text under the control, linked with aria-describedby. Checkbox shows it inline. */
   hint?: ReactNode | undefined;
-  /** Error text under the control. Marks the control aria-invalid and links it. */
+  /** Error text under the control (a list is fine). Marks the control aria-invalid and links it. */
   error?: ReactNode | undefined;
   /** Classes for the wrapper around the label, control, hint and error (layout, width). */
   wrapperClassName?: string | undefined;
@@ -60,13 +60,14 @@ export const fieldDescribedBy = (
 /**
  * @function FieldError
  * @param props {{ id: string; error?: ReactNode }} the control's id and the error, if any
- * @returns {JSX.Element | null} the error paragraph, or nothing without an error
+ * @returns {JSX.Element | null} the error in a `<div>` (block content like a list is fine), or
+ *          nothing without an error
  */
 export function FieldError({ id, error }: { id: string; error?: ReactNode | undefined }) {
   return error ? (
-    <p id={errorId(id)} role="alert" className="text-rose-300 text-sm">
+    <div id={errorId(id)} role="alert" className="text-rose-300 text-sm">
       {error}
-    </p>
+    </div>
   ) : null;
 }
 
@@ -89,9 +90,9 @@ export function FieldFrame({ id, label, hint, error, className, children }: Fiel
       </label>
       {children}
       {hint ? (
-        <p id={hintId(id)} className="text-c4 text-xs">
+        <div id={hintId(id)} className="text-c4 text-xs">
           {hint}
-        </p>
+        </div>
       ) : null}
       <FieldError id={id} error={error} />
     </div>

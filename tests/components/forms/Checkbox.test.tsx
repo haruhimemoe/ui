@@ -15,6 +15,24 @@ import { Checkbox } from "../../../src/components/forms/Checkbox.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
 describe("Checkbox", () => {
+  it("takes a list of errors without invalid nesting", () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    render(
+      <Checkbox
+        id="terms"
+        label="I agree"
+        error={
+          <ul>
+            <li>Required.</li>
+          </ul>
+        }
+      />,
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent("Required.");
+    expect(logged).not.toHaveBeenCalled();
+    logged.mockRestore();
+  });
+
   it("renders a checkbox named by its label alone, described by its hint", () => {
     render(
       <Checkbox
