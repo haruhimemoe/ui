@@ -1,7 +1,8 @@
 /**
  * @file src/components/filters/Chip.tsx
  * @desc Toggle pill (osu! beatmap listing style): a `<button>` with `aria-pressed`, pink when on.
- *       Same look as the mod chips on packs.haruhime.moe.
+ *       Same look as the mod chips on packs.haruhime.moe. In forced-colors mode a pressed chip
+ *       takes the system highlight colors, so on and off still look different.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -23,7 +24,7 @@ export type ChipProps = Omit<ComponentProps<"button">, "aria-pressed"> & {
 const BASE =
   "rounded-full px-2.5 py-0.5 font-bold text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40";
 
-const PRESSED = "bg-h1 text-b6";
+const PRESSED = "bg-h1 text-b6 forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]";
 const UNPRESSED = "bg-b3 text-c2 not-disabled:hover:bg-b2";
 
 /**

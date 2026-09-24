@@ -70,17 +70,19 @@ const defaultParse = (text: string): number | null => {
 };
 
 // Native range inputs, stacked on one track. Only the thumbs take the pointer, so either thumb
-// can be dragged wherever they sit. The focus ring goes on the thumb, not the full-width input.
+// can be dragged wherever they sit. The focus ring goes on the thumb, not the full-width input:
+// solid h1, so it clears 3:1 on the panel. Forced-colors mode drops box-shadow rings, so the
+// input keeps a transparent outline (`outline-hidden`) that mode paints instead.
 const RANGE =
-  "pointer-events-none absolute inset-x-0 top-1/2 h-4 w-full -translate-y-1/2 appearance-none bg-transparent focus-visible:outline-none disabled:cursor-not-allowed " +
+  "pointer-events-none absolute inset-x-0 top-1/2 h-4 w-full -translate-y-1/2 appearance-none bg-transparent focus-visible:outline-hidden disabled:cursor-not-allowed " +
   "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:box-border [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-h1 [&::-webkit-slider-thumb]:bg-c1 " +
   "[&::-moz-range-track]:bg-transparent [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:box-border [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-h1 [&::-moz-range-thumb]:bg-c1 " +
-  "focus-visible:[&::-webkit-slider-thumb]:ring-4 focus-visible:[&::-webkit-slider-thumb]:ring-h1/50 focus-visible:[&::-moz-range-thumb]:ring-4 focus-visible:[&::-moz-range-thumb]:ring-h1/50";
+  "focus-visible:[&::-webkit-slider-thumb]:ring-4 focus-visible:[&::-webkit-slider-thumb]:ring-h1 focus-visible:[&::-moz-range-thumb]:ring-4 focus-visible:[&::-moz-range-thumb]:ring-h1";
 
 // The field look (border b3 on b6, h1 border on focus), sized for a short value. The group dims
 // itself when disabled, so the boxes do not dim twice.
 const BOX =
-  "w-18 shrink-0 rounded-md border border-b3 bg-b6 px-2 py-1 text-center text-c1 text-sm tabular-nums placeholder:text-c4 focus-visible:border-h1 focus-visible:outline-none disabled:cursor-not-allowed";
+  "w-18 shrink-0 rounded-md border border-b3 bg-b6 px-2 py-1 text-center text-c1 text-sm tabular-nums placeholder:text-c4 focus-visible:border-h1 focus-visible:outline-hidden disabled:cursor-not-allowed";
 
 /**
  * @function RangeSlider
@@ -226,7 +228,7 @@ export function RangeSlider({
           <div aria-hidden="true" className="absolute inset-x-2 top-1/2 h-1.5 -translate-y-1/2">
             <div
               data-range-fill=""
-              className="absolute inset-y-0 rounded-full bg-h1"
+              className="absolute inset-y-0 rounded-full bg-h1 forced-colors:bg-[Highlight]"
               style={{ left: `${lowPercent}%`, right: `${100 - highPercent}%` }}
             />
           </div>

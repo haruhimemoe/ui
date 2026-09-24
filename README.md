@@ -245,7 +245,7 @@ Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChang
 
 #### `fieldClasses`
 
-`fieldClasses(className?: string): string` returns the field look (`b6` background, `b3` border, `h1` border on focus, rose border when `aria-invalid`). Use it on a bare control that labels itself:
+`fieldClasses(className?: string): string` returns the field look (`b6` background, `b3` border, `h1` border on focus, rose border when `aria-invalid`, and an `h1` border and ring when an invalid field has focus). Use it on a bare control that labels itself:
 
 ```tsx
 <select aria-label="Move to" className={fieldClasses("w-auto")}>...</select>
@@ -509,7 +509,8 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 ## Accessibility
 
 - Every component is checked with axe against the WCAG 2.2 A and AA rules in the test suite (all but color contrast, which needs a real browser). Interactive ones also have keyboard tests.
-- Focus is always visible: the theme draws an `h1` outline on `:focus-visible`.
+- Focus is always visible: the theme draws an `h1` outline on `:focus-visible`. Fields show focus with an `h1` border instead (plus an `h1` ring when invalid), and `RangeSlider` thumbs with a solid `h1` ring. Those keep a transparent outline, so Windows high contrast mode (forced colors) still shows focus.
+- In forced colors mode, a pressed `Chip` takes the system highlight colors, so on and off still look different.
 - Form fields link their label, hint and error. An error sets `aria-invalid` and is announced.
 - `Chip` uses `aria-pressed`. `ChipGroup`, `RangeSlider` and `FilterRow` are fieldsets named by their label. `RangeSlider`'s thumbs are native range inputs with `aria-valuetext`, so "10+" reads as it shows.
 - `FilterPanel`'s phone toggle carries `aria-expanded` and `aria-controls`. The result count is a live region. When "Clear filters" disappears after use, focus moves to the panel's heading instead of getting lost.

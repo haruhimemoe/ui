@@ -182,6 +182,34 @@ describe("RangeSlider labels and values", () => {
   });
 });
 
+describe("RangeSlider focus styles", () => {
+  it("hides outlines with outline-hidden, which forced-colors mode still paints", () => {
+    stars();
+    for (const control of [lowThumb(), highThumb(), lowBox(), highBox()]) {
+      const classes = control.className.split(/\s+/);
+      expect(classes).toContain("focus-visible:outline-hidden");
+      expect(classes).not.toContain("focus-visible:outline-none");
+    }
+  });
+
+  it("rings a focused thumb in solid h1, not a see-through one", () => {
+    stars();
+    const classes = lowThumb().className.split(/\s+/);
+    expect(classes).toContain("focus-visible:[&::-webkit-slider-thumb]:ring-h1");
+    expect(classes).toContain("focus-visible:[&::-moz-range-thumb]:ring-h1");
+    expect(classes.some((c) => c.includes("ring-h1/"))).toBe(false);
+  });
+
+  it("paints the fill in the system highlight color in forced-colors mode", () => {
+    const { container } = render(
+      <RangeSlider label="Length" min={0} max={200} value={[50, 150]} onChange={() => {}} />,
+    );
+    expect(container.querySelector("[data-range-fill]")).toHaveClass(
+      "forced-colors:bg-[Highlight]",
+    );
+  });
+});
+
 describe("RangeSlider keyboard", () => {
   it("moves the low thumb one step with the arrow keys", async () => {
     const user = userEvent.setup();

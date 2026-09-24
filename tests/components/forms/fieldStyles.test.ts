@@ -1,6 +1,7 @@
 /**
  * @file tests/components/forms/fieldStyles.test.ts
- * @desc Unit tests for fieldClasses: the exact packs field classes, and extras appended last.
+ * @desc Unit tests for fieldClasses: the packs field look, focus that shows on invalid fields and
+ *       in forced-colors mode, and extras appended last.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -10,10 +11,24 @@ import { describe, expect, it } from "vitest";
 import { fieldClasses } from "../../../src/components/forms/fieldStyles.js";
 
 const PACKS_FIELD =
-  "w-full rounded-md border border-b3 bg-b6 px-3 py-2 text-c1 text-sm placeholder:text-c4 focus-visible:border-h1 focus-visible:outline-none disabled:opacity-50 aria-invalid:border-rose-400";
+  "w-full rounded-md border border-b3 bg-b6 px-3 py-2 text-c1 text-sm placeholder:text-c4 focus-visible:border-h1 focus-visible:outline-hidden disabled:opacity-50 aria-invalid:border-rose-400 aria-invalid:focus-visible:border-h1 aria-invalid:focus-visible:ring-1 aria-invalid:focus-visible:ring-h1";
 
 describe("fieldClasses", () => {
-  it("returns the packs field classes unchanged with no extras", () => {
+  it("shows focus on an invalid field: the h1 border and a ring beat the rose border", () => {
+    const classes = fieldClasses().split(" ");
+    expect(classes).toContain("aria-invalid:border-rose-400");
+    expect(classes).toContain("aria-invalid:focus-visible:border-h1");
+    expect(classes).toContain("aria-invalid:focus-visible:ring-1");
+    expect(classes).toContain("aria-invalid:focus-visible:ring-h1");
+  });
+
+  it("hides the outline with outline-hidden, which forced-colors mode still paints", () => {
+    const classes = fieldClasses().split(" ");
+    expect(classes).toContain("focus-visible:outline-hidden");
+    expect(classes).not.toContain("focus-visible:outline-none");
+  });
+
+  it("returns the packs field classes with no extras", () => {
     expect(fieldClasses()).toBe(PACKS_FIELD);
   });
 

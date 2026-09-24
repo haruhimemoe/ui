@@ -48,6 +48,14 @@ describe("Chip", () => {
     expect(chip).not.toHaveClass("bg-b3", "text-c2");
   });
 
+  it("tells pressed from unpressed in forced-colors mode with the system highlight", () => {
+    const { rerender } = render(<Chip pressed={false}>DT</Chip>);
+    const chip = screen.getByRole("button");
+    expect(chip).not.toHaveClass("forced-colors:bg-[Highlight]");
+    rerender(<Chip pressed>DT</Chip>);
+    expect(chip).toHaveClass("forced-colors:bg-[Highlight]", "forced-colors:text-[HighlightText]");
+  });
+
   it("reports the opposite state on click", async () => {
     const user = userEvent.setup();
     const onPressedChange = vi.fn();
