@@ -1,8 +1,9 @@
 /**
  * @file tests/packaging.test.ts
- * @desc Checks on the source files as they ship: Next subpath imports carry ".js" (next has no
- *       exports map, so Node ESM and Vitest in a consuming app need the file name), and every
- *       file that uses client hooks starts with "use client".
+ * @desc Checks on what ships: Next subpath imports carry ".js" (next has no exports map, so Node
+ *       ESM and Vitest in a consuming app need the file name), every file that uses client hooks
+ *       starts with "use client", the Tailwind peer range covers only versions with the utilities
+ *       the components use, and no declaration maps point at source that isn't published.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -68,5 +69,19 @@ describe("shipped source", () => {
       const file = sources.find((s) => s.name === `src/components/filters/${name}.tsx`);
       expect(firstStatement(file?.text ?? ""), name).toBe('"use client";');
     }
+  });
+});
+
+describe("package manifest and build", () => {
+  const pkg = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
+  const build = JSON.parse(readFileSync(path.join(root, "tsconfig.build.json"), "utf8"));
+
+  it("asks for Tailwind 4.1 or later (wrap-anywhere), below 5", () => {
+    expect(pkg.peerDependencies.tailwindcss).toBe(">=4.1.0 <5");
+  });
+
+  it("emits no declaration maps, since src is not published", () => {
+    expect(pkg.files).not.toContain("src");
+    expect(build.compilerOptions.declarationMap).not.toBe(true);
   });
 });

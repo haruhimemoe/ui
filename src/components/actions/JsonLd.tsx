@@ -21,7 +21,7 @@ export type JsonLdProps = Omit<
 /**
  * @function jsonLdString
  * @param data {Record<string, unknown>} a schema.org object
- * @returns {string} JSON with `@context` added and every "<" written as <
+ * @returns {string} JSON with `@context` added and every "<" written as the escape `\u003c`
  */
 const jsonLdString = (data: Record<string, unknown>): string =>
   JSON.stringify({ "@context": "https://schema.org", ...data }).replace(/</g, "\\u003c");

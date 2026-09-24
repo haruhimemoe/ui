@@ -6,7 +6,7 @@ React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-w
 
 - Next.js 16 (app router)
 - React 19
-- Tailwind CSS 4
+- Tailwind CSS 4.1 or later
 
 These are peer dependencies. The package is ESM only.
 
@@ -533,7 +533,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 | --- | --- |
 | Next.js | 16 (app router). Components use `next/link` and `next/navigation`. |
 | React | 19 |
-| Tailwind CSS | 4, through `@tailwindcss/postcss` |
+| Tailwind CSS | 4.1 or later (4.x), through `@tailwindcss/postcss` |
 | Module format | ESM only. Plain Node and Vitest can import it (for component tests in your app). |
 | Theme | Dark only |
 
