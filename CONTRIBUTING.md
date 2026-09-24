@@ -28,7 +28,7 @@ bun run check && bun run typecheck && bun run test && bun run build
 bun run check:consumer
 ```
 
-`check:consumer` packs the package, installs it into a throwaway Next.js 16 + Tailwind 4 app in your temp directory, renders every component on one page and runs `next build`. It checks that the build passes, that the library's classes end up in the app's CSS, that the pages prerender, and that the header's client list loads no tailwind-merge. It needs the network (npm and Google Fonts). Pass `--keep` (`node scripts/check-consumer.mjs --keep`) to leave the app in place and look at it.
+`check:consumer` packs the package, installs it into a throwaway Next.js 16 + Tailwind 4 app in your temp directory, renders every component on one page and runs `next build`. It checks that the build passes, that the library's classes end up in the app's CSS, that the pages prerender, and that the nav hydrates and loads tailwind-merge only where the README says it does. It needs the network (npm and Google Fonts). Pass `--keep` (`node scripts/check-consumer.mjs --keep`) to leave the app in place and look at it.
 
 ## Releases
 

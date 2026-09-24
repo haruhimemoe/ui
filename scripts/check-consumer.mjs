@@ -6,9 +6,11 @@
  *       It then checks that the build passed, that the emitted CSS holds classes only the library
  *       uses (so the theme's @source line works), and that the page prerendered with client
  *       components inside, including a data-only FilterPanel straight from the Server Component
- *       page, and a NavLinks with no internal link that renders on the server alone. Two
- *       header-only pages check the nav's bundle: the client list loads no tailwind-merge, and
- *       with only external links the page never references it. Before the build, plain Node
+ *       page, and a NavLinks with no internal link that renders on the server alone. Header-only
+ *       pages check what the README says about the nav: the client list loads no tailwind-merge;
+ *       with only external and text-only links nothing hydrates beyond a bare page's Next
+ *       modules; a relative href skips the client list but hydrates next/link; and NavLinks in
+ *       an app's own Client Component brings tailwind-merge. Before the build, plain Node
  *       imports the installed package, the way Vitest in a consuming app does. Usage:
  *       `node scripts/check-consumer.mjs [--keep]` (--keep leaves the app in the temp dir). Needs
  *       the npm registry and Google Fonts.
@@ -51,7 +53,11 @@ const write = (file, text) => {
   writeFileSync(path.join(dir, file), text);
 };
 
-/** A prerendered route's HTML and the JavaScript its script tags load, or null if it's missing. */
+/**
+ * A prerendered route's HTML, the JavaScript its script tags load, and the ids of the client
+ * modules its RSC payload references (the `I[id,...]` rows: what hydrates), or null if it's
+ * missing.
+ */
 const readRoute = (name) => {
   const file = path.join(dir, ".next", "server", "app", `${name}.html`);
   if (!existsSync(file)) return null;
@@ -59,7 +65,8 @@ const readRoute = (name) => {
   const scripts = [...html.matchAll(/<script src="\/_next\/([^"?]+\.js)/g)].map((match) =>
     readFileSync(path.join(dir, ".next", match[1]), "utf8"),
   );
-  return { html, scripts };
+  const clients = new Set([...html.matchAll(/:I\[(\d+),/g)].map((match) => match[1]));
+  return { html, scripts, clients };
 };
 
 // A class group name from tailwind-merge's default config: in a chunk, it means tailwind-merge.
@@ -266,6 +273,38 @@ export default function Page() {
 }
 `;
 
+// A header of the app's own that is a Client Component (for a menu toggle), with NavLinks in it.
+const CLIENT_NAV = `"use client";
+
+import { NavLinks } from "@haruhimemoe/ui";
+import { useState } from "react";
+
+export function ClientNav() {
+  const [open, setOpen] = useState(true);
+  return (
+    <nav aria-label="Main">
+      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
+        Menu
+      </button>
+      {open ? <NavLinks links={[{ label: "Client nav", href: "/client-nav" }]} /> : null}
+    </nav>
+  );
+}
+`;
+
+const CLIENT_NAV_PAGE = `import { ClientNav } from "./ClientNav";
+
+export default function Page() {
+  return <ClientNav />;
+}
+`;
+
+// No library code at all: the client modules it references are Next's own, on every page.
+const BARE_PAGE = `export default function Page() {
+  return <p>bare</p>;
+}
+`;
+
 const LAYOUT = `import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import type { ReactNode } from "react";
@@ -366,6 +405,16 @@ try {
       { label: "Pools", note: "soon" },
     ]),
   );
+  write(
+    "src/app/relative/page.tsx",
+    headerPage([
+      { label: "Top", href: "#main" },
+      { label: "osu!", href: "https://osu.ppy.sh" },
+    ]),
+  );
+  write("src/app/client-nav/page.tsx", CLIENT_NAV_PAGE);
+  write("src/app/client-nav/ClientNav.tsx", CLIENT_NAV);
+  write("src/app/bare/page.tsx", BARE_PAGE);
 
   console.log(`consumer: installing into ${dir}`);
   run("bun", ["install", "--no-progress"]);
@@ -440,18 +489,65 @@ try {
     }
   }
 
+  const bare = readRoute("bare");
+  if (!bare) failures.push("/bare did not prerender");
+  /** The client modules a route references beyond Next's own (those of /bare). */
+  const hydrated = (route) => [...route.clients].filter((id) => !bare?.clients.has(id));
+
+  // External and text-only links: the README says nothing in the nav hydrates.
   const offsite = readRoute("offsite");
   if (!offsite) {
     failures.push("/offsite did not prerender");
-  } else if (offsite.html.includes("NavListClient")) {
-    failures.push("/offsite references NavListClient, though none of its links can be current");
+  } else {
+    if (offsite.html.includes("NavListClient")) {
+      failures.push("/offsite references NavListClient, though none of its links can be current");
+    }
+    if (bare && hydrated(offsite).length > 0) {
+      failures.push(
+        `/offsite hydrates client modules ${hydrated(offsite).join(", ")}, though its nav has only external and text-only links`,
+      );
+    }
+  }
+
+  // A relative href can't be current either, so the nav skips the client list. The README says
+  // the link is still next/link, which hydrates.
+  const relative = readRoute("relative");
+  if (!relative) {
+    failures.push("/relative did not prerender");
+  } else {
+    if (relative.html.includes("NavListClient")) {
+      failures.push("/relative references NavListClient, though none of its links can be current");
+    }
+    if (bare && hydrated(relative).length === 0) {
+      failures.push(
+        "/relative hydrates nothing, but the README says its next/link does: update the README",
+      );
+    }
+  }
+
+  // NavLinks in an app's own Client Component merges its classes in the browser. The README
+  // says tailwind-merge ships with it there.
+  const clientNav = readRoute("client-nav");
+  if (!clientNav) {
+    failures.push("/client-nav did not prerender");
+  } else {
+    if (
+      !/<a\b(?=[^>]*aria-current="page")(?=[^>]*href="\/client-nav")[^>]*>/.test(clientNav.html)
+    ) {
+      failures.push("/client-nav is missing its current link (NavLinks in a Client Component)");
+    }
+    if (!clientNav.scripts.some((js) => js.includes(TAILWIND_MERGE))) {
+      failures.push(
+        "/client-nav loads no tailwind-merge, but the README says NavLinks in a Client Component brings it: update the README",
+      );
+    }
   }
 
   if (failures.length > 0) {
     throw new Error(`${failures.join("\n")}\n\nnext build output:\n${build}`);
   }
   console.log(
-    "consumer: ok (next build passed, library CSS generated, pages prerendered, nav bundle lean)",
+    "consumer: ok (next build passed, library CSS generated, pages prerendered, nav as documented)",
   );
 } catch (error) {
   console.error(`consumer: FAILED\n${error.stdout ?? ""}${error.stderr ?? error.message}`);

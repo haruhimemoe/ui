@@ -1,8 +1,8 @@
 /**
  * @file src/components/shell/NavLinks.tsx
- * @desc The header's nav list. Server-safe: it merges the classes here, then renders the list on
- *       the server when no link can be the current page (all external or text-only), or hands it
- *       to the small NavListClient, which reads the path to set aria-current.
+ * @desc The header's nav list. Server-safe: it merges the classes here, then renders the list
+ *       itself when no link can be the current page (external, relative or text-only), or hands
+ *       it to the small NavListClient, which reads the path to set aria-current.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Thu Sep 24, 2026
@@ -40,8 +40,9 @@ const CURRENT = "text-c1 transition-colors";
  * @param props {NavLinksProps} the links (items without `href` show as dimmed text with their
  *        `note`), the alignment (default "start") and native list props
  * @returns {JSX.Element} a `<ul>` of links, the one for the current path marked aria-current.
- *          When no link can be current, the list renders on the server alone: nothing hydrates
- *          and nothing reads the path.
+ *          When no link can be current, it skips the client list and nothing reads the path.
+ *          From a Server Component with only external and text-only links, nothing hydrates; a
+ *          relative href still renders next/link, which does.
  */
 export function NavLinks({ links, align = "start", className, ...props }: NavLinksProps) {
   const listClassName = cx(LISTS[align], className);
