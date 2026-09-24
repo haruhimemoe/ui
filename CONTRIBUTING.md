@@ -2,6 +2,8 @@
 
 ## Setup
 
+You need [Bun](https://bun.sh) 1.4 (the exact version is `packageManager` in `package.json`) and Node.js 22.12 or later (`.nvmrc` has the version CI uses).
+
 ```sh
 bun install
 ```
@@ -22,7 +24,7 @@ bun install
 bun run check && bun run typecheck && bun run test && bun run build
 ```
 
-`check` is Biome (`check:fix` to auto-fix). `build` compiles `src/` to `dist/` file by file and copies `theme.css` next to it.
+`check` is Biome (`check:fix` to auto-fix). `build` compiles `src/` to `dist/` file by file and copies `theme.css` next to it. CI runs the tests as `bun run test:coverage`, which fails under 90% coverage of `src/`.
 
 ```sh
 bun run check:consumer

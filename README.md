@@ -2,13 +2,17 @@
 
 React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, cards, form fields, filter controls (toggle chips, a two-thumb range slider, a filter panel) and the site header, footer and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
 
+See every component in its states at [haruhime.moe/ui](https://www.haruhime.moe/ui). The page names the version it runs.
+
+This README describes version 0.2.0. Anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
+
 ## Requirements
 
 - Next.js 16 (app router)
 - React 19
-- Tailwind CSS 4.1 or later
+- Tailwind CSS 4.1 or later, below 5
 
-These are peer dependencies. The package is ESM only.
+These are peer dependencies. The package is ESM only, and its `engines` field asks for Node.js 22.12 or later.
 
 ## Install
 
@@ -148,16 +152,16 @@ export default function Home() {
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
 - **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`. Each file starts with `"use client"`.
-- **`SiteHeader` and `NavLinks`** are Server Components with a small client part. When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
+- **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
 A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere.
 
 ## Props, classes and refs
 
-- Every component takes its element's native props and passes them through (`id`, `aria-*`, `data-*`, event handlers). The tables below list only the extra props.
-- `ref` is a normal prop (React 19). Like the native props, it goes on the component's outer element (for `PageShell`, the wrapper `<div>`, not `<main>`).
-- `className` is added after the built-in classes and wins on conflict: a class that sets the same property as a built-in one replaces it (merged with [tailwind-merge](https://github.com/dcastil/tailwind-merge)). `<Select className="w-auto">` drops the built-in `w-full`.
+- Every component takes its element's native props and passes them through (`id`, `aria-*`, `data-*`, event handlers). Each section below names that element. The tables list only the extra props.
+- `ref` is a normal prop (React 19). It goes where the native props go: the outer element for most components, the control (`<input>`, `<select>`, `<textarea>`) for the form fields, and the `<button>` for `CopyButton`. On `PageShell` that is the wrapper `<div>`, not `<main>`.
+- `className` is added after the built-in classes and wins on conflict: a class that sets the same property as a built-in one replaces it (merged with [tailwind-merge](https://github.com/dcastil/tailwind-merge)). `<Select className="w-auto">` drops the built-in `w-full`. On `GitHubIcon` and `HaruhimeWordmark`, `className` replaces the default size instead.
 
 ## Components
 
@@ -177,8 +181,8 @@ A pill button. Every native `<button>` prop.
 
 A link that looks like `Button`. Every `next/link` prop (`href`, `prefetch`, `replace`, `scroll`, `target`, `rel`...), plus `variant` and `size` as on `Button`.
 
-- An `href` with a scheme (`https:`, `mailto:`) or starting with `//` renders a plain `<a>`, and `next/link`'s own props are dropped.
-- With `target="_blank"` and no `rel`, it adds `rel="noreferrer"`. A `rel` you pass always wins.
+- A string `href` with a scheme (`https:`, `mailto:`) or starting with `//` renders a plain `<a>`, and `next/link`'s own props are dropped.
+- That plain `<a>` with `target="_blank"` and no `rel` gets `rel="noreferrer"`. A `rel` you pass always wins. Internal links get only the `rel` you pass.
 
 #### `buttonClasses`
 
@@ -195,7 +199,7 @@ The osu!-web panel: rounded, `b4` background, `p-5`. Every native `<section>` pr
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `title` | `ReactNode` | none | Rendered as a heading at the top (`<h2>` by default). It also names the section (`aria-labelledby`), which makes the card a region landmark. |
-| `headingLevel` | `2 \| 3 \| 4` | `2` | The title's heading level. Use `3` or `4` for a card that sits under another heading, such as a card inside a titled card. |
+| `headingLevel` | `2 \| 3 \| 4` | `2` | The title's heading level. Use `3` or `4` for a card that sits under another heading, such as a card inside a titled card. Since 0.2.0. |
 
 #### `PageHeader`
 
@@ -230,7 +234,7 @@ An error notice (`role="alert"`) is announced either way.
 
 Long-form typography for MDX, docs and legal pages. A `max-w-3xl` `<div>` that styles the `h2`, `h3`, `p`, `a`, `strong`, `ul`, `ol`, `li`, `code`, `pre`, `hr` and `table` elements inside it. Every native `<div>` prop.
 
-The first element inside gets no top margin (`[&>:first-child]:mt-0`), so a heading that opens the block sits flush with what's above it instead of taking the `h2` or `h3` gap. The rule reaches direct children only. If you wrap the content in `<section>`s, the heading at the top of the first section keeps its margin. Reach one level deeper for that:
+The first element inside gets no top margin (`[&>:first-child]:mt-0`, since 0.2.0), so a heading that opens the block sits flush with what's above it instead of taking the `h2` or `h3` gap. The rule reaches direct children only. If you wrap the content in `<section>`s, the heading at the top of the first section keeps its margin. Reach one level deeper for that:
 
 ```tsx
 <Prose className="[&>:first-child>:first-child]:mt-0">
@@ -334,7 +338,7 @@ schema.org structured data in a `<script type="application/ld+json">`. Every `<`
 
 #### `GitHubIcon`
 
-The GitHub mark as an inline SVG in the current text color. Always hidden from screen readers, so put a label on the link around it. Every native `<svg>` prop.
+The GitHub mark as an inline SVG in the current text color. Always hidden from screen readers, so put a label on the link around it. Every native `<svg>` prop except `viewBox`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -342,7 +346,7 @@ The GitHub mark as an inline SVG in the current text color. Always hidden from s
 
 #### `HaruhimeWordmark`
 
-The haruhime.moe wordmark as an inline SVG. It keeps the brand's own white and pink whatever `--hue` is. Every native `<svg>` prop.
+The haruhime.moe wordmark as an inline SVG. It keeps the brand's own white and pink whatever `--hue` is. Every native `<svg>` prop except `viewBox`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -495,7 +499,7 @@ Links in the header and footer are data (type `SiteLinkItem`):
 type SiteLinkItem = { label: string; href?: string; note?: string };
 ```
 
-Paths use `next/link`; anything with a scheme (`https:`, `mailto:`) or starting with `//` is a plain `<a>`. An item without `href` shows as muted text with its `note` beside it in small uppercase letters (`{ label: "Pools", note: "soon" }`).
+Paths use `next/link`; anything with a scheme (`https:`, `mailto:`) or starting with `//` is a plain `<a>`. An item without `href` shows as plain text. `note` adds a word beside it in small uppercase letters (`{ label: "Pools", note: "soon" }`). The header dims text-only items and shows the note only on them. The footer shows a note beside a link too.
 
 #### `SiteHeader`
 
@@ -555,7 +559,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 
 ## Accessibility
 
-- Every component is checked with axe against the WCAG 2.2 A and AA rules in the test suite (all but color contrast, which needs a real browser). Interactive ones also have keyboard tests.
+- Every component is checked in the test suite with axe-core's WCAG 2.0, 2.1 and 2.2 A and AA rules (all but color contrast, which needs a real browser). Interactive ones also have keyboard tests. The tests also calculate the contrast figures under Setup (`c1` on `h2`, `h1` on `b4`, and the `--h1-l` and `--h2-l` values).
 - Focus is always visible: the theme draws an `h1` outline on `:focus-visible`. Fields show focus with an `h1` border instead (plus an `h1` ring when invalid), and `RangeSlider` thumbs with a solid `h1` ring. Those keep a transparent outline, so Windows high contrast mode (forced colors) still shows focus.
 - In forced colors mode, a pressed `Chip` takes the system highlight colors, so on and off still look different.
 - Form fields link their label, hint and error. An error sets `aria-invalid` and is announced.
@@ -574,6 +578,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 | Next.js | 16 (app router). Components use `next/link` and `next/navigation`. |
 | React | 19 |
 | Tailwind CSS | 4.1 or later (4.x), through `@tailwindcss/postcss` |
+| Node.js | 22.12 or later (`engines`) |
 | Module format | ESM only. Plain Node and Vitest can import it (for component tests in your app). |
 | Theme | Dark only |
 

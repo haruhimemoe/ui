@@ -1,0 +1,41 @@
+# @haruhimemoe/ui
+
+> React components for the haruhime.moe osu! tools on Next.js 16 (app router), React 19 and Tailwind CSS 4.1+. It ships the osu!-web-style palette as a Tailwind theme (`@haruhimemoe/ui/theme.css`, colors `b1`-`b6`, `c1`-`c4`, `h1`, `h2` from one `--hue`), plus buttons, cards, form fields, filter controls (chips, a two-thumb range slider, a filter panel) and the site header, footer and page frame. ESM only. Most components are Server Components; the client ones carry `"use client"` in their own files, so everything imports from `@haruhimemoe/ui`. MIT license.
+
+The README describes version 0.2.0 and marks what 0.1.0 lacks with "since 0.2.0". An app sets it up by loading Tailwind through `@tailwindcss/postcss`, adding `@import "@haruhimemoe/ui/theme.css";` after `@import "tailwindcss";`, and loading Nunito from `next/font` as the `--font-nunito` variable (without it, the system font).
+
+## Docs
+
+- [Requirements](https://github.com/haruhimemoe/ui#requirements): the Next.js, React, Tailwind and Node.js versions
+- [Install](https://github.com/haruhimemoe/ui#install): the package and its peer dependencies
+- [Setup](https://github.com/haruhimemoe/ui#setup): PostCSS, the theme import, Nunito, and picking a hue with the `--h1-l` and `--h2-l` contrast fixes
+- [Example](https://github.com/haruhimemoe/ui#example): a root layout with PageShell, SiteHeader and SiteFooter, and a page
+- [Server and client components](https://github.com/haruhimemoe/ui#server-and-client-components): which components are client ones, which navs hydrate, and where callback props must come from
+- [Props, classes and refs](https://github.com/haruhimemoe/ui#props-classes-and-refs): native props, `ref`, and how `className` merges
+- [Basics](https://github.com/haruhimemoe/ui#basics): Button, ButtonLink, buttonClasses, Card, PageHeader, Notice, Prose
+- [Forms](https://github.com/haruhimemoe/ui#forms): TextInput, Textarea, Select, Checkbox, fieldClasses and the shared field props
+- [Actions](https://github.com/haruhimemoe/ui#actions): CopyButton, Pagination, JsonLd
+- [Icons](https://github.com/haruhimemoe/ui#icons): GitHubIcon, HaruhimeWordmark, HaruhimeWordmarkLink
+- [Filters](https://github.com/haruhimemoe/ui#filters): Chip, ChipGroup, RangeSlider, FilterRow, FilterPanel, with a client example
+- [Shell](https://github.com/haruhimemoe/ui#shell): SiteLinkItem, SiteHeader, NavLinks, SiteFooter, PageShell
+- [Accessibility](https://github.com/haruhimemoe/ui#accessibility): what the components do for screen readers, keyboards and forced colors
+- [Compatibility](https://github.com/haruhimemoe/ui#compatibility): supported versions and module format
+
+## Source
+
+- [src/index.ts](https://github.com/haruhimemoe/ui/blob/main/src/index.ts): every public export and type
+- [src/theme.css](https://github.com/haruhimemoe/ui/blob/main/src/theme.css): the theme as it ships
+
+## Elsewhere
+
+- [npm package](https://www.npmjs.com/package/@haruhimemoe/ui): published versions
+- [Component showcase](https://www.haruhime.moe/ui): every component rendered in its states, on haruhime.moe
+- [haruhime.moe llms.txt](https://www.haruhime.moe/llms.txt): the haruhime.moe site and its tools
+- [haruhimemoe on GitHub](https://github.com/haruhimemoe): the other @haruhimemoe packages and tools
+
+## Optional
+
+- [CHANGELOG.md](https://github.com/haruhimemoe/ui/blob/main/CHANGELOG.md): what changed in each version
+- [CONTRIBUTING.md](https://github.com/haruhimemoe/ui/blob/main/CONTRIBUTING.md): setup, checks and changelog lines for contributors
+- [AGENTS.md](https://github.com/haruhimemoe/ui/blob/main/AGENTS.md): conventions and file layout for AI coding agents
+- [SECURITY.md](https://github.com/haruhimemoe/ui/blob/main/SECURITY.md): how to report a vulnerability
