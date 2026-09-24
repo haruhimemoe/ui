@@ -147,7 +147,7 @@ export default function Page() {
       <PageHeader
         title="Consumer check"
         lead="Every component, from the packed tarball."
-        meta="0.1.0"
+        meta="${pkg.version}"
         actions={<ButtonLink href="/docs">Docs</ButtonLink>}
       />
       <nav aria-label="Secondary">
