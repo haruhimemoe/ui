@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": ["**", "!**/dist", "!**/coverage"]
+  },
+  "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
+  "javascript": {
+    "formatter": { "quoteStyle": "double", "trailingCommas": "all", "semicolons": "always" }
+  },
+  "css": { "parser": { "tailwindDirectives": true } },
+  "linter": {
+    "enabled": true,
+    "domains": { "next": "recommended", "react": "recommended", "test": "recommended" },
+    "rules": {
+      "preset": "recommended",
+      "correctness": {
+        "useImportExtensions": { "level": "error", "options": { "forceJsExtensions": true } }
+      },
+      "nursery": {
+        "useSortedClasses": { "level": "error", "fix": "safe", "options": { "functions": ["cx"] } }
+      }
+    }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } }
+}
