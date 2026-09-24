@@ -79,6 +79,17 @@ describe("Card", () => {
     expect(ref.current?.className.endsWith(" mt-4")).toBe(true);
   });
 
+  it("lets a caller class replace a built-in one that sets the same property", () => {
+    render(
+      <Card className="p-3" data-testid="card">
+        Body
+      </Card>,
+    );
+    const card = screen.getByTestId("card");
+    expect(card).toHaveClass("p-3");
+    expect(card).not.toHaveClass("p-5");
+  });
+
   it("lets the caller override the accessible name", () => {
     render(
       <Card title="Shown" aria-label="Hidden name" aria-labelledby={undefined}>

@@ -83,6 +83,13 @@ describe("PageShell", () => {
     expect(main.className.endsWith(" max-w-7xl!")).toBe(true);
   });
 
+  it("lets main classes replace the built-in width", () => {
+    render(<PageShell mainClassName="max-w-7xl">page</PageShell>);
+    const main = screen.getByRole("main");
+    expect(main).toHaveClass("max-w-7xl");
+    expect(main).not.toHaveClass("max-w-5xl");
+  });
+
   it("keeps the footer at the bottom, appends a caller className and passes div props and a ref", () => {
     const ref = createRef<HTMLDivElement>();
     const { container } = render(

@@ -57,6 +57,9 @@
     "check:consumer": "node scripts/check-consumer.mjs",
     "prepublishOnly": "bun run check && bun run typecheck && bun run test && bun run build"
   },
+  "dependencies": {
+    "tailwind-merge": "3.7.0"
+  },
   "peerDependencies": {
     "next": ">=16.0.0 <17",
     "react": ">=19.0.0",

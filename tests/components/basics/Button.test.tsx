@@ -47,6 +47,13 @@ describe("Button", () => {
     expect(screen.getByRole("button").className.endsWith(" w-full")).toBe(true);
   });
 
+  it("lets a caller class replace a built-in one that sets the same property", () => {
+    render(<Button className="h-11 px-8">Tall</Button>);
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("h-11", "px-8");
+    expect(button).not.toHaveClass("h-9", "px-4");
+  });
+
   it("passes native props through and takes a ref as a plain prop", () => {
     const ref = createRef<HTMLButtonElement>();
     render(

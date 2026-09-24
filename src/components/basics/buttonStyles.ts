@@ -38,7 +38,8 @@ const SIZES: Record<ButtonSize, string> = {
  * @function buttonClasses
  * @param opts {ButtonClassOptions} variant (default "primary"), size (default "md") and extra
  *        classes
- * @returns {string} the pill button classes, with the caller's className appended last
+ * @returns {string} the pill button classes, with the caller's className appended last (it
+ *          replaces a built-in class that sets the same property)
  */
 export const buttonClasses = ({
   variant = "primary",

@@ -13,9 +13,8 @@ const FIELD =
 
 /**
  * @function fieldClasses
- * @param className {string} extra classes, appended last. `cx` does not resolve Tailwind
- *        conflicts, so an extra class that fights a built-in one (like `w-auto` against
- *        `w-full`) needs the `!` modifier: `fieldClasses("!w-auto")`.
+ * @param className {string} extra classes, appended last. One that sets the same property as a
+ *        built-in class replaces it: `fieldClasses("w-auto")` drops `w-full`.
  * @returns {string} class string for a form control
  */
 export const fieldClasses = (className?: string | undefined): string => cx(FIELD, className);

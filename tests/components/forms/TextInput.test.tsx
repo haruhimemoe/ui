@@ -74,6 +74,11 @@ describe("TextInput", () => {
     expect(input).toHaveAttribute("aria-invalid", "true");
   });
 
+  it("keeps both description ids whatever the control's id looks like", () => {
+    render(<TextInput id="text" label="Text" hint="Hint." error="Error." />);
+    expect(screen.getByRole("textbox")).toHaveAttribute("aria-describedby", "text-hint text-error");
+  });
+
   it("passes native props through and takes a ref as a plain prop", () => {
     const ref = createRef<HTMLInputElement>();
     render(

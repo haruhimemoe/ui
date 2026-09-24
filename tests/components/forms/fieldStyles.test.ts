@@ -21,6 +21,19 @@ describe("fieldClasses", () => {
     expect(fieldClasses("font-mono")).toBe(`${PACKS_FIELD} font-mono`);
   });
 
+  it("lets a caller's class replace a built-in one that sets the same property", () => {
+    expect(fieldClasses("w-auto")).not.toContain("w-full");
+    expect(fieldClasses("w-auto").split(" ")).toContain("w-auto");
+    expect(fieldClasses("w-32")).not.toContain("w-full");
+    expect(fieldClasses("w-40")).not.toContain("w-full");
+    const slot = fieldClasses("w-auto text-sm").split(" ");
+    expect(slot).not.toContain("w-full");
+    expect(slot.filter((c) => c === "text-sm")).toHaveLength(1);
+    const title = fieldClasses("font-bold text-lg").split(" ");
+    expect(title).not.toContain("text-sm");
+    expect(title).toContain("text-lg");
+  });
+
   it("ignores an empty extra", () => {
     expect(fieldClasses("")).toBe(PACKS_FIELD);
   });

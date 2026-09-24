@@ -152,7 +152,7 @@ export default function Page() {
           <option value="taiko">osu!taiko</option>
         </Select>
         <Checkbox id="video" label="Include video" hint="Bigger download" defaultChecked />
-        <select aria-label="Move to" className={fieldClasses("!w-auto")}>
+        <select aria-label="Move to" className={fieldClasses("w-auto")}>
           <option>Top</option>
         </select>
       </Card>

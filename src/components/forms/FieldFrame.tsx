@@ -53,7 +53,9 @@ export const fieldDescribedBy = (
   error: ReactNode,
   extra: string | undefined,
 ): string | undefined =>
-  cx(hint ? hintId(id) : null, error ? errorId(id) : null, extra) || undefined;
+  // A plain join, not cx: these are ids, and cx would treat an id like "text-hint" as a class.
+  [hint ? hintId(id) : null, error ? errorId(id) : null, extra].filter(Boolean).join(" ") ||
+  undefined;
 
 /**
  * @function FieldError

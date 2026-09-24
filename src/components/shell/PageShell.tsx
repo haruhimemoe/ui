@@ -20,7 +20,7 @@ export type PageShellProps = ComponentProps<"div"> & {
   skipLabel?: string | undefined;
   /** The main landmark's id, which the skip link targets. Default "main". */
   mainId?: string | undefined;
-  /** Extra classes for the main landmark, appended last. */
+  /** Extra classes for the main landmark, appended last (they win on conflict). */
   mainClassName?: string | undefined;
 };
 

@@ -143,7 +143,7 @@ A Server Component can't pass a function to a Client Component. So callback prop
 
 - Every component takes its element's native props and passes them through (`id`, `aria-*`, `data-*`, event handlers). The tables below list only the extra props.
 - `ref` is a normal prop (React 19). It reaches the main element.
-- `className` is added after the built-in classes. It does not remove a built-in class that sets the same property. To override one, use Tailwind's important modifier: `className="!w-auto"`.
+- `className` is added after the built-in classes and wins on conflict: a class that sets the same property as a built-in one replaces it (merged with [tailwind-merge](https://github.com/dcastil/tailwind-merge)). `<Select className="w-auto">` drops the built-in `w-full`.
 
 ## Components
 
@@ -248,7 +248,7 @@ Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChang
 `fieldClasses(className?: string): string` returns the field look (`b6` background, `b3` border, `h1` border on focus, rose border when `aria-invalid`). Use it on a bare control that labels itself:
 
 ```tsx
-<select aria-label="Move to" className={fieldClasses("!w-auto")}>...</select>
+<select aria-label="Move to" className={fieldClasses("w-auto")}>...</select>
 ```
 
 ### Actions
@@ -504,7 +504,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 | `footer` | `ReactNode` | none | Below `<main>`, usually a `SiteFooter`. |
 | `skipLabel` | `string` | `"Skip to content"` | The skip link's text. It is the first thing Tab reaches and shows only when focused. |
 | `mainId` | `string` | `"main"` | `<main>`'s id, which the skip link targets. |
-| `mainClassName` | `string` | none | Extra classes for `<main>`, e.g. `"!max-w-7xl"`. |
+| `mainClassName` | `string` | none | Extra classes for `<main>`, e.g. `"max-w-7xl"`. |
 
 ## Accessibility
 
