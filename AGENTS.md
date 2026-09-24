@@ -4,11 +4,12 @@
 
 ## Layout
 
-- `src/components/<group>/<Name>.tsx`: one component per file. Groups: `basics`, `forms`, `actions`, `filters`, `shell`.
+- `src/components/<group>/<Name>.tsx`: one component per file. Groups: `basics`, `forms`, `actions`, `icons`, `filters`, `shell`.
 - `src/components/<group>/<name>Styles.ts`: class builders shared by several components (like `buttonClasses`).
-- `src/utils/`: internal helpers (`cx`).
+- `src/utils/`: internal helpers (`cx`, `isExternalHref`).
 - `src/index.ts`: the public API. Export only what apps should use.
 - `tests/components/<group>/<Name>.test.tsx`, `tests/utils/<name>.test.ts`, `tests/helpers/` (`axe.ts`).
+- `scripts/check-consumer.mjs`: the consumer check (a throwaway Next.js app built against the packed tarball).
 
 ## Rules
 
@@ -26,4 +27,5 @@
 
 ```sh
 bun run check && bun run typecheck && bun run test && bun run build
+bun run check:consumer   # packs the package into a throwaway Next.js app and runs next build
 ```
