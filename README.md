@@ -229,6 +229,23 @@ An error notice (`role="alert"`) is announced either way.
 
 Long-form typography for MDX, docs and legal pages. A `max-w-3xl` `<div>` that styles the `h2`, `h3`, `p`, `a`, `strong`, `ul`, `ol`, `li`, `code`, `pre`, `hr` and `table` elements inside it. Every native `<div>` prop.
 
+The first element inside gets no top margin (`[&>:first-child]:mt-0`), so a heading that opens the block sits flush with what's above it instead of taking the `h2` or `h3` gap. The rule reaches direct children only. If you wrap the content in `<section>`s, the heading at the top of the first section keeps its margin. Reach one level deeper for that:
+
+```tsx
+<Prose className="[&>:first-child>:first-child]:mt-0">
+  <section>
+    <h2>What we store</h2>
+    <p>Your osu! id and your packs.</p>
+  </section>
+  <section>
+    <h2>How long we keep it</h2>
+    <p>Until you delete your account.</p>
+  </section>
+</Prose>
+```
+
+Later sections keep their heading margin, which spaces them apart.
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.
