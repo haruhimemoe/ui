@@ -14,7 +14,7 @@
 ## Rules
 
 - **Server-safe by default.** A component with no state, effects or browser APIs has no directive and works in Server Components. Put `"use client";` as the first line only in a file that needs it (hooks, event handlers it defines itself, `window`, `navigator`). Keep client files small; a server component can render a client one, not the other way round.
-- **Next.js only.** Use `next/link` for internal links and `next/image` where it helps. No other framework shims.
+- **Next.js only.** Use `next/link` for internal links and `next/image` where it helps. No other framework shims. Import them with the `.js` suffix (`next/link.js`, `next/navigation.js`): next has no exports map, so bare specifiers break Node ESM and Vitest in consuming apps (`tests/packaging.test.ts` enforces this).
 - **No site-specific copy.** Text, links, URLs and brand names come in as props. Defaults may be generic English ("Clear filters"), never a site's own wording.
 - **Look comes from the palette.** Use the theme's colors (`b1` to `b6`, `c1` to `c4`, `h1`, `h2`) and Tailwind's scale. No hex values, no `hsl()` in class names, no new CSS variables without adding them to `theme.css`. Ports of existing site components keep their classes exactly.
 - **Native props pass through.** Props extend the element's own (`ComponentProps<"button">` and so on). `ref` is a normal prop in React 19: no `forwardRef`. Merge `className` with `cx`, caller last.
