@@ -424,11 +424,12 @@ Two thumbs on one track with an editable box at each end, for star rating, lengt
 | `onChange` | `(value: [number, number \| null]) => void` | required | Gets the new range. |
 | `openEnded` | `boolean` | `false` | The top end at `max` means "no upper limit": it shows `max+` (like `10+`) and reports `null`. |
 | `format` | `(n: number) => string` | `String` | Display text for the boxes and screen readers. |
-| `parse` | `(text: string) => number \| null` | plain number | Reads a typed value back (without a trailing `+`). Pair it with `format` for `m:ss` lengths. |
+| `parse` | `(text: string) => number \| null` | plain number | Reads a typed value back (without a trailing `+`). The default takes a comma as the decimal point (`5,5`). Pair it with `format` for `m:ss` lengths. |
+| `inputMode` | `"decimal" \| "text" \| "numeric" \| ...` | `"decimal"`, or `"text"` with a custom `parse` | The on-screen keyboard for the two boxes. Phone decimal keypads have no `:`, so a custom `parse` gets the full keyboard. |
 | `minLabel`, `maxLabel` | `string` | "Minimum *label*", "Maximum *label*" | The accessible names of the two ends. |
 | `disabled` | `boolean` | `false` | Turns off both thumbs and both boxes. |
 
-The thumbs can't cross. Arrow keys move one step, Page Up and Page Down ten, Home and End as far as the thumb can go. A box commits on blur or Enter, and Escape undoes the typing. An empty low box means `min`; an empty top box means open (with `openEnded`) or `max`. Values that come in out of range or crossed (from a URL, say) are shown clamped.
+The thumbs can't cross. Arrow keys move one step, Page Up and Page Down ten, Home and End as far as the thumb can go. A box commits on blur or Enter, and Escape undoes the typing. An empty low box means `min`; an empty top box means open (with `openEnded`) or `max`. Values that come in out of range or crossed (from a URL, say) are shown clamped, and a `NaN` or infinite end counts as no limit on that end. When both thumbs sit on one value, dragging moves whichever end can go that way.
 
 #### `FilterRow`
 

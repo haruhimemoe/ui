@@ -137,6 +137,43 @@ describe("RangeSlider labels and values", () => {
     expect(thumbValue(highThumb())).toBe("3");
   });
 
+  it("treats a NaN or infinite end (a bad URL value) as no limit on that end", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <RangeSlider
+        label="Star rating"
+        min={0}
+        max={10}
+        step={0.1}
+        openEnded
+        value={[Number("abc"), Number.NaN]}
+        onChange={onChange}
+      />,
+    );
+    expect(lowBox()).toHaveValue("0");
+    expect(highBox()).toHaveValue("10+");
+    await user.click(lowThumb());
+    await user.keyboard("{ArrowRight}");
+    expect(onChange).toHaveBeenLastCalledWith([0.1, null]);
+
+    rerender(
+      <RangeSlider
+        label="Star rating"
+        min={0}
+        max={10}
+        step={0.1}
+        value={[Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY]}
+        onChange={onChange}
+      />,
+    );
+    expect(lowBox()).toHaveValue("0");
+    expect(highBox()).toHaveValue("10");
+    await user.click(highThumb());
+    await user.keyboard("{ArrowLeft}");
+    expect(onChange).toHaveBeenLastCalledWith([0, 9.9]);
+  });
+
   it("fills the track between the two thumbs", () => {
     const { container } = render(
       <RangeSlider label="Length" min={0} max={200} value={[50, 150]} onChange={() => {}} />,
@@ -335,6 +372,37 @@ describe("RangeSlider pointer (native change events)", () => {
     expect(onChange).toHaveBeenLastCalledWith([6, 6]);
   });
 
+  it("drags parked thumbs apart in either direction, mid-track", () => {
+    // Both at 3.0: the high thumb is on top. Dragging it left moves the low end instead.
+    const { onChange } = stars({ initial: [3, 3] });
+    fireEvent.pointerDown(highThumb());
+    fireEvent.change(highThumb(), { target: { value: "2.5" } });
+    expect(onChange).toHaveBeenLastCalledWith([2.5, 3]);
+    // The same drag keeps moving the low end, even once the thumbs are apart.
+    fireEvent.change(highThumb(), { target: { value: "2.4" } });
+    expect(onChange).toHaveBeenLastCalledWith([2.4, 3]);
+    fireEvent.pointerUp(highThumb());
+    // A new change after the drag moves the high end again.
+    fireEvent.change(highThumb(), { target: { value: "2.8" } });
+    expect(onChange).toHaveBeenLastCalledWith([2.4, 2.8]);
+  });
+
+  it("drags parked thumbs apart to the right past the middle, where the low thumb is on top", () => {
+    const { onChange } = stars({ initial: [6, 6] });
+    fireEvent.pointerDown(lowThumb());
+    fireEvent.change(lowThumb(), { target: { value: "6.5" } });
+    expect(onChange).toHaveBeenLastCalledWith([6, 6.5]);
+    fireEvent.pointerCancel(lowThumb());
+    fireEvent.change(lowThumb(), { target: { value: "5" } });
+    expect(onChange).toHaveBeenLastCalledWith([5, 6.5]);
+  });
+
+  it("does not swap ends for a change without a pointer (assistive tech steps)", () => {
+    const { onChange } = stars({ initial: [3, 3] });
+    fireEvent.change(highThumb(), { target: { value: "2.9" } });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it("reports null when the high thumb is dragged to the top of an open-ended track", () => {
     const { onChange } = stars();
     fireEvent.change(highThumb(), { target: { value: "10" } });
@@ -431,6 +499,48 @@ describe("RangeSlider boxes", () => {
     await user.clear(highBox());
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenLastCalledWith([2, 10]);
+  });
+
+  it("reads a comma as the decimal separator (comma-locale keypads)", async () => {
+    const user = userEvent.setup();
+    const { onChange } = stars();
+    await user.clear(lowBox());
+    await user.type(lowBox(), "5,5{Enter}");
+    expect(onChange).toHaveBeenLastCalledWith([5.5, 6]);
+  });
+
+  it("opens a decimal keypad by default, and a text keyboard with a custom parse", () => {
+    const { rerender } = render(
+      <RangeSlider label="Star rating" min={0} max={10} value={[2, 6]} onChange={() => {}} />,
+    );
+    expect(lowBox()).toHaveAttribute("inputmode", "decimal");
+    expect(highBox()).toHaveAttribute("inputmode", "decimal");
+    rerender(
+      <RangeSlider
+        label="Star rating"
+        min={0}
+        max={600}
+        value={[0, 600]}
+        onChange={() => {}}
+        format={clock}
+        parse={readClock}
+      />,
+    );
+    // m:ss needs a ":" key, which the decimal keypad lacks.
+    expect(lowBox()).toHaveAttribute("inputmode", "text");
+    expect(highBox()).toHaveAttribute("inputmode", "text");
+    rerender(
+      <RangeSlider
+        label="Star rating"
+        min={0}
+        max={600}
+        value={[0, 600]}
+        onChange={() => {}}
+        parse={readClock}
+        inputMode="numeric"
+      />,
+    );
+    expect(lowBox()).toHaveAttribute("inputmode", "numeric");
   });
 
   it("puts the current value back for text it can't read", async () => {

@@ -2,7 +2,8 @@
  * @file src/components/filters/RangeSlider.tsx
  * @desc Two-thumb range slider with an editable box at each end (star rating, length, BPM). Two
  *       native range inputs share one track; the thumbs can't cross. With `openEnded`, the top
- *       end at `max` means "no upper limit": it shows "max+" and reports `null`.
+ *       end at `max` means "no upper limit": it shows "max+" and reports `null`. When both thumbs
+ *       sit on one value, a drag moves whichever end can go the way the pointer goes.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Wed Sep 23, 2026
@@ -13,9 +14,11 @@
 import {
   type ChangeEvent,
   type ComponentProps,
+  type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
   useId,
+  useRef,
   useState,
 } from "react";
 import { cx } from "../../utils/cx.js";
@@ -24,7 +27,10 @@ import { cx } from "../../utils/cx.js";
 export type RangeSliderValue = [number, number | null];
 
 /** Every native `<fieldset>` prop except `onChange` and `children`, plus the range. */
-export type RangeSliderProps = Omit<ComponentProps<"fieldset">, "onChange" | "children"> & {
+export type RangeSliderProps = Omit<
+  ComponentProps<"fieldset">,
+  "onChange" | "children" | "inputMode"
+> & {
   /** Names the group, and the ends as "Minimum <label>" and "Maximum <label>". */
   label: string;
   /**
@@ -47,6 +53,11 @@ export type RangeSliderProps = Omit<ComponentProps<"fieldset">, "onChange" | "ch
    * "+"; return `null` for text it can't read, and the box goes back to the current value.
    */
   parse?: ((text: string) => number | null) | undefined;
+  /**
+   * The on-screen keyboard for the boxes. Default "decimal" (digits and a decimal separator), or
+   * "text" when `parse` is set, since formats like m:ss need keys the decimal keypad lacks.
+   */
+  inputMode?: HTMLAttributes<HTMLInputElement>["inputMode"] | undefined;
   /** When true, the top end at `max` means "no upper limit" and reports `null`. */
   openEnded?: boolean | undefined;
   /** Accessible name of the low end (default "Minimum <label>"). */
@@ -67,8 +78,9 @@ const decimalsOf = (n: number): number => {
 
 const clamp = (n: number, low: number, high: number): number => Math.min(Math.max(n, low), high);
 
+// A comma reads as the decimal point: comma-locale keypads (de, fr, pl, pt-BR, ru) type "5,5".
 const defaultParse = (text: string): number | null => {
-  const n = Number(text);
+  const n = Number(text.replace(",", "."));
   return Number.isFinite(n) ? n : null;
 };
 
@@ -107,6 +119,7 @@ export function RangeSlider({
   onChange,
   format = String,
   parse = defaultParse,
+  inputMode = parse === defaultParse ? "decimal" : "text",
   openEnded = false,
   minLabel = `Minimum ${label}`,
   maxLabel = `Maximum ${label}`,
@@ -116,11 +129,15 @@ export function RangeSlider({
 }: RangeSliderProps) {
   const labelId = useId();
   const [drafts, setDrafts] = useState<Record<End, string | null>>({ low: null, high: null });
+  // The pointer drag in progress, and the end it moves (picked on its first change).
+  const drag = useRef<{ end: End | null } | null>(null);
 
-  // Normalize what came in (it may come from a URL): inside the bounds, low <= high.
-  const low = clamp(value[0], min, max);
-  const highOpen = openEnded && (value[1] === null || value[1] >= max);
-  const high = value[1] === null ? max : clamp(value[1], low, max);
+  // Normalize what came in (it may come from a URL): inside the bounds, low <= high. A NaN or
+  // infinite end means no limit on that end, like an empty box.
+  const low = Number.isFinite(value[0]) ? clamp(value[0], min, max) : min;
+  const top = value[1] !== null && Number.isFinite(value[1]) ? value[1] : null;
+  const highOpen = openEnded && (top === null || top >= max);
+  const high = top === null ? max : clamp(top, low, max);
   const highOut = highOpen ? null : high;
 
   const decimals = Math.max(decimalsOf(step), decimalsOf(min));
@@ -189,13 +206,40 @@ export function RangeSlider({
     commit(end, next);
   };
 
-  const onThumbChange = (end: End) => (event: ChangeEvent<HTMLInputElement>) =>
-    commit(end, Number(event.currentTarget.value));
+  const onThumbPointerDown = () => {
+    drag.current = { end: null };
+    const done = () => {
+      drag.current = null;
+      window.removeEventListener("pointerup", done);
+      window.removeEventListener("pointercancel", done);
+    };
+    window.addEventListener("pointerup", done);
+    window.addEventListener("pointercancel", done);
+  };
+
+  // With both thumbs on one value, only the top one can be grabbed, and it can only move one way.
+  // So a drag's first move picks the end: toward the other thumb's side, the other end moves.
+  // The drag keeps that end until the pointer lifts. Changes without a pointer (assistive tech
+  // stepping a slider) always move their own end.
+  const onThumbChange = (end: End) => (event: ChangeEvent<HTMLInputElement>) => {
+    const n = Number(event.currentTarget.value);
+    const gesture = drag.current;
+    if (gesture && gesture.end === null) {
+      const parked = low === high;
+      gesture.end =
+        parked && end === "high" && n < low
+          ? "low"
+          : parked && end === "low" && n > high
+            ? "high"
+            : end;
+    }
+    commit(gesture?.end ?? end, n);
+  };
 
   const box = (end: End): ReactNode => (
     <input
       type="text"
-      inputMode="decimal"
+      inputMode={inputMode}
       autoComplete="off"
       aria-label={end === "low" ? minLabel : maxLabel}
       disabled={disabled}
@@ -250,6 +294,7 @@ export function RangeSlider({
             disabled={disabled}
             onChange={onThumbChange("low")}
             onKeyDown={onThumbKeyDown("low")}
+            onPointerDown={onThumbPointerDown}
             // Past the middle, the low thumb sits on top, so two thumbs parked at the top end can
             // still be pulled apart.
             className={cx(RANGE, lowPercent > 50 && "z-10")}
@@ -265,6 +310,7 @@ export function RangeSlider({
             disabled={disabled}
             onChange={onThumbChange("high")}
             onKeyDown={onThumbKeyDown("high")}
+            onPointerDown={onThumbPointerDown}
             className={RANGE}
           />
         </div>
