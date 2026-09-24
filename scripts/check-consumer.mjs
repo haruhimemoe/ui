@@ -5,7 +5,9 @@
  *       versions, renders one static page with every exported component, and runs `next build`.
  *       It then checks that the build passed, that the emitted CSS holds classes only the library
  *       uses (so the theme's @source line works), and that the page prerendered with client
- *       components inside. Usage: `node scripts/check-consumer.mjs [--keep]` (--keep leaves the
+ *       components inside, including a data-only FilterPanel straight from the Server Component
+ *       page. Before the build, plain Node imports the installed package, the way Vitest in a
+ *       consuming app does. Usage: `node scripts/check-consumer.mjs [--keep]` (--keep leaves the
  *       app in the temp dir). Needs the npm registry and Google Fonts.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
@@ -70,6 +72,8 @@ const PAGE = `import {
   Checkbox,
   Chip,
   CopyButton,
+  FilterPanel,
+  FilterRow,
   fieldClasses,
   GitHubIcon,
   HaruhimeWordmark,
@@ -165,6 +169,11 @@ export default function Page() {
         <HaruhimeWordmarkLink />
       </Card>
       <Filters />
+      <FilterPanel title="Server filters" resultCount="3 maps">
+        <FilterRow label="Mode">
+          <Chip pressed={false}>osu!taiko</Chip>
+        </FilterRow>
+      </FilterPanel>
     </PageShell>
   );
 }
@@ -313,6 +322,15 @@ try {
   console.log(`consumer: installing into ${dir}`);
   run("bun", ["install", "--no-progress"]);
 
+  // Node's ESM resolver, as Vitest uses for node_modules: every import in dist must resolve.
+  console.log("consumer: importing the package in plain Node");
+  const exported = run("node", [
+    "--input-type=module",
+    "-e",
+    'const ui = await import("@haruhimemoe/ui"); console.log(Object.keys(ui).length);',
+  ]).trim();
+  if (!(Number(exported) > 20)) throw new Error(`Node imported only ${exported} exports`);
+
   console.log("consumer: next build");
   const build = run(path.join(dir, "node_modules", ".bin", "next"), ["build"]);
 
@@ -330,18 +348,24 @@ try {
     failures.push("/ did not prerender (.next/server/app/index.html is missing)");
   } else {
     const page = readFileSync(html, "utf8");
+    // Markup only the named component renders: props also show up in the RSC payload, and
+    // Pagination's status span carries aria-current too, so plain strings could match elsewhere.
     const expected = [
-      ["Consumer check", "PageHeader"],
-      ["Page 2 of 3", "Pagination"],
-      ["Copy link", "CopyButton (client)"],
-      ["Minimum Star rating", "RangeSlider (client)"],
-      ['aria-pressed="true"', "Chip (client)"],
-      ["12 packs", "FilterPanel (client)"],
-      ['aria-current="page"', "NavLinks marking the current page (client)"],
-      ["application/ld+json", "JsonLd"],
+      [/>Consumer check<\/h1>/, "PageHeader"],
+      [/>Page 2 of 3<\/span>/, "Pagination"],
+      [/>Copy link<\/button>/, "CopyButton (client)"],
+      [/<input[^>]*aria-label="Minimum Star rating"/, "RangeSlider (client)"],
+      [/<button[^>]*aria-pressed="true"/, "Chip (client)"],
+      [/>12 packs<\/output>/, "FilterPanel (client)"],
+      [/>3 maps<\/output>/, "FilterPanel from the Server Component page (client)"],
+      [
+        /<a\b(?=[^>]*aria-current="page")(?=[^>]*href="\/")[^>]*>/,
+        "NavLinks marking the current page (client)",
+      ],
+      [/<script type="application\/ld\+json">/, "JsonLd"],
     ];
-    for (const [text, from] of expected) {
-      if (!page.includes(text)) failures.push(`prerendered / is missing ${text} (${from})`);
+    for (const [pattern, from] of expected) {
+      if (!pattern.test(page)) failures.push(`prerendered / is missing ${pattern} (${from})`);
     }
   }
 

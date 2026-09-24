@@ -7,7 +7,7 @@
  * @modified Wed Sep 23, 2026
  */
 
-import Link from "next/link";
+import Link from "next/link.js";
 import type { ComponentProps } from "react";
 import { isExternalHref } from "../../utils/href.js";
 import { type ButtonSize, type ButtonVariant, buttonClasses } from "./buttonStyles.js";

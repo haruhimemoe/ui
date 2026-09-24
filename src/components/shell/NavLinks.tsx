@@ -9,7 +9,7 @@
 
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname } from "next/navigation.js";
 import type { ComponentProps } from "react";
 import { cx } from "../../utils/cx.js";
 import { AutoLink } from "./AutoLink.js";

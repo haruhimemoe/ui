@@ -534,7 +534,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 | Next.js | 16 (app router). Components use `next/link` and `next/navigation`. |
 | React | 19 |
 | Tailwind CSS | 4, through `@tailwindcss/postcss` |
-| Module format | ESM only |
+| Module format | ESM only. Plain Node and Vitest can import it (for component tests in your app). |
 | Theme | Dark only |
 
 ## Changelog and contributing

@@ -9,7 +9,7 @@
  * @modified Wed Sep 23, 2026
  */
 
-import Link from "next/link";
+import Link from "next/link.js";
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
 import { buttonClasses } from "../basics/buttonStyles.js";
