@@ -597,7 +597,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 
 ## Changelog and contributing
 
-See [CHANGELOG.md](./CHANGELOG.md) for what changed in each version and [CONTRIBUTING.md](./CONTRIBUTING.md) to work on the package. Report security issues as described in [SECURITY.md](./SECURITY.md).
+See [CHANGELOG.md](./CHANGELOG.md) for what changed in each version and [CONTRIBUTING.md](./CONTRIBUTING.md) to work on the package. Report security issues as described in [SECURITY.md](./SECURITY.md). Bring questions and feedback to the haruhime.moe [Discord server](https://discord.gg/bKy9kjMV4y).
 
 ## License
 
