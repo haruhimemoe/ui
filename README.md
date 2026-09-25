@@ -1,3 +1,5 @@
+<p align="center"><a href="https://github.com/haruhimemoe/ui"><picture><source media="(prefers-color-scheme: light)" srcset="https://www.haruhime.moe/brand/repos/ui-banner-on-light.svg"><img alt="@haruhimemoe/ui" src="https://www.haruhime.moe/brand/repos/ui-banner.svg" width="640"></picture></a></p>
+
 # @haruhimemoe/ui
 
 React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, cards, form fields, filter controls (toggle chips, a two-thumb range slider, a filter panel) and the site header, footer and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
@@ -313,7 +315,7 @@ A button that copies text, with the result in an `<output>` beside it that scree
 
 #### `Pagination`
 
-Previous and next pill links around "Page X of Y". Renders nothing when there is one page or none. Every native `<nav>` prop; `aria-label` defaults to `"Pages"`.
+Previous and next pill links around "Page X of Y". Renders nothing when there is one page or none. Every native `<nav>` prop except `children`; `aria-label` defaults to `"Pages"`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -366,7 +368,7 @@ The haruhime.moe wordmark as an inline SVG. It keeps the brand's own white and p
 
 #### `HaruhimeWordmarkLink`
 
-A plain `<a>` around a decorative `HaruhimeWordmark`, dimmed until hovered. Every native `<a>` prop.
+A plain `<a>` around a decorative `HaruhimeWordmark`, dimmed until hovered. Every native `<a>` prop except `children`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -436,7 +438,7 @@ Give the `ChipGroup` or `RangeSlider` inside a `FilterRow` `hideLabel`. The row'
 
 #### `Chip` (client)
 
-A toggle pill: a `<button>` with `aria-pressed`, `h1` when on. Every native `<button>` prop.
+A toggle pill: a `<button>` with `aria-pressed`, `h1` when on. Every native `<button>` prop except `aria-pressed`, which `pressed` sets.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -509,11 +511,11 @@ Links in the header and footer are data (type `SiteLinkItem`):
 type SiteLinkItem = { label: string; href?: string; note?: string };
 ```
 
-Paths use `next/link`; anything with a scheme (`https:`, `mailto:`) or starting with `//` is a plain `<a>`. An item without `href` shows as plain text. `note` adds a word beside it in small uppercase letters (`{ label: "Pools", note: "soon" }`). The header dims text-only items and shows the note only on them. The footer shows a note beside a link too.
+Paths use `next/link`; anything with a scheme (`https:`, `mailto:`) or starting with `//` is a plain `<a>`. An item without `href` shows as plain text. `note` adds a word beside it in small uppercase letters (`{ label: "Sheets", note: "soon" }`). The header dims text-only items and shows the note only on them. The footer shows a note beside a link too.
 
 #### `SiteHeader`
 
-The dark top bar: brand on the left, the nav, and an actions slot on the right. Every native `<header>` prop. A Server Component; the nav list inside is `NavLinks`.
+The dark top bar: brand on the left, the nav, and an actions slot on the right. Every native `<header>` prop except `children`. A Server Component; the nav list inside is `NavLinks`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -533,7 +535,7 @@ Next bundles every client component a route imports, rendered or not. So a page 
 
 #### `NavLinks`
 
-The `<ul>` of links `SiteHeader` uses, for building your own header. Put it inside a `<nav>`. Every native `<ul>` prop. Type: `SiteNavAlign`. It works in Server and Client Components. Since 0.2.0 it is a Server Component with a small client part (in 0.1.0 it is a client component). From a Server Component it behaves like `SiteHeader`'s nav. Inside a Client Component (a header with a menu toggle, say), it renders in the browser with the rest of that component: it merges its classes there, so tailwind-merge ships in that page's bundle.
+The `<ul>` of links `SiteHeader` uses, for building your own header. Put it inside a `<nav>`. Every native `<ul>` prop except `children`. Type: `SiteNavAlign`. It works in Server and Client Components. Since 0.2.0 it is a Server Component with a small client part (in 0.1.0 it is a client component). From a Server Component it behaves like `SiteHeader`'s nav. Inside a Client Component (a header with a menu toggle, say), it renders in the browser with the rest of that component: it merges its classes there, so tailwind-merge ships in that page's bundle.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -542,7 +544,7 @@ The `<ul>` of links `SiteHeader` uses, for building your own header. Put it insi
 
 #### `SiteFooter`
 
-Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub icon link and an optional Discord icon link. Every native `<footer>` prop. Type: `SiteFooterColumn` (`{ title: string; items: readonly SiteLinkItem[] }`).
+Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub icon link and an optional Discord icon link. Every native `<footer>` prop except `children`. Type: `SiteFooterColumn` (`{ title: string; items: readonly SiteLinkItem[] }`).
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
