@@ -5,7 +5,7 @@
  *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Fri Sep 25, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -24,14 +24,14 @@ const LINKS = [
   { href: "/new", label: "New pack" },
   { href: "/packs", label: "Public packs" },
   { href: "https://github.com/haruhimemoe", label: "GitHub" },
-  { label: "pools", note: "soon" },
+  { label: "sheets", note: "soon" },
 ];
 
 // Nothing here can be the current page: external links, a relative one and a text-only entry.
 const OFFSITE = [
   { href: "https://github.com/haruhimemoe", label: "GitHub" },
   { href: "#main", label: "Top" },
-  { label: "pools", note: "soon" },
+  { label: "sheets", note: "soon" },
 ];
 
 describe("NavLinks", () => {
@@ -81,14 +81,14 @@ describe("NavLinks", () => {
   });
 
   it("shows entries without an href as dimmed text with their note, not as links", () => {
-    render(<NavLinks links={[...LINKS, { label: "sheets" }]} />);
+    render(<NavLinks links={[...LINKS, { label: "stats" }]} />);
     expect(screen.getAllByRole("link")).toHaveLength(3);
-    const pools = screen.getByText("pools");
-    expect(pools).toHaveAttribute("aria-disabled", "true");
-    expect(pools).toHaveClass("text-c4");
-    expect(pools).toHaveTextContent("pools soon");
+    const sheets = screen.getByText("sheets");
+    expect(sheets).toHaveAttribute("aria-disabled", "true");
+    expect(sheets).toHaveClass("text-c4");
+    expect(sheets).toHaveTextContent("sheets soon");
     expect(screen.getByText("soon")).toHaveClass("text-xs", "uppercase");
-    expect(screen.getByText("sheets")).toHaveTextContent(/^sheets$/);
+    expect(screen.getByText("stats")).toHaveTextContent(/^stats$/);
   });
 
   it("uses the compact left-aligned list by default and the centered one on request", () => {

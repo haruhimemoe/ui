@@ -5,7 +5,7 @@
  *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Fri Sep 25, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -72,7 +72,7 @@ describe("SiteHeader", () => {
     const offsite = [
       { href: "https://packs.haruhime.moe", label: "packs" },
       { href: "mailto:hi@example.com", label: "Mail" },
-      { label: "pools", note: "soon" },
+      { label: "sheets", note: "soon" },
     ];
     render(<SiteHeader brand={BRAND} links={offsite} navLabel="Tools" navAlign="center" />);
     const nav = screen.getByRole("navigation", { name: "Tools" });
@@ -81,7 +81,7 @@ describe("SiteHeader", () => {
     expect(packs).toHaveAttribute("href", "https://packs.haruhime.moe");
     expect(packs).toHaveClass("text-c2", "hover:text-c1");
     expect(packs).not.toHaveAttribute("aria-current");
-    expect(within(nav).getByText("pools")).toHaveAttribute("aria-disabled", "true");
+    expect(within(nav).getByText("sheets")).toHaveAttribute("aria-disabled", "true");
     expect(usePathname).not.toHaveBeenCalled();
   });
 
@@ -154,7 +154,7 @@ describe("SiteHeader", () => {
           brand={<Link href="/">haruhime.moe home</Link>}
           links={[
             { href: "https://packs.haruhime.moe", label: "packs" },
-            { label: "pools", note: "soon" },
+            { label: "sheets", note: "soon" },
           ]}
           navLabel="Tools"
           navAlign="center"

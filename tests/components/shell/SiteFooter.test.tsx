@@ -21,8 +21,8 @@ const COLUMNS: SiteFooterColumn[] = [
     title: "Tools",
     items: [
       { label: "packs", href: "https://packs.haruhime.moe" },
-      { label: "pools", note: "soon" },
       { label: "sheets", note: "soon" },
+      { label: "stats", note: "soon" },
     ],
   },
   {
@@ -69,7 +69,7 @@ describe("SiteFooter", () => {
       "href",
       "https://packs.haruhime.moe",
     );
-    for (const name of ["pools", "sheets"]) {
+    for (const name of ["sheets", "stats"]) {
       expect(within(tools).getByText(name).parentElement).toHaveTextContent(`${name} soon`);
     }
     expect(within(tools).getAllByText("soon")[0]).toHaveClass("text-xs", "uppercase", "text-c4");

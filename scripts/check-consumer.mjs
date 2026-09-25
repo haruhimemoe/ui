@@ -125,7 +125,7 @@ const LINKS: SiteLinkItem[] = [
   { label: "Home", href: "/" },
   { label: "Docs", href: "/docs" },
   { label: "osu!", href: "https://osu.ppy.sh" },
-  { label: "Pools", note: "soon" },
+  { label: "Sheets", note: "soon" },
 ];
 
 // No path in the app, so NavLinks renders these on the server with no client list.
@@ -410,7 +410,7 @@ try {
     "src/app/offsite/page.tsx",
     headerPage([
       { label: "osu!", href: "https://osu.ppy.sh" },
-      { label: "Pools", note: "soon" },
+      { label: "Sheets", note: "soon" },
     ]),
   );
   write(
