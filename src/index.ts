@@ -5,7 +5,7 @@
  *       their own "use client" directive, so this barrel is safe to import from Server Components.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Fri Sep 25, 2026
  */
 
 // Actions
@@ -47,6 +47,7 @@ export { Textarea, type TextareaProps } from "./components/forms/Textarea.js";
 export { TextInput, type TextInputProps } from "./components/forms/TextInput.js";
 
 // Icons
+export { DiscordIcon, type DiscordIconProps } from "./components/icons/DiscordIcon.js";
 export { GitHubIcon, type GitHubIconProps } from "./components/icons/GitHubIcon.js";
 export {
   HaruhimeWordmark,

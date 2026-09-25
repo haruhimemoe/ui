@@ -161,7 +161,7 @@ A Server Component can't pass a function to a Client Component. So callback prop
 
 - Every component takes its element's native props and passes them through (`id`, `aria-*`, `data-*`, event handlers). Each section below names that element. The tables list only the extra props.
 - `ref` is a normal prop (React 19). It goes where the native props go: the outer element for most components, the control (`<input>`, `<select>`, `<textarea>`) for the form fields, and the `<button>` for `CopyButton`. On `PageShell` that is the wrapper `<div>`, not `<main>`.
-- `className` is added after the built-in classes and wins on conflict: a class that sets the same property as a built-in one replaces it (merged with [tailwind-merge](https://github.com/dcastil/tailwind-merge)). `<Select className="w-auto">` drops the built-in `w-full`. On `GitHubIcon` and `HaruhimeWordmark`, `className` replaces the default size instead.
+- `className` is added after the built-in classes and wins on conflict: a class that sets the same property as a built-in one replaces it (merged with [tailwind-merge](https://github.com/dcastil/tailwind-merge)). `<Select className="w-auto">` drops the built-in `w-full`. On `DiscordIcon`, `GitHubIcon` and `HaruhimeWordmark`, `className` replaces the default size instead.
 
 ## Components
 
@@ -335,6 +335,16 @@ schema.org structured data in a `<script type="application/ld+json">`. Every `<`
 | `data` | `Record<string, unknown>` | required | The schema.org object. `@context` defaults to `https://schema.org`; set it in `data` to change it. |
 
 ### Icons
+
+#### `DiscordIcon`
+
+Since 0.3.0. The Discord logo as an inline SVG in the current text color. Hidden from screen readers by default (`aria-hidden="true"`), so put a label on the link around it. Every native `<svg>` prop except `children` and `viewBox`.
+
+The path is Simple Icons' `discord.svg` at tag 16.32.0 ([simple-icons/simple-icons](https://github.com/simple-icons/simple-icons), CC0 1.0). Discord is a trademark of Discord Inc. Use the logo to link to a Discord server, which Discord's brand guidelines allow.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `className` | `string` | `"size-5"` | Replaces the default size. |
 
 #### `GitHubIcon`
 
@@ -532,17 +542,18 @@ The `<ul>` of links `SiteHeader` uses, for building your own header. Put it insi
 
 #### `SiteFooter`
 
-Link columns, an extra slot, fine print, the haruhime.moe wordmark and a GitHub icon link. Every native `<footer>` prop. Type: `SiteFooterColumn` (`{ title: string; items: readonly SiteLinkItem[] }`).
+Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub icon link and an optional Discord icon link. Every native `<footer>` prop. Type: `SiteFooterColumn` (`{ title: string; items: readonly SiteLinkItem[] }`).
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `columns` | `readonly SiteFooterColumn[]` | `[]` | Each column is a `<nav>` named by its title, which shows above the list. Up to four columns side by side from `sm` up. |
 | `extra` | `ReactNode` | none | Shown above the fine print, e.g. a "clear local data" button. |
 | `finePrint` | `ReactNode` | none | One line of small print, in a `<p>`. |
-| `parentLink` | `boolean` | `true` | Show the haruhime.moe wordmark linking the parent site. With it, the last row holds the wordmark and the GitHub icon, and the fine print sits above. Without it, the fine print shares the row with the icon. |
+| `parentLink` | `boolean` | `true` | Show the haruhime.moe wordmark linking the parent site. With it, the last row holds the wordmark and the icons, and the fine print sits above. Without it, the fine print shares the row with the icons. |
 | `parentHref` | `string` | `"https://www.haruhime.moe"` | Where the wordmark links. |
 | `githubHref` | `string \| false` | `"https://github.com/haruhimemoe"` | Where the GitHub icon links. `false` leaves it out. |
 | `githubLabel` | `string` | `"haruhimemoe on GitHub"` | The GitHub link's accessible name. |
+| `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon, at the same size and colors, and the link's accessible name is "Discord". Since 0.3.0. |
 
 #### `PageShell`
 
@@ -568,7 +579,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 - `CopyButton` announces "Copied." (or the failure) through an `<output>`, on every press.
 - `Pagination` moves focus to its "Page X of Y" text when the link you pressed goes away on the first or last page.
 - `SiteHeader` marks the current page with `aria-current`. `PageShell` starts with a skip link to `<main>`.
-- `GitHubIcon` is hidden from screen readers by default: give the link around it an `aria-label`, as `SiteFooter` does.
+- `DiscordIcon` and `GitHubIcon` are hidden from screen readers by default: give the link around each one an `aria-label`, as `SiteFooter` does.
 - You supply the text, so you also supply labels: give icon-only buttons an `aria-label`, and keep `label` props meaningful.
 
 ## Compatibility

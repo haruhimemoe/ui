@@ -1,11 +1,11 @@
 /**
  * @file tests/components/shell/SiteFooter.test.tsx
  * @desc Component tests for SiteFooter: link columns from data, text-only entries with notes,
- *       internal and external links, extra slot, fine print, parent wordmark and GitHub links,
- *       native props, accessibility.
+ *       internal and external links, extra slot, fine print, parent wordmark, GitHub and Discord
+ *       links, native props, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Fri Sep 25, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -13,6 +13,8 @@ import { createRef } from "react";
 import { describe, expect, it } from "vitest";
 import { SiteFooter, type SiteFooterColumn } from "../../../src/components/shell/SiteFooter.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
+
+const DISCORD = "https://discord.gg/example";
 
 const COLUMNS: SiteFooterColumn[] = [
   {
@@ -177,6 +179,65 @@ describe("SiteFooter", () => {
     expect(screen.getByRole("link", { name: "haruhime.moe" })).toBeInTheDocument();
   });
 
+  it("shows no Discord link without discordHref", () => {
+    render(<SiteFooter />);
+    expect(screen.queryByRole("link", { name: "Discord" })).toBeNull();
+    expect(screen.getAllByRole("link")).toHaveLength(2);
+  });
+
+  it("links discordHref with a decorative Discord icon, styled like the GitHub icon", () => {
+    render(<SiteFooter discordHref={DISCORD} />);
+    const link = screen.getByRole("link", { name: "Discord" });
+    const github = screen.getByRole("link", { name: "haruhimemoe on GitHub" });
+    expect(link).toHaveAttribute("href", DISCORD);
+    expect(link.className).toBe(github.className);
+    expect(link).toHaveClass("shrink-0", "text-c3", "hover:text-c1");
+    const svg = link.querySelector("svg");
+    expect(svg).toHaveAttribute("aria-hidden", "true");
+    expect(svg).toHaveAttribute("viewBox", "0 0 24 24");
+    expect(svg).toHaveClass("size-5");
+    expect(github.querySelector("svg")).toHaveClass("size-5");
+  });
+
+  it("groups the Discord and GitHub icons at the end of the last row, Discord first", () => {
+    const { rerender } = render(<SiteFooter discordHref={DISCORD} />);
+    const discord = () => screen.getByRole("link", { name: "Discord" });
+    const github = () => screen.getByRole("link", { name: "haruhimemoe on GitHub" });
+    const group = discord().parentElement;
+    expect(group).toBe(github().parentElement);
+    expect(group).toHaveClass("flex", "items-center", "gap-4");
+    expect(group?.firstElementChild).toBe(discord());
+    expect(group?.lastElementChild).toBe(github());
+    const row = group?.parentElement;
+    expect(row).toHaveClass("justify-between");
+    expect(row?.firstElementChild).toBe(screen.getByRole("link", { name: "haruhime.moe" }));
+    expect(row?.lastElementChild).toBe(group);
+
+    // Without the wordmark, the fine print shares the row with the icon group.
+    rerender(<SiteFooter discordHref={DISCORD} parentLink={false} finePrint="Fine print." />);
+    expect(screen.getByText("Fine print.").parentElement).toBe(
+      discord().parentElement?.parentElement,
+    );
+  });
+
+  it("puts the Discord icon straight in the row when the GitHub icon is off", () => {
+    render(<SiteFooter discordHref={DISCORD} githubHref={false} />);
+    const discord = screen.getByRole("link", { name: "Discord" });
+    expect(screen.queryByRole("link", { name: /GitHub/ })).toBeNull();
+    expect(discord.parentElement).toHaveClass("justify-between");
+    expect(discord.parentElement).toBe(
+      screen.getByRole("link", { name: "haruhime.moe" }).parentElement,
+    );
+  });
+
+  it("renders a bottom row for the Discord icon alone", () => {
+    render(<SiteFooter parentLink={false} githubHref={false} discordHref={DISCORD} />);
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+    expect(screen.getByRole("link", { name: "Discord" }).parentElement).toHaveClass(
+      "justify-between",
+    );
+  });
+
   it("renders no bottom row when there is nothing to put in it", () => {
     render(<SiteFooter columns={COLUMNS} parentLink={false} githubHref={false} />);
     expect(screen.getByRole("contentinfo").querySelector(".pt-6")).toBeNull();
@@ -218,6 +279,7 @@ describe("SiteFooter", () => {
           columns={COLUMNS}
           extra={<button type="button">Clear local data</button>}
           finePrint="Not affiliated with osu! or ppy Pty Ltd."
+          discordHref={DISCORD}
         />
         <SiteFooter
           columns={[{ title: "Site", items: [{ label: "Thanks", href: "/thanks" }] }]}
@@ -225,6 +287,7 @@ describe("SiteFooter", () => {
           finePrint="Fine print."
           githubLabel="haruhimemoe org on GitHub"
         />
+        <SiteFooter parentLink={false} githubHref={false} discordHref={DISCORD} />
       </div>,
     );
     await expectNoAxeViolations(container);

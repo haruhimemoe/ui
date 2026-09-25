@@ -15,7 +15,7 @@ The README describes version 0.2.0 and marks what 0.1.0 lacks with "since 0.2.0"
 - [Basics](https://github.com/haruhimemoe/ui#basics): Button, ButtonLink, buttonClasses, Card, PageHeader, Notice, Prose
 - [Forms](https://github.com/haruhimemoe/ui#forms): TextInput, Textarea, Select, Checkbox, fieldClasses and the shared field props
 - [Actions](https://github.com/haruhimemoe/ui#actions): CopyButton, Pagination, JsonLd
-- [Icons](https://github.com/haruhimemoe/ui#icons): GitHubIcon, HaruhimeWordmark, HaruhimeWordmarkLink
+- [Icons](https://github.com/haruhimemoe/ui#icons): DiscordIcon, GitHubIcon, HaruhimeWordmark, HaruhimeWordmarkLink
 - [Filters](https://github.com/haruhimemoe/ui#filters): Chip, ChipGroup, RangeSlider, FilterRow, FilterPanel, with a client example
 - [Shell](https://github.com/haruhimemoe/ui#shell): SiteLinkItem, SiteHeader, NavLinks, SiteFooter, PageShell
 - [Accessibility](https://github.com/haruhimemoe/ui#accessibility): what the components do for screen readers, keyboards and forced colors

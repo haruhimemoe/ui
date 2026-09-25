@@ -16,7 +16,7 @@
  *       the npm registry and Google Fonts.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Fri Sep 25, 2026
  */
 
 import { execFileSync } from "node:child_process";
@@ -96,6 +96,7 @@ const PAGE = `import {
   Checkbox,
   Chip,
   CopyButton,
+  DiscordIcon,
   FilterPanel,
   FilterRow,
   fieldClasses,
@@ -148,7 +149,13 @@ export default function Page() {
           actions={<Button variant="ghost">Sign in</Button>}
         />
       }
-      footer={<SiteFooter columns={COLUMNS} finePrint="Not affiliated with osu!." />}
+      footer={
+        <SiteFooter
+          columns={COLUMNS}
+          finePrint="Not affiliated with osu!."
+          discordHref="https://discord.gg/example"
+        />
+      }
     >
       <JsonLd data={{ "@type": "WebSite", name: "consumer" }} />
       <PageHeader
@@ -197,6 +204,7 @@ export default function Page() {
         <CopyButton text="https://example.com" label="Copy link" />
         <Pagination page={2} pageCount={3} hrefFor={(page) => \`/?page=\${page}\`} />
         <Chip pressed>HD</Chip>
+        <DiscordIcon />
         <GitHubIcon />
         <HaruhimeWordmark />
         <HaruhimeWordmarkLink />
@@ -464,6 +472,10 @@ try {
         "NavLinks on the server alone",
       ],
       [/<script type="application\/ld\+json">/, "JsonLd"],
+      [
+        /<a\b(?=[^>]*href="https:\/\/discord\.gg\/example")(?=[^>]*aria-label="Discord")[^>]*><svg\b[^>]*viewBox="0 0 24 24"/,
+        "SiteFooter's Discord link with DiscordIcon",
+      ],
     ];
     for (const [pattern, from] of expected) {
       if (!pattern.test(page)) failures.push(`prerendered / is missing ${pattern} (${from})`);
