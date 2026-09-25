@@ -6,7 +6,7 @@
  *       sit on one value, a drag moves whichever end can go the way the pointer goes.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Fri Sep 25, 2026
  */
 
 "use client";
@@ -26,7 +26,7 @@ import { cx } from "../../utils/cx.js";
 /** A range as `[low, high]`. `high` is `null` for an open top end (no upper limit). */
 export type RangeSliderValue = [number, number | null];
 
-/** Every native `<fieldset>` prop except `onChange` and `children`, plus the range. */
+/** Every native `<fieldset>` prop except `onChange`, `children` and `inputMode`, plus the range. */
 export type RangeSliderProps = Omit<
   ComponentProps<"fieldset">,
   "onChange" | "children" | "inputMode"

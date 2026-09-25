@@ -330,7 +330,7 @@ The links use `next/link` with `rel="prev"` and `rel="next"`. On the first and l
 
 #### `JsonLd`
 
-schema.org structured data in a `<script type="application/ld+json">`. Every `<` in the output is escaped, so a string in the data can't close the tag. Native `<script>` props such as `id` and `nonce` pass through.
+schema.org structured data in a `<script type="application/ld+json">`. Every `<` in the output is escaped, so a string in the data can't close the tag. Every native `<script>` prop except `children`, `dangerouslySetInnerHTML`, `type` and `src` (`id` and `nonce` pass through).
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -462,7 +462,7 @@ A labelled row of chips for picking several values (mods, game modes). A `<field
 
 #### `RangeSlider` (client)
 
-Two thumbs on one track with an editable box at each end, for star rating, length or BPM. A `<fieldset>`; every native `<fieldset>` prop except `onChange` and `children`. Type: `RangeSliderValue` (`[number, number | null]`), so `useState<RangeSliderValue>` can pass its setter straight in.
+Two thumbs on one track with an editable box at each end, for star rating, length or BPM. A `<fieldset>`; every native `<fieldset>` prop except `onChange`, `children` and `inputMode`. Type: `RangeSliderValue` (`[number, number | null]`), so `useState<RangeSliderValue>` can pass its setter straight in.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
