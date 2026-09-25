@@ -3,7 +3,7 @@
  * @desc Site footer: labelled link columns from data (entries without an href show as text with
  *       a small note, like "soon"), an optional extra slot, one line of fine print, the
  *       haruhime.moe wordmark linking the parent site, a GitHub icon link, and an optional
- *       Discord icon link beside it.
+ *       Discord icon link beside it (white, as Discord's brand guidelines ask).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Fri Sep 25, 2026
@@ -43,8 +43,12 @@ export type SiteFooterProps = Omit<ComponentProps<"footer">, "children"> & {
   discordHref?: string | undefined;
 };
 
-// The icon links in the bottom row share one look.
+// The GitHub icon link in the bottom row.
 const ICON_LINK = "shrink-0 text-c3 transition-colors hover:text-c1";
+
+// Discord's brand guidelines ask for the logo in color, black or white, never recolored. c1 is
+// white at every hue, so the Discord link stays white and dims on hover instead of changing hue.
+const DISCORD_LINK = "shrink-0 text-c1 transition-opacity hover:opacity-80";
 
 // Static strings so Tailwind sees every class. Four or more columns share the four-column grid.
 const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-4"] as const;
@@ -74,7 +78,7 @@ export function SiteFooter({
     </a>
   ) : null;
   const discord = discordHref ? (
-    <a href={discordHref} aria-label="Discord" className={ICON_LINK}>
+    <a href={discordHref} aria-label="Discord" className={DISCORD_LINK}>
       <DiscordIcon />
     </a>
   ) : null;

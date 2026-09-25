@@ -340,7 +340,7 @@ schema.org structured data in a `<script type="application/ld+json">`. Every `<`
 
 Since 0.3.0. The Discord logo as an inline SVG in the current text color. Hidden from screen readers by default (`aria-hidden="true"`), so put a label on the link around it. Every native `<svg>` prop except `children` and `viewBox`.
 
-The path is Simple Icons' `discord.svg` at tag 16.32.0 ([simple-icons/simple-icons](https://github.com/simple-icons/simple-icons), CC0 1.0). Discord is a trademark of Discord Inc. Use the logo to link to a Discord server, which Discord's brand guidelines allow.
+The path is Simple Icons' `discord.svg` at tag 16.32.0 ([simple-icons/simple-icons](https://github.com/simple-icons/simple-icons), CC0 1.0). Discord is a trademark of Discord Inc. Its [brand guidelines](https://discord.com/branding) ask for the logo in color, black or white, and not recolored. The icon takes the current text color, so give the element around it one of those (`SiteFooter` uses white).
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -553,7 +553,7 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub ico
 | `parentHref` | `string` | `"https://www.haruhime.moe"` | Where the wordmark links. |
 | `githubHref` | `string \| false` | `"https://github.com/haruhimemoe"` | Where the GitHub icon links. `false` leaves it out. |
 | `githubLabel` | `string` | `"haruhimemoe on GitHub"` | The GitHub link's accessible name. |
-| `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon, at the same size and colors, and the link's accessible name is "Discord". Since 0.3.0. |
+| `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon at the same size. It stays white (`text-c1`) and dims on hover instead of changing color, since Discord's brand guidelines ask that the logo not be recolored. The link's accessible name is "Discord". Since 0.3.0. |
 
 #### `PageShell`
 

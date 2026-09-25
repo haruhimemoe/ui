@@ -1,9 +1,10 @@
 /**
  * @file src/components/icons/DiscordIcon.tsx
- * @desc The Discord logo as a static inline SVG (no icon library, no external request). Always
- *       decorative: label the link around it. The path is Simple Icons' discord.svg at tag
- *       16.32.0 (https://github.com/simple-icons/simple-icons, CC0 1.0). Discord is a trademark
- *       of Discord Inc.; use the logo only to link to a Discord server.
+ * @desc The Discord logo as a static inline SVG (no icon library, no external request), in the
+ *       current text color. Always decorative: label the link around it. The path is Simple
+ *       Icons' discord.svg at tag 16.32.0 (https://github.com/simple-icons/simple-icons, CC0
+ *       1.0). Discord is a trademark of Discord Inc. Its brand guidelines ask for the logo in
+ *       color, black or white and not recolored, so set one of those as the text color.
  * @author David @dvhsh (https://dvh.sh)
  * @created Fri Sep 25, 2026
  * @modified Fri Sep 25, 2026

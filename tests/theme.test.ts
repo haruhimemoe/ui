@@ -1,10 +1,11 @@
 /**
  * @file tests/theme.test.ts
- * @desc Unit tests for theme.css: the h1 and h2 lightness can be overridden, and the values the
- *       README gives for other hues meet WCAG AA contrast (4.5:1) where the defaults do not.
+ * @desc Unit tests for theme.css: the h1 and h2 lightness can be overridden, the values the
+ *       README gives for other hues meet WCAG AA contrast (4.5:1) where the defaults do not, and
+ *       c1 stays white at every hue.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Fri Sep 25, 2026
  */
 
 import { readFileSync } from "node:fs";
@@ -37,6 +38,11 @@ describe("theme.css", () => {
   it("lets an app set the h1 and h2 lightness", () => {
     expect(theme).toContain("--color-h1: hsl(var(--hue) 100% var(--h1-l, 70%));");
     expect(theme).toContain("--color-h2: hsl(var(--hue) 50% var(--h2-l, 45%));");
+  });
+
+  it("keeps c1 white at every hue, so SiteFooter's Discord logo stays white", () => {
+    expect(theme).toContain("--color-c1: hsl(var(--hue) 40% 100%);");
+    for (const hue of [0, 150, 200, 240, 333]) expect(c1(hue)).toBe(1);
   });
 
   it("meets 4.5:1 at the default hue (primary buttons, h1 links on cards)", () => {

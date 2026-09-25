@@ -10,8 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- `DiscordIcon`: the Discord logo as an inline SVG in the current text color, sized and hidden from screen readers like `GitHubIcon`. The path is Simple Icons' `discord.svg` (CC0 1.0).
-- `SiteFooter` takes `discordHref`. When set, a Discord icon link named "Discord" sits before the GitHub icon in the last row, at the same size and colors. Without it the footer is unchanged.
+- `DiscordIcon`: the Discord logo as an inline SVG in the current text color, sized and hidden from screen readers like `GitHubIcon`. The path is Simple Icons' `discord.svg` (CC0 1.0). Discord's brand guidelines ask for the logo in color, black or white, so set one of those as the text color.
+- `SiteFooter` takes `discordHref`. When set, a Discord icon link named "Discord" sits before the GitHub icon in the last row, at the same size. The logo stays white and dims on hover instead of changing color, as Discord's guidelines ask. Without `discordHref` the footer is unchanged.
 
 ## [0.2.0] - 2026-09-24
 

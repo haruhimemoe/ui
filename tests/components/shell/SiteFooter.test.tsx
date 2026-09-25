@@ -185,18 +185,30 @@ describe("SiteFooter", () => {
     expect(screen.getAllByRole("link")).toHaveLength(2);
   });
 
-  it("links discordHref with a decorative Discord icon, styled like the GitHub icon", () => {
+  it("links discordHref with a decorative Discord icon at the GitHub icon's size", () => {
     render(<SiteFooter discordHref={DISCORD} />);
     const link = screen.getByRole("link", { name: "Discord" });
     const github = screen.getByRole("link", { name: "haruhimemoe on GitHub" });
     expect(link).toHaveAttribute("href", DISCORD);
-    expect(link.className).toBe(github.className);
-    expect(link).toHaveClass("shrink-0", "text-c3", "hover:text-c1");
+    expect(link).toHaveClass("shrink-0");
     const svg = link.querySelector("svg");
     expect(svg).toHaveAttribute("aria-hidden", "true");
     expect(svg).toHaveAttribute("viewBox", "0 0 24 24");
     expect(svg).toHaveClass("size-5");
     expect(github.querySelector("svg")).toHaveClass("size-5");
+  });
+
+  it("keeps the Discord logo white, as Discord's brand guidelines ask, and dims it on hover", () => {
+    render(<SiteFooter discordHref={DISCORD} />);
+    const link = screen.getByRole("link", { name: "Discord" });
+    // c1 is white at every hue. No other text color, at rest or on hover, recolors the logo.
+    expect(link).toHaveClass("text-c1", "transition-opacity", "hover:opacity-80");
+    expect(link.className.split(" ").filter((c) => /(^|:)text-/.test(c))).toEqual(["text-c1"]);
+    // The GitHub icon keeps the footer's own colors.
+    expect(screen.getByRole("link", { name: "haruhimemoe on GitHub" })).toHaveClass(
+      "text-c3",
+      "hover:text-c1",
+    );
   });
 
   it("groups the Discord and GitHub icons at the end of the last row, Discord first", () => {
