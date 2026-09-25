@@ -4,7 +4,7 @@ React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-w
 
 See every component in its states at [haruhime.moe/ui](https://www.haruhime.moe/ui). The page names the version it runs.
 
-This README describes version 0.2.0. Anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
+This README describes version 0.3.0. Anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
 
 ## Requirements
 

@@ -2,7 +2,7 @@
 
 > React components for the haruhime.moe osu! tools on Next.js 16 (app router), React 19 and Tailwind CSS 4.1+. It ships the osu!-web-style palette as a Tailwind theme (`@haruhimemoe/ui/theme.css`, colors `b1`-`b6`, `c1`-`c4`, `h1`, `h2` from one `--hue`), plus buttons, cards, form fields, filter controls (chips, a two-thumb range slider, a filter panel) and the site header, footer and page frame. ESM only. Most components are Server Components; the client ones carry `"use client"` in their own files, so everything imports from `@haruhimemoe/ui`. MIT license.
 
-The README describes version 0.2.0 and marks what 0.1.0 lacks with "since 0.2.0". An app sets it up by loading Tailwind through `@tailwindcss/postcss`, adding `@import "@haruhimemoe/ui/theme.css";` after `@import "tailwindcss";`, and loading Nunito from `next/font` as the `--font-nunito` variable (without it, the system font).
+The README describes version 0.3.0 and marks what 0.2.0 lacks with "since 0.3.0" and what 0.1.0 lacks with "since 0.2.0". An app sets it up by loading Tailwind through `@tailwindcss/postcss`, adding `@import "@haruhimemoe/ui/theme.css";` after `@import "tailwindcss";`, and loading Nunito from `next/font` as the `--font-nunito` variable (without it, the system font).
 
 ## Docs
 
