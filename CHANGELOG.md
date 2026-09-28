@@ -17,6 +17,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `InlineConfirm`: a two-step confirm in the page. Opening moves focus to cancel; cancel, Escape or a confirm that resolves puts it back on the trigger, so focus never falls to the page body. The open confirm is a group named by its question. A pending confirm keeps focus and ignores presses; a failed one stays open.
 - `AsyncButton`: runs an async action and announces its result (or a failure, in rose) in an `<output>`, one run at a time, with an optional pending label.
 - `Disclosure`: a button with `aria-expanded` and `aria-controls` that shows and hides a panel, which stays in the page while hidden. Uncontrolled, or controlled with `open` and `onOpenChange`.
+- `RadioGroup`: a native radio fieldset on the `Checkbox` look, with a legend, per-option hints, and a group hint and error. Controlled or uncontrolled.
+- `TypeToConfirm`: a form whose submit stays off until a name is typed exactly, for actions that can't be undone.
+- `ChoiceChips`: single-select chips as native radios (arrow keys move and pick), with `Chip`'s look and `ChipGroup`'s `label` and `hideLabel`.
+- `Chip` and `ChipOption` take `unavailableReason`: the chip is blocked but stays focusable (`aria-disabled`), with the reason as its description and title.
 - `Pagination` button mode: `onPageChange` instead of `hrefFor`, for results fetched in place. `pageCount` can be `null` (the status reads "Page X", and `hasNext` says whether Next works). The ends stay in place with `aria-disabled`, and the status is a polite live region.
 
 ### Changed

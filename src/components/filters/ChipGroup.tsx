@@ -18,6 +18,8 @@ export type ChipOption = {
   value: string;
   label: ReactNode;
   disabled?: boolean | undefined;
+  /** Why the chip can't be picked right now; it stays focusable. See Chip. */
+  unavailableReason?: ReactNode;
 };
 
 /**
@@ -71,6 +73,7 @@ export function ChipGroup({ options, value, onChange, ...props }: ChipGroupProps
             key={option.value}
             pressed={value.includes(option.value)}
             disabled={option.disabled}
+            unavailableReason={option.unavailableReason}
             onPressedChange={(on) => onChange(toggleValue(value, option.value, on, options))}
           >
             {option.label}

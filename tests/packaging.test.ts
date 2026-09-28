@@ -95,6 +95,7 @@ describe("shipped source", () => {
       "src/components/filters/FilterPanel.tsx",
       "src/components/filters/RangeBox.tsx",
       "src/components/filters/RangeSlider.tsx",
+      "src/components/forms/TypeToConfirm.tsx",
       "src/components/shell/NavListClient.tsx",
     ]);
     for (const { name, text } of client) {
@@ -130,9 +131,14 @@ describe("shipped source", () => {
     expect(loadsOf("src/components/actions/PaginationStatus.tsx")).not.toContain("tailwind-merge");
   });
 
-  it('keeps "use client" on the chip components, which take click handlers', () => {
-    for (const name of ["Chip", "ChipGroup"]) {
-      const file = sources.find((s) => s.name === `src/components/filters/${name}.tsx`);
+  it('keeps "use client" on the components that define their own event handlers', () => {
+    for (const name of [
+      "filters/Chip",
+      "filters/ChipGroup",
+      "filters/ChoiceChips",
+      "forms/RadioGroup",
+    ]) {
+      const file = sources.find((s) => s.name === `src/components/${name}.tsx`);
       expect(firstStatement(file?.text ?? ""), name).toBe('"use client";');
     }
   });

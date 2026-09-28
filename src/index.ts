@@ -40,6 +40,11 @@ export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
 // Filters
 export { Chip, type ChipProps } from "./components/filters/Chip.js";
 export { ChipGroup, type ChipGroupProps, type ChipOption } from "./components/filters/ChipGroup.js";
+export {
+  type ChoiceChipOption,
+  ChoiceChips,
+  type ChoiceChipsProps,
+} from "./components/filters/ChoiceChips.js";
 export { FilterPanel, type FilterPanelProps } from "./components/filters/FilterPanel.js";
 export { FilterRow, type FilterRowProps } from "./components/filters/FilterRow.js";
 export {
@@ -52,9 +57,15 @@ export {
 export { Checkbox, type CheckboxProps } from "./components/forms/Checkbox.js";
 export type { FieldProps } from "./components/forms/FieldFrame.js";
 export { fieldClasses } from "./components/forms/fieldStyles.js";
+export {
+  RadioGroup,
+  type RadioGroupProps,
+  type RadioOption,
+} from "./components/forms/RadioGroup.js";
 export { Select, type SelectProps } from "./components/forms/Select.js";
 export { Textarea, type TextareaProps } from "./components/forms/Textarea.js";
 export { TextInput, type TextInputProps } from "./components/forms/TextInput.js";
+export { TypeToConfirm, type TypeToConfirmProps } from "./components/forms/TypeToConfirm.js";
 
 // Icons
 export { DiscordIcon, type DiscordIconProps } from "./components/icons/DiscordIcon.js";

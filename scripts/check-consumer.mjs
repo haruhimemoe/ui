@@ -218,6 +218,13 @@ try {
       [/>Refresh pages<\/button>/, "AsyncButton (client)"],
       [/<button[^>]*aria-expanded="false"[^>]*>Download options/, "Disclosure (client)"],
       [/aria-live="polite"[^>]*>Page 2<\/span>/, "Pagination buttons (client)"],
+      [/<input[^>]*type="radio"[^>]*class="sr-only"/, "ChoiceChips (client)"],
+      [
+        /<button[^>]*aria-disabled="true"[^>]*title="EZ can&#x27;t go with HR\."/,
+        "Chip unavailable (client)",
+      ],
+      [/<legend[^>]*>Who can see this pool<\/legend>/, "RadioGroup (client)"],
+      [/>Type OWC 2026 to confirm<\/label>/, "TypeToConfirm (client)"],
       [
         /<a\b(?=[^>]*href="https:\/\/discord\.gg\/example")(?=[^>]*aria-label="Discord")[^>]*><svg\b[^>]*viewBox="0 0 24 24"/,
         "SiteFooter's Discord link with DiscordIcon",

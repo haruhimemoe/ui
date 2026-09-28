@@ -153,7 +153,7 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm` and `Disclosure`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup` and `TypeToConfirm`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
@@ -327,6 +327,41 @@ Every native `<select>` prop, plus the field props. Pass `<option>` elements as 
 #### `Checkbox`
 
 Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChange`, `name`, `disabled`...), plus the field props. The label is bold `text-c1` and the hint follows it inline after a dot. Clicking anywhere on the row toggles it. The label alone is the accessible name; the hint is the description. An `aria-labelledby` you pass is added after the label (since 0.4.0; 0.3.0 dropped it).
+
+#### `RadioGroup` (client)
+
+Since 0.4.0. A native radio group on the `Checkbox` look: a `<fieldset>` named by its `<legend>`, one radio per option with a bold label and an inline hint, then the group's hint and error. Each option's label is its accessible name and its hint its description. Arrow keys move and pick, as native radios do. Every native `<fieldset>` prop except `onChange`, `children` and `defaultValue`; `disabled` turns off every radio. Types: `RadioOption`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | required | The legend. |
+| `options` | `readonly RadioOption[]` | required | `{ value: string; label: ReactNode; hint?: ReactNode; disabled?: boolean }` for each radio. |
+| `value` / `defaultValue` | `string` | none | The picked value, held by you (`value`, with `onChange`) or by the group (`defaultValue`). |
+| `onChange` | `(value: string) => void` | none | Gets the picked option's value. |
+| `name` | `string` | generated | The radios' name, for a form. |
+| `hint`, `error` | `ReactNode` | none | Under the options, linked to the group with `aria-describedby`. An error is a `role="alert"` and marks the radios `aria-invalid`. |
+| `required` | `boolean` | `false` | Every radio gets `required`. |
+
+#### `TypeToConfirm` (client)
+
+Since 0.4.0. A confirm for something that can't be undone: a `<form>` whose submit button stays off until the expected text is typed exactly (spaces around it don't count). The field has no autocomplete, autocapitalize or spellcheck. Enter submits once it matches. Children show above the field, to say what the action does. Every native `<form>` prop except `onSubmit`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `id` | `string` | required | The text field's id, as on `TextInput`. |
+| `expected` | `string` | required | What has to be typed. |
+| `label` | `ReactNode` | `"Type <expected> to confirm"` | The field's label. |
+| `hint`, `error` | `ReactNode` | none | As on `TextInput`. Pass `error` when the action fails. |
+| `submitLabel` | `ReactNode` | required | The button's text. |
+| `pendingLabel` | `ReactNode` | `submitLabel` | The button's text while `onConfirm` runs. It runs once at a time. |
+| `onConfirm` | `() => void \| Promise<void>` | required | Runs on submit once the text matches. If it throws or rejects, the form stays as typed. |
+| `variant` | `"primary" \| "secondary" \| "ghost"` | `"secondary"` | The button's look. |
+
+```tsx
+<TypeToConfirm id="delete-pool" expected={pool.name} submitLabel="Delete this pool" onConfirm={remove} error={error}>
+  <p>This deletes the pool for everyone who edits it. It can't be undone.</p>
+</TypeToConfirm>
+```
 
 #### `fieldClasses`
 
@@ -514,6 +549,7 @@ A toggle pill: a `<button>` with `aria-pressed`, `h1` when on. Every native `<bu
 | `pressed` | `boolean` | required | Whether it is on. |
 | `onPressedChange` | `(pressed: boolean) => void` | none | Called with the new state on click, Enter or Space. |
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Never submits a form by default. |
+| `unavailableReason` | `ReactNode` | none | Since 0.4.0. Why the chip can't be pressed right now (EZ with HR picked). The chip is dimmed and never toggles, but stays in the tab order (`aria-disabled="true"`, not `disabled`), so keyboard and screen reader users find it and hear the reason as its description. A string reason is also its `title`. |
 
 Your own `onClick` runs first. Call `event.preventDefault()` in it to skip the toggle.
 
@@ -525,9 +561,22 @@ A labelled row of chips for picking several values (mods, game modes). A `<field
 | --- | --- | --- | --- |
 | `label` | `ReactNode` | required | Names the group. |
 | `hideLabel` | `boolean` | `false` | For use inside a `FilterRow`, which names the row: the label doesn't render and the fieldset isn't a group of its own (`role="none"`). `disabled` still reaches every chip. |
-| `options` | `readonly ChipOption[]` | required | `{ value: string; label: ReactNode; disabled?: boolean }` for each chip. |
+| `options` | `readonly ChipOption[]` | required | `{ value: string; label: ReactNode; disabled?: boolean; unavailableReason?: ReactNode }` for each chip (`unavailableReason` since 0.4.0, as on `Chip`). |
 | `value` | `readonly string[]` | required | The picked values. |
 | `onChange` | `(value: string[]) => void` | required | Gets the new picked values, in the options' order, without duplicates. |
+
+#### `ChoiceChips` (client)
+
+Since 0.4.0. One choice from a few, as a real radio group drawn as chips (a status or type filter): native radios under one name, so Tab reaches the checked chip and the arrow keys move and pick. Same look as `Chip`, with the focus ring on the chip. A `<fieldset>` like `ChipGroup`, with the same `label` and `hideLabel`; every native `<fieldset>` prop except `onChange`, `children` and `defaultValue`. Type: `ChoiceChipOption`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | required | Names the group. |
+| `hideLabel` | `boolean` | `false` | As on `ChipGroup`, inside a `FilterRow`. |
+| `options` | `readonly ChoiceChipOption<T>[]` | required | `{ value: T; label: ReactNode; disabled?: boolean }` for each chip. |
+| `value` | `T` | required | The picked value. |
+| `onChange` | `(value: T) => void` | required | Gets the picked value. |
+| `name` | `string` | generated | The radios' name, for a form. |
 
 #### `RangeSlider` (client)
 
