@@ -163,12 +163,23 @@ try {
 
   // Node's ESM resolver, as Vitest uses for node_modules: every import in dist must resolve.
   console.log("consumer: importing the package in plain Node");
-  const exported = run("node", [
-    "--input-type=module",
-    "-e",
-    'const ui = await import("@haruhimemoe/ui"); console.log(Object.keys(ui).length);',
-  ]).trim();
-  if (!(Number(exported) > 20)) throw new Error(`Node imported only ${exported} exports`);
+  const exported = JSON.parse(
+    run("node", [
+      "--input-type=module",
+      "-e",
+      'const ui = await import("@haruhimemoe/ui"); console.log(JSON.stringify(Object.keys(ui)));',
+    ]),
+  );
+  if (!(exported.length > 20)) throw new Error(`Node imported only ${exported.length} exports`);
+  // Every runtime export has to appear in the fixture, so a new component gets built here too.
+  const fixtureText = readdirSync(FIXTURE, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".tsx"))
+    .map((entry) => readFileSync(path.join(entry.parentPath, entry.name), "utf8"))
+    .join("\n");
+  const unused = exported.filter((name) => !new RegExp(`\\b${name}\\b`).test(fixtureText));
+  if (unused.length > 0) {
+    throw new Error(`scripts/consumer-fixture renders no ${unused.join(", ")}: add them`);
+  }
 
   console.log("consumer: next build");
   const build = run(path.join(dir, "node_modules", ".bin", "next"), ["build"]);

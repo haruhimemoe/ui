@@ -2,11 +2,11 @@
 
 # @haruhimemoe/ui
 
-React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, cards, form fields, filter controls (toggle chips, a two-thumb range slider, a filter panel) and the site header, footer and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
+React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, links, badges, form fields and confirms, filter controls (toggle and choice chips, a two-thumb range slider, a filter panel), tables, osu! beatmap display pieces and the site header, footer, tabs, account menu and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
 
 See every component in its states at [haruhime.moe/ui](https://www.haruhime.moe/ui). The page names the version it runs.
 
-This README describes version 0.3.0. Anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
+This README describes version 0.4.0. Anything marked "since 0.4.0" is not in 0.3.0, anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
 
 ## Requirements
 
