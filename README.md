@@ -6,7 +6,7 @@ React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-w
 
 See every component in its states at [haruhime.moe/ui](https://www.haruhime.moe/ui). The page names the version it runs.
 
-This README describes version 0.4.0. Anything marked "since 0.4.0" is not in 0.3.0, anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
+This README describes version 0.5.0. Anything marked "since 0.5.0" is not in 0.4.0, anything marked "since 0.4.0" is not in 0.3.0, anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
 
 ## Requirements
 
@@ -153,7 +153,7 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
@@ -292,6 +292,25 @@ Since 0.4.0. A small pill for a status or tag ("Unranked", "beta", a count). A `
 | --- | --- | --- | --- |
 | `tone` | `"neutral" \| "accent" \| "warning" \| "muted"` | `"neutral"` | `neutral` is `b3` with `c2` text, `accent` is `h1` with dark bold text, `warning` is a faint amber with bold amber text, `muted` is an outlined pill in small bold capitals (a "beta" tag). |
 
+#### `Tabs` (client)
+
+Since 0.5.0. A tab list for panels on the same page (use `LinkTabs` when each tab is its own URL): pill buttons with `role="tab"` in a `role="tablist"` named by `label`. The chosen tab is `aria-selected` and the only one in the Tab order (the first one when none is chosen). Left and Right move and wrap, Home and End jump to the ends; each picks the tab and focuses it. Controlled. Every native `<div>` prop except `onChange` and `children`, for the tablist. Types: `TabItem<T>`, `TabsProps<T>`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | `string` | required | The tablist's accessible name. |
+| `idPrefix` | `string` | required | Prefix for the tabs' and panels' ids. |
+| `tabs` | `readonly { id: T; label: ReactNode }[]` | required | The tabs, left to right. |
+| `value` | `T` | required | The chosen tab's id. |
+| `onChange` | `(id: T) => void` | required | Gets the picked tab's id. |
+
+The panels are yours. `tabId(prefix, tab)` and `tabPanelId(prefix, tab)` (server-safe) give the ids that tie them together (`<prefix>-tab-<tab>`, `<prefix>-panel-<tab>`):
+
+```tsx
+<Tabs label="Editor view" idPrefix="ed" tabs={TABS} value={tab} onChange={setTab} />
+<div role="tabpanel" id={tabPanelId("ed", tab)} aria-labelledby={tabId("ed", tab)}>...</div>
+```
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.
@@ -361,6 +380,70 @@ Since 0.4.0. A confirm for something that can't be undone: a `<form>` whose subm
 <TypeToConfirm id="delete-pool" expected={pool.name} submitLabel="Delete this pool" onConfirm={remove} error={error}>
   <p>This deletes the pool for everyone who edits it. It can't be undone.</p>
 </TypeToConfirm>
+```
+
+#### `CharCounter`
+
+Since 0.5.0. How much of a length limit a text uses: "1,234 / 60,000 characters" in `c3`, then bold rose with ": 1,500 over the limit" once past it (at the limit is not over). You count, so any rule works (a string's length, a BBCode counter). Every native `<p>` prop except `children`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `count` | `number` | required | How many are used. |
+| `limit` | `number` | required | The most allowed. |
+| `unit` | `string` | `"characters"` | What is counted. |
+
+#### `VisibilitySelect` (client)
+
+Since 0.5.0. Who can see something: private, unlisted or public, each with a line that says who that is. As radios (a `RadioGroup`, every line shown as its option's description) or as a native select (a `Select`, the picked option's line as the hint). Controlled. Also exported: `VISIBILITIES` (`["private", "unlisted", "public"]`), the `Visibility` type, `VisibilityText` (`{ label: string; hint?: ReactNode }`) and `VISIBILITY_TEXT`, the default words ("Only you can see it.", "Anyone with the link can see it. It isn't listed.", "Anyone can see it, and it's listed.").
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `value` | `Visibility` | required | The picked visibility. |
+| `onChange` | `(value: Visibility) => void` | required | Gets the new one. |
+| `label` | `ReactNode` | `"Who can see it"` | The legend, or the select's label. |
+| `as` | `"radio" \| "select"` | `"radio"` | Radios, or a dropdown. |
+| `text` | `Partial<Record<Visibility, Partial<VisibilityText>>>` | none | Your words, merged over `VISIBILITY_TEXT` per visibility. |
+| `id` | `string` | generated | The select's id, or the radios' name. |
+| `hint` | `ReactNode` | none | Under the radios. On a select it replaces the picked option's line. |
+| `error` | `ReactNode` | none | As on the fields. |
+| `disabled` | `boolean` | `false` | Turns it off. |
+| `className` | `string` | none | Classes for the fieldset, or the select's wrapper. |
+
+```tsx
+<VisibilitySelect
+  label="Who can see this pool"
+  value={visibility}
+  onChange={setVisibility}
+  text={{ private: { hint: "Only you and your editors." } }}
+/>
+```
+
+#### `ReportDisclosure` (client)
+
+Since 0.5.0. "Report this": a `Disclosure` holding a reason `Textarea` (required) and a submit button. `onSubmit` gets the trimmed reason and says how it went: `{ ok: true, message? }` replaces the form with a `role="status"` line (your message, like "You already reported it.", or `sentMessage`); `{ ok: false, message }` shows the message as the field's error and keeps what was typed for a retry. A throw reads as `failedMessage`. One send at a time. Type: `ReportResult`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `onSubmit` | `(reason: string) => Promise<ReportResult>` | required | Sends the report. |
+| `summary` | `ReactNode` | `"Report"` | The disclosure button's text. |
+| `label` | `ReactNode` | `"What's wrong with it?"` | The reason field's label. |
+| `hint` | `ReactNode` | none | Help under the field. |
+| `submitLabel`, `pendingLabel` | `ReactNode` | `"Send report"`, `"Sending…"` | The button's text, and while sending. |
+| `sentMessage` | `ReactNode` | `"Thanks. Your report was sent."` | Said when the result has no message. |
+| `failedMessage` | `ReactNode` | `"Couldn't send the report. Try again."` | Said when `onSubmit` throws. |
+| `minLength`, `maxLength` | `number` | `3`, none | The reason's length limits. |
+| `rows` | `number` | `3` | The field's height. |
+| `className` | `string` | none | Classes for the wrapper (or the status line once sent). |
+
+```tsx
+<ReportDisclosure
+  summary="Report this template"
+  maxLength={500}
+  onSubmit={async (reason) => {
+    const response = await fetch(`/api/templates/${id}/report`, { method: "POST", body: JSON.stringify({ reason }) });
+    return response.ok ? { ok: true } : { ok: false, message: "Reporting failed." };
+  }}
+/>
 ```
 
 #### `fieldClasses`
@@ -803,6 +886,7 @@ Since 0.4.0. `cx(...classes: ClassValue[]): string` is the class merger every co
 - `FilterPanel`'s phone toggle carries `aria-expanded` and `aria-controls`. The result count is a live region. When "Clear filters" disappears after use, focus moves to the panel's heading instead of getting lost.
 - `CopyButton` announces "Copied." (or the failure) through an `<output>`, on every press.
 - `Pagination` moves focus to its "Page X of Y" text when the link you pressed goes away on the first or last page.
+- `Tabs` follows the ARIA tabs pattern: one tab in the Tab order, arrows, Home and End to move, `aria-controls` to its panel. `ReportDisclosure` says the outcome in a `role="status"` line and keeps a failed reason in the field.
 - `SiteHeader` marks the current page with `aria-current`. `PageShell` starts with a skip link to `<main>`.
 - `DiscordIcon` and `GitHubIcon` are hidden from screen readers by default: give the link around each one an `aria-label`, as `SiteFooter` does.
 - You supply the text, so you also supply labels: give icon-only buttons an `aria-label`, and keep `label` props meaningful.

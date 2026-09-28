@@ -31,6 +31,7 @@ import {
 import Link from "next/link";
 import { Additions } from "./Additions";
 import { ClientAdditions } from "./ClientAdditions";
+import { ClientAdditions05 } from "./ClientAdditions05";
 import { Filters } from "./Filters";
 
 const LINKS: SiteLinkItem[] = [
@@ -129,6 +130,7 @@ export default function Page() {
       </Card>
       <Additions />
       <ClientAdditions />
+      <ClientAdditions05 />
       <Filters />
       <FilterPanel title="Server filters" resultCount="3 maps">
         <FilterRow label="Mode">

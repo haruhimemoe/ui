@@ -35,7 +35,9 @@ export {
 export { Notice, type NoticeProps, type NoticeTone } from "./components/basics/Notice.js";
 export { PageHeader, type PageHeaderProps } from "./components/basics/PageHeader.js";
 export { Prose, type ProseProps } from "./components/basics/Prose.js";
+export { type TabItem, Tabs, type TabsProps } from "./components/basics/Tabs.js";
 export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
+export { tabId, tabPanelId } from "./components/basics/tabIds.js";
 
 // Filters
 export { Chip, type ChipProps } from "./components/filters/Chip.js";
@@ -54,6 +56,7 @@ export {
 } from "./components/filters/RangeSlider.js";
 
 // Forms
+export { CharCounter, type CharCounterProps } from "./components/forms/CharCounter.js";
 export { Checkbox, type CheckboxProps } from "./components/forms/Checkbox.js";
 export type { FieldProps } from "./components/forms/FieldFrame.js";
 export { fieldClasses } from "./components/forms/fieldStyles.js";
@@ -62,10 +65,23 @@ export {
   type RadioGroupProps,
   type RadioOption,
 } from "./components/forms/RadioGroup.js";
+export {
+  ReportDisclosure,
+  type ReportDisclosureProps,
+  type ReportResult,
+} from "./components/forms/ReportDisclosure.js";
 export { Select, type SelectProps } from "./components/forms/Select.js";
 export { Textarea, type TextareaProps } from "./components/forms/Textarea.js";
 export { TextInput, type TextInputProps } from "./components/forms/TextInput.js";
 export { TypeToConfirm, type TypeToConfirmProps } from "./components/forms/TypeToConfirm.js";
+export {
+  VISIBILITIES,
+  VISIBILITY_TEXT,
+  type Visibility,
+  VisibilitySelect,
+  type VisibilitySelectProps,
+  type VisibilityText,
+} from "./components/forms/VisibilitySelect.js";
 
 // Icons
 export { DiscordIcon, type DiscordIconProps } from "./components/icons/DiscordIcon.js";

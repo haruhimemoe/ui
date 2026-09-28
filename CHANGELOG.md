@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-28
+
+### Added
+
+- `Tabs`: an ARIA tab list for panels on the same page. The chosen tab is the only one in the Tab order; Left and Right (wrapping), Home and End pick and focus a tab. `tabId` and `tabPanelId` give the ids that tie a tab to its panel. Moved from bb.haruhime.moe.
+- `CharCounter`: "1,234 / 60,000 characters", bold rose with how many to cut once over the limit. The caller counts. Moved from bb.haruhime.moe.
+- `VisibilitySelect`: private, unlisted or public with a line each saying who sees it, as radios or a select, with the words overridable. Also `VISIBILITIES`, `VISIBILITY_TEXT` and the `Visibility` and `VisibilityText` types. It replaces the pools pool editor's radios and bb's template selects.
+- `ReportDisclosure`: a report reason in a disclosure, sent through `onSubmit`, which returns a `ReportResult`; done replaces the form with a status line, an error stays on the field for a retry. Moved from bb.haruhime.moe (ReportForm).
+
 ## [0.4.0] - 2026-09-28
 
 ### Added
@@ -77,7 +86,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.4.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/haruhimemoe/ui/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/haruhimemoe/ui/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/haruhimemoe/ui/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/haruhimemoe/ui/compare/v0.1.0...v0.2.0
