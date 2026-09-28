@@ -4,7 +4,7 @@
  *       error wiring, native props, className, ref, mouse and keyboard toggling, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -86,6 +86,17 @@ describe("Checkbox", () => {
     const box = screen.getByRole("checkbox");
     expect(box).toHaveAttribute("aria-describedby", "more");
     expect(box).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("keeps a caller aria-labelledby after its own label", () => {
+    render(
+      <>
+        <h3 id="section">Downloads</h3>
+        <Checkbox id="x" label="Include video" aria-labelledby="section" />
+      </>,
+    );
+    const box = screen.getByRole("checkbox", { name: "Include video Downloads" });
+    expect(box).toHaveAttribute("aria-labelledby", "x-label section");
   });
 
   it("passes native props through and takes a ref as a plain prop", () => {

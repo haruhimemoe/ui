@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `SiteFooter` takes `discordLabel` (default "Discord"), the Discord link's accessible name, as `githubLabel` does for GitHub.
+
+### Fixed
+
+- Hrefs that browsers read as off-site now count as external: `/\host`, `\\host`, and a URL behind leading spaces or control characters. Before, `ButtonLink` sent them through `next/link` without its `rel="noreferrer"` default, and a nav hydrated its client list for them.
+- `Pagination` normalizes `page` and `pageCount`: `NaN` reads as page 1 (a `NaN` count as one page), a page past either end is pulled back inside, and fractions are dropped. Before, `page={NaN}` showed "Page NaN of 5" with no links, and page 99 of 5 linked to page 98.
+- `CopyButton` reports only the latest press. A slow earlier copy that failed after a later one worked no longer replaces "Copied." with the failure.
+- `SiteHeader` and `NavLinks` key entries by label and href, as `SiteFooter` does, so two entries with the same href no longer share a React key.
+- `Checkbox` keeps an `aria-labelledby` you pass, after its own label. Before, it was dropped.
+
 ### Security
 
 - The release workflow pins every GitHub Action to a full commit SHA and npm to an exact version, since that job holds the npm publish token. It also runs the coverage floor and the consumer check before publishing, as CI does. Dependabot keeps the pins and the exact dependency versions current.

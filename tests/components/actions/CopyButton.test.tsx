@@ -4,7 +4,7 @@
  *       keyboard use, accessibility. The clipboard is always a stub.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { act, render, screen } from "@testing-library/react";
@@ -72,6 +72,27 @@ describe("CopyButton", () => {
     expect(status).toHaveTextContent("Copied.");
     // A fresh node, so the live region reports an addition even with the same text.
     expect(status.firstChild).not.toBe(first);
+  });
+
+  it("reports only the latest press, even when an earlier one settles after it", async () => {
+    const pending: { resolve: () => void; reject: (error: Error) => void }[] = [];
+    const { user } = setup(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          pending.push({ resolve, reject });
+        }),
+    );
+    render(<CopyButton text="12345" />);
+    const status = screen.getByRole("status");
+    const button = screen.getByRole("button", { name: "Copy" });
+
+    await user.click(button);
+    await user.click(button);
+    await act(async () => pending[1]?.resolve());
+    expect(status).toHaveTextContent("Copied.");
+    // The first press (a permission prompt, say) fails late: the status keeps the newer result.
+    await act(async () => pending[0]?.reject(new Error("denied")));
+    expect(status).toHaveTextContent("Copied.");
   });
 
   it("tells the reader to copy by hand when the clipboard refuses", async () => {

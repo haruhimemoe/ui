@@ -5,7 +5,7 @@
  *       ever be the current page.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { isExternalHref } from "../../utils/href.js";
@@ -18,6 +18,14 @@ export type SiteLinkItem = {
   href?: string | undefined;
   note?: string | undefined;
 };
+
+/**
+ * @function linkItemKey
+ * @param item {SiteLinkItem} a nav or footer entry
+ * @returns {string} its React key, from the label and the href together, so two entries with the
+ *          same href (or two text-only entries) still get different keys
+ */
+export const linkItemKey = (item: SiteLinkItem): string => `${item.label} ${item.href ?? ""}`;
 
 const trimSlash = (path: string): string =>
   path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;

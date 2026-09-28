@@ -4,7 +4,7 @@
  *       which hrefs can ever be the current page.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { describe, expect, it } from "vitest";
@@ -12,6 +12,7 @@ import {
   ariaCurrentFor,
   canBeCurrent,
   isExternalHref,
+  linkItemKey,
 } from "../../../src/components/shell/links.js";
 
 describe("isExternalHref", () => {
@@ -27,9 +28,23 @@ describe("isExternalHref", () => {
     }
   });
 
+  it("reads an href as the browser does: backslashes as slashes, no leading space or controls", () => {
+    for (const href of [
+      "/\\evil.example",
+      "\\\\evil.example",
+      "\\/evil.example",
+      " https://evil.example",
+      "\u0000\u001f//evil.example",
+      "/\t/evil.example",
+      "java\nscript:alert(1)",
+    ]) {
+      expect(isExternalHref(href), JSON.stringify(href)).toBe(true);
+    }
+  });
+
   it("treats paths, fragments and queries as internal", () => {
-    for (const href of ["/", "/packs", "packs", "#main", "?page=2"]) {
-      expect(isExternalHref(href)).toBe(false);
+    for (const href of ["/", "/packs", "packs", "#main", "?page=2", " /packs", "/a\\b"]) {
+      expect(isExternalHref(href), JSON.stringify(href)).toBe(false);
     }
   });
 });
@@ -76,6 +91,8 @@ describe("canBeCurrent", () => {
       "https://example.com/packs",
       "//cdn.example.com/packs",
       "mailto:hi@example.com",
+      "/\\evil.example/packs",
+      "\\\\evil.example",
       "packs",
       "#main",
       "?page=2",
@@ -93,5 +110,17 @@ describe("canBeCurrent", () => {
       }
     }
     expect(pathnames.some((pathname) => ariaCurrentFor(pathname, "/packs"))).toBe(true);
+  });
+});
+
+describe("linkItemKey", () => {
+  it("keys on the label and href together, so a shared href or label stays unique", () => {
+    const keys = [
+      { label: "Docs", href: "/docs" },
+      { label: "API", href: "/docs" },
+      { label: "Docs", href: "/guide" },
+      { label: "Docs" },
+    ].map(linkItemKey);
+    expect(new Set(keys).size).toBe(4);
   });
 });

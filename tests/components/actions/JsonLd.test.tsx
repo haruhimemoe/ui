@@ -4,7 +4,7 @@
  *       "</script>" in the data from closing the tag (in the DOM and in server HTML), native props.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { render } from "@testing-library/react";
@@ -51,9 +51,15 @@ describe("JsonLd", () => {
   });
 
   it("passes native script props like id and nonce through, but not a different type", () => {
-    const { container } = render(<JsonLd id="ld" nonce="abc" data={{ "@type": "Thing" }} />);
+    // The type prop is left out of JsonLdProps; a cast stands in for plain JavaScript callers.
+    const rogue = { type: "text/javascript" } as Record<string, unknown>;
+    const { container } = render(
+      <JsonLd id="ld" nonce="abc" data={{ "@type": "Thing" }} {...rogue} />,
+    );
     const script = container.querySelector("script");
     expect(script).toHaveAttribute("id", "ld");
+    // React moves nonce to the property, so check it there (the CSP reads the same value).
+    expect(script?.nonce).toBe("abc");
     expect(script).toHaveAttribute("type", "application/ld+json");
   });
 

@@ -5,10 +5,11 @@
  *       browser, so both lists print the same markup.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Sep 24, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { AutoLink } from "./AutoLink.js";
+import { LinkNote } from "./LinkNote.js";
 import type { SiteLinkItem } from "./links.js";
 
 /** One nav entry, its aria-current and the finished classes for its link. */
@@ -21,13 +22,6 @@ export type NavItemProps = {
 };
 
 /**
- * @function navItemKey
- * @param item {SiteLinkItem} a nav entry
- * @returns {string} its React key: the href, or the label for a text-only entry
- */
-export const navItemKey = (item: SiteLinkItem): string => item.href || item.label;
-
-/**
  * @function NavItem
  * @param props {NavItemProps} the entry, its aria-current and its link classes
  * @returns {JSX.Element} an `<li>` with the link, or with dimmed text and the note beside it
@@ -38,12 +32,7 @@ export function NavItem({ item, current, linkClassName }: NavItemProps) {
       <li>
         <span aria-disabled="true" className="text-c4">
           {item.label}
-          {item.note ? (
-            <>
-              {" "}
-              <span className="text-xs uppercase tracking-wide">{item.note}</span>
-            </>
-          ) : null}
+          <LinkNote note={item.note} />
         </span>
       </li>
     );

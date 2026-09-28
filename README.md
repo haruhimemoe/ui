@@ -183,7 +183,7 @@ A pill button. Every native `<button>` prop.
 
 A link that looks like `Button`. Every `next/link` prop (`href`, `prefetch`, `replace`, `scroll`, `target`, `rel`...), plus `variant` and `size` as on `Button`.
 
-- A string `href` with a scheme (`https:`, `mailto:`) or starting with `//` renders a plain `<a>`, and `next/link`'s own props are dropped.
+- A string `href` with a scheme (`https:`, `mailto:`) or starting with `//` renders a plain `<a>`, and `next/link`'s own props are dropped. The href is read the way the browser reads it: leading spaces don't count and a backslash counts as a slash, so `/\host` and `\\host` are off-site too (since 0.4.0).
 - That plain `<a>` with `target="_blank"` and no `rel` gets `rel="noreferrer"`. A `rel` you pass always wins. Internal links get only the `rel` you pass.
 
 #### `buttonClasses`
@@ -287,7 +287,7 @@ Every native `<select>` prop, plus the field props. Pass `<option>` elements as 
 
 #### `Checkbox`
 
-Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChange`, `name`, `disabled`...), plus the field props. The label is bold `text-c1` and the hint follows it inline after a dot. Clicking anywhere on the row toggles it. The label alone is the accessible name; the hint is the description.
+Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChange`, `name`, `disabled`...), plus the field props. The label is bold `text-c1` and the hint follows it inline after a dot. Clicking anywhere on the row toggles it. The label alone is the accessible name; the hint is the description. An `aria-labelledby` you pass is added after the label (since 0.4.0; 0.3.0 dropped it).
 
 #### `fieldClasses`
 
@@ -301,7 +301,7 @@ Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChang
 
 #### `CopyButton` (client)
 
-A button that copies text, with the result in an `<output>` beside it that screen readers announce. Each press clears the message first, so a second copy is announced too. If the clipboard is missing or refuses (an insecure page, say), it shows the failure message. Every `Button` prop except `onClick` and `children`; `className` and the native props go on the button.
+A button that copies text, with the result in an `<output>` beside it that screen readers announce. Each press clears the message first, so a second copy is announced too. Only the latest press reports: an earlier copy that settles later (behind a permission prompt, say) doesn't overwrite it (since 0.4.0). If the clipboard is missing or refuses (an insecure page, say), it shows the failure message. Every `Button` prop except `onClick` and `children`; `className` and the native props go on the button.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -325,6 +325,8 @@ Previous and next pill links around "Page X of Y". Renders nothing when there is
 | `previousLabel` | `ReactNode` | `"Previous"` | Text of the link to the page before. |
 | `nextLabel` | `ReactNode` | `"Next"` | Text of the link to the page after. |
 | `formatStatus` | `(page: number, pageCount: number) => ReactNode` | `"Page X of Y"` | The text in the middle. |
+
+A `page` or `pageCount` straight from a URL is safe to pass (since 0.4.0): `NaN` reads as page 1 (and a `NaN` count as one page), a page past either end is pulled back inside, and fractions are dropped. `Number("abc")` shows page 1 with a Next link, and page 99 of 5 shows page 5.
 
 The links use `next/link` with `rel="prev"` and `rel="next"`. On the first and last page one link goes away. If it had keyboard focus (Next pressed on page 4 of 5), focus moves to the "Page X of Y" text instead of falling back to the top of the page. `Pagination` stays a Server Component; that text is a small client component inside it.
 
@@ -511,7 +513,7 @@ Links in the header and footer are data (type `SiteLinkItem`):
 type SiteLinkItem = { label: string; href?: string; note?: string };
 ```
 
-Paths use `next/link`; anything with a scheme (`https:`, `mailto:`) or starting with `//` is a plain `<a>`. An item without `href` shows as plain text. `note` adds a word beside it in small uppercase letters (`{ label: "Sheets", note: "soon" }`). The header dims text-only items and shows the note only on them. The footer shows a note beside a link too.
+Paths use `next/link`; anything with a scheme (`https:`, `mailto:`) or starting with `//` is a plain `<a>` (and, since 0.4.0, `/\host`, `\\host` or a URL behind leading spaces, which browsers also read as off-site). An item without `href` shows as plain text. `note` adds a word beside it in small uppercase letters (`{ label: "Sheets", note: "soon" }`). The header dims text-only items and shows the note only on them. The footer shows a note beside a link too.
 
 #### `SiteHeader`
 
@@ -555,7 +557,8 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub ico
 | `parentHref` | `string` | `"https://www.haruhime.moe"` | Where the wordmark links. |
 | `githubHref` | `string \| false` | `"https://github.com/haruhimemoe"` | Where the GitHub icon links. `false` leaves it out. |
 | `githubLabel` | `string` | `"haruhimemoe on GitHub"` | The GitHub link's accessible name. |
-| `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon at the same size. It stays white (`text-c1`) and dims on hover instead of changing color, since Discord's brand guidelines ask that the logo not be recolored. The link's accessible name is "Discord". Since 0.3.0. |
+| `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon at the same size. It stays white (`text-c1`) and dims on hover instead of changing color, since Discord's brand guidelines ask that the logo not be recolored. Since 0.3.0. |
+| `discordLabel` | `string` | `"Discord"` | The Discord link's accessible name. Since 0.4.0. |
 
 #### `PageShell`
 

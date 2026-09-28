@@ -5,12 +5,12 @@
  *       links, native props, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { SiteFooter, type SiteFooterColumn } from "../../../src/components/shell/SiteFooter.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
@@ -196,6 +196,33 @@ describe("SiteFooter", () => {
     expect(svg).toHaveAttribute("viewBox", "0 0 24 24");
     expect(svg).toHaveClass("size-5");
     expect(github.querySelector("svg")).toHaveClass("size-5");
+  });
+
+  it("names the Discord link with discordLabel", () => {
+    render(<SiteFooter discordHref={DISCORD} discordLabel="Discord の招待" />);
+    expect(screen.getByRole("link", { name: "Discord の招待" })).toHaveAttribute("href", DISCORD);
+    expect(screen.queryByRole("link", { name: "Discord" })).toBeNull();
+  });
+
+  it("keys entries by label and href, so two links to one href render without a warning", () => {
+    const errors: unknown[] = [];
+    const spy = vi.spyOn(console, "error").mockImplementation((...args) => errors.push(args));
+    render(
+      <SiteFooter
+        columns={[
+          {
+            title: "Help",
+            items: [
+              { label: "Docs", href: "/docs" },
+              { label: "Guide", href: "/docs" },
+            ],
+          },
+        ]}
+      />,
+    );
+    spy.mockRestore();
+    expect(errors).toEqual([]);
+    expect(screen.getAllByRole("link", { name: /Docs|Guide/ })).toHaveLength(2);
   });
 
   it("keeps the Discord logo white, as Discord's brand guidelines ask, and dims it on hover", () => {

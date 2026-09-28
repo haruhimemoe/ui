@@ -5,15 +5,15 @@
  *       the server, so it imports no class merging and ships no tailwind-merge to the browser.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Sep 24, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 "use client";
 
 import { usePathname } from "next/navigation.js";
 import type { ComponentProps } from "react";
-import { ariaCurrentFor, type SiteLinkItem } from "./links.js";
-import { NavItem, navItemKey } from "./NavItem.js";
+import { ariaCurrentFor, linkItemKey, type SiteLinkItem } from "./links.js";
+import { NavItem } from "./NavItem.js";
 
 /** Every native `<ul>` prop (including `ref`), plus the links and their finished classes. */
 export type NavListClientProps = Omit<ComponentProps<"ul">, "children"> & {
@@ -43,7 +43,7 @@ export function NavListClient({
         const current = item.href ? ariaCurrentFor(pathname, item.href) : undefined;
         return (
           <NavItem
-            key={navItemKey(item)}
+            key={linkItemKey(item)}
             item={item}
             current={current}
             linkClassName={current ? currentClassName : linkClassName}

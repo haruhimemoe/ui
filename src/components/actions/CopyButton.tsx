@@ -4,10 +4,10 @@
  *       it (a polite live region), like the packs export and doc pages. If the clipboard is
  *       missing or refuses, it says so and tells the reader to copy by hand. Each press empties
  *       the status first and then writes the result as a new node, so a second copy is announced
- *       too.
+ *       too. Only the latest press reports: a slow earlier copy that settles later is ignored.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 "use client";
@@ -53,12 +53,14 @@ export function CopyButton({
     // same "Copied." twice) is not announced again.
     setStatus(null);
     const press = ++presses.current;
+    let result: "copied" | "failed" = "copied";
     try {
       await navigator.clipboard.writeText(text);
-      setStatus({ result: "copied", press });
     } catch {
-      setStatus({ result: "failed", press });
+      result = "failed";
     }
+    // A later press owns the status now; this one settled too late to say anything.
+    if (press === presses.current) setStatus({ result, press });
   };
 
   return (

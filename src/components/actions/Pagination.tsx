@@ -3,10 +3,11 @@
  * @desc Previous / next links around "Page X of Y". Renders nothing for a single page. The
  *       caller builds each page's URL, so it works with any query string or route shape. When
  *       the link a keyboard user pressed goes away (Next on the last page), focus moves to the
- *       status text instead of the page body.
+ *       status text instead of the page body. A page or count from a URL is normalized first:
+ *       NaN reads as page 1, and a page past either end is pulled back inside.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import Link from "next/link.js";
@@ -14,12 +15,13 @@ import type { ComponentProps, ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
 import { buttonClasses } from "../basics/buttonStyles.js";
 import { PaginationStatus } from "./PaginationStatus.js";
+import { normalizePages } from "./pages.js";
 
 /** Every native `<nav>` prop except children, plus the page state and the link builder. */
 export type PaginationProps = Omit<ComponentProps<"nav">, "children"> & {
-  /** The current page, 1-based. */
+  /** The current page, 1-based. NaN reads as 1; a page past either end is pulled back inside. */
   page: number;
-  /** How many pages there are. At 1 or fewer, nothing renders. */
+  /** How many pages there are. At 1 or fewer (or NaN), nothing renders. */
   pageCount: number;
   /** Builds the URL for a page number, e.g. `(p) => \`/packs?page=${p}\``. */
   hrefFor: (page: number) => string;
@@ -41,8 +43,8 @@ const defaultStatus = (page: number, pageCount: number): ReactNode =>
  * @returns {JSX.Element | null} a `<nav>` with previous / next pill links, or null for one page
  */
 export function Pagination({
-  page,
-  pageCount,
+  page: rawPage,
+  pageCount: rawPageCount,
   hrefFor,
   previousLabel = "Previous",
   nextLabel = "Next",
@@ -50,7 +52,8 @@ export function Pagination({
   className,
   ...props
 }: PaginationProps) {
-  if (pageCount <= 1) return null;
+  const { page, pageCount } = normalizePages(rawPage, rawPageCount);
+  if (pageCount === null || pageCount <= 1) return null;
   return (
     <nav
       aria-label="Pages"

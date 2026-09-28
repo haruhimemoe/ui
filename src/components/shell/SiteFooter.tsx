@@ -6,7 +6,7 @@
  *       Discord icon link beside it (white, as Discord's brand guidelines ask).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
@@ -15,7 +15,8 @@ import { DiscordIcon } from "../icons/DiscordIcon.js";
 import { GitHubIcon } from "../icons/GitHubIcon.js";
 import { HaruhimeWordmarkLink } from "../icons/HaruhimeWordmarkLink.js";
 import { AutoLink } from "./AutoLink.js";
-import type { SiteLinkItem } from "./links.js";
+import { LinkNote } from "./LinkNote.js";
+import { linkItemKey, type SiteLinkItem } from "./links.js";
 
 /** One footer column: a title (also the nav landmark's name) and its entries. */
 export type SiteFooterColumn = {
@@ -41,6 +42,8 @@ export type SiteFooterProps = Omit<ComponentProps<"footer">, "children"> & {
   githubLabel?: string | undefined;
   /** Where the Discord icon links, e.g. a server invite. No Discord icon without it. */
   discordHref?: string | undefined;
+  /** The Discord link's accessible name. Default "Discord". */
+  discordLabel?: string | undefined;
 };
 
 // The GitHub icon link in the bottom row.
@@ -56,7 +59,7 @@ const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-
 /**
  * @function SiteFooter
  * @param props {SiteFooterProps} columns, extra slot, fine print, parent, GitHub and Discord
- *        links, and native footer props
+ *        links and their names, and native footer props
  * @returns {JSX.Element} the footer: columns on top, then extra, fine print and the brand row
  */
 export function SiteFooter({
@@ -68,6 +71,7 @@ export function SiteFooter({
   githubHref = "https://github.com/haruhimemoe",
   githubLabel = "haruhimemoe on GitHub",
   discordHref,
+  discordLabel = "Discord",
   className,
   ...props
 }: SiteFooterProps) {
@@ -78,7 +82,7 @@ export function SiteFooter({
     </a>
   ) : null;
   const discord = discordHref ? (
-    <a href={discordHref} aria-label="Discord" className={DISCORD_LINK}>
+    <a href={discordHref} aria-label={discordLabel} className={DISCORD_LINK}>
       <DiscordIcon />
     </a>
   ) : null;
@@ -108,7 +112,7 @@ export function SiteFooter({
                 </p>
                 <ul className="flex flex-col gap-2">
                   {column.items.map((item) => (
-                    <li key={`${item.label} ${item.href ?? ""}`}>
+                    <li key={linkItemKey(item)}>
                       {item.href ? (
                         <AutoLink
                           href={item.href}
@@ -119,14 +123,7 @@ export function SiteFooter({
                       ) : (
                         <span>{item.label}</span>
                       )}
-                      {item.note ? (
-                        <>
-                          {" "}
-                          <span className="text-c4 text-xs uppercase tracking-wide">
-                            {item.note}
-                          </span>
-                        </>
-                      ) : null}
+                      <LinkNote note={item.note} />
                     </li>
                   ))}
                 </ul>

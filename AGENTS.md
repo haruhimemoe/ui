@@ -10,8 +10,8 @@
 - `src/components/<group>/<name>Styles.ts`: class builders shared by several components (`buttonClasses`, `fieldClasses`).
 - Internal files. `src/index.ts` exports none of their runtime code, only two types from them, `FieldProps` and `SiteLinkItem`, which are public API (the README documents both):
   - `forms/FieldFrame.tsx`: the label, hint and error layout (`FieldFrame`, `FieldError`), the `<id>-hint` / `<id>-error` ids the fields share (`hintId`, `errorId`, `fieldDescribedBy`), and the public `FieldProps` type.
-  - `actions/PaginationStatus.tsx`: the client "Page X of Y" text that takes focus when a Pagination link goes away.
-  - `shell/links.ts` (the public `SiteLinkItem` type, plus `canBeCurrent` and `ariaCurrentFor`), `shell/AutoLink.tsx` (next/link or a plain `<a>`, by href), `shell/NavItem.tsx` (one nav entry) and `shell/NavListClient.tsx` (the client list that sets `aria-current`).
+  - `actions/PaginationStatus.tsx`: the client "Page X of Y" text that takes focus when a Pagination link goes away. `actions/pages.ts`: `normalizePages`, which cleans a page and page count from a URL.
+  - `shell/links.ts` (the public `SiteLinkItem` type, plus `canBeCurrent`, `ariaCurrentFor` and `linkItemKey`, the one React key for nav and footer entries), `shell/AutoLink.tsx` (next/link or a plain `<a>`, by href), `shell/NavItem.tsx` (one nav entry), `shell/LinkNote.tsx` (the "soon" note beside an entry) and `shell/NavListClient.tsx` (the client list that sets `aria-current`).
 - `src/utils/`: `cx.ts` (`cx`, tailwind-merge) and `href.ts` (`isExternalHref`, re-exported from `shell/links.ts`).
 - `tests/components/<group>/`: tests in the same group as their source, `<Name>.test.tsx` for components and `<name>.test.ts` for plain modules (`forms/fieldStyles.test.ts`, `shell/links.test.ts`, which also covers `isExternalHref`). Some internal files have their own test (`shell/AutoLink.test.tsx`); the rest are covered through the components that use them.
 - `tests/utils/cx.test.ts`, `tests/helpers/axe.ts` (`expectNoAxeViolations`), `tests/setup/dom.ts` (jest-dom matchers, cleanup).

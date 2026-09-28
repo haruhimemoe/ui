@@ -1,11 +1,12 @@
 /**
  * @file src/components/forms/Checkbox.tsx
  * @desc Checkbox with a bold label and an inline hint (the packs download-options look). The whole
- *       row toggles it; the label alone is its accessible name and the hint its description.
- *       Server-safe: the required id names the label, hint and error.
+ *       row toggles it; the label alone is its accessible name (plus any aria-labelledby the
+ *       caller adds) and the hint its description. Server-safe: the required id names the label,
+ *       hint and error.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -30,6 +31,7 @@ export function Checkbox({
   className,
   "aria-describedby": describedBy,
   "aria-invalid": invalid,
+  "aria-labelledby": labelledBy,
   ...props
 }: CheckboxProps) {
   const labelId = `${id}-label`;
@@ -40,7 +42,8 @@ export function Checkbox({
           {...props}
           type="checkbox"
           id={id}
-          aria-labelledby={labelId}
+          // The label first, then the caller's own ids: a plain join, since these are ids.
+          aria-labelledby={labelledBy ? `${labelId} ${labelledBy}` : labelId}
           aria-describedby={fieldDescribedBy(id, hint, error, describedBy)}
           aria-invalid={error ? true : invalid}
           className={cx("mt-1 accent-h1", className)}

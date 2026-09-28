@@ -5,13 +5,13 @@
  *       it to the small NavListClient, which reads the path to set aria-current.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import type { ComponentProps } from "react";
 import { cx } from "../../utils/cx.js";
-import { canBeCurrent, type SiteLinkItem } from "./links.js";
-import { NavItem, navItemKey } from "./NavItem.js";
+import { canBeCurrent, linkItemKey, type SiteLinkItem } from "./links.js";
+import { NavItem } from "./NavItem.js";
 import { NavListClient } from "./NavListClient.js";
 
 /** Where the nav sits in the header: after the brand ("start") or centered in the free space. */
@@ -50,7 +50,7 @@ export function NavLinks({ links, align = "start", className, ...props }: NavLin
     return (
       <ul className={listClassName} {...props}>
         {links.map((item) => (
-          <NavItem key={navItemKey(item)} item={item} linkClassName={LINKS[align]} />
+          <NavItem key={linkItemKey(item)} item={item} linkClassName={LINKS[align]} />
         ))}
       </ul>
     );

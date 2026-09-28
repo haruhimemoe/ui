@@ -5,7 +5,7 @@
  *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -89,6 +89,27 @@ describe("NavLinks", () => {
     expect(sheets).toHaveTextContent("sheets soon");
     expect(screen.getByText("soon")).toHaveClass("text-xs", "uppercase");
     expect(screen.getByText("stats")).toHaveTextContent(/^stats$/);
+  });
+
+  it("keys entries by label and href, so two entries with one href render without a warning", () => {
+    const errors: unknown[] = [];
+    const spy = vi.spyOn(console, "error").mockImplementation((...args) => errors.push(args));
+    for (const links of [
+      [
+        { label: "Docs", href: "/docs" },
+        { label: "API", href: "/docs" },
+      ],
+      [
+        { label: "Docs", href: "https://example.com/docs" },
+        { label: "API", href: "https://example.com/docs" },
+      ],
+    ]) {
+      const { unmount } = render(<NavLinks links={links} />);
+      expect(screen.getAllByRole("link")).toHaveLength(2);
+      unmount();
+    }
+    spy.mockRestore();
+    expect(errors).toEqual([]);
   });
 
   it("uses the compact left-aligned list by default and the centered one on request", () => {

@@ -2,10 +2,10 @@
  * @file tests/components/actions/Pagination.test.tsx
  * @desc Component tests for Pagination: single page, first / middle / last page links, labels,
  *       native nav props, className, keyboard order, focus kept when an end link goes away,
- *       accessibility.
+ *       NaN and out-of-range pages, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -22,6 +22,27 @@ describe("Pagination", () => {
     expect(container).toBeEmptyDOMElement();
     rerender(<Pagination page={1} pageCount={0} hrefFor={hrefFor} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("reads a NaN page as page 1 and a NaN count as one page", () => {
+    const { container, rerender } = render(
+      <Pagination page={Number("abc")} pageCount={5} hrefFor={hrefFor} />,
+    );
+    expect(screen.getByText("Page 1 of 5")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute("href", "/packs?page=2");
+    rerender(<Pagination page={2} pageCount={Number.NaN} hrefFor={hrefFor} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("pulls a page past either end back inside, and drops fractions", () => {
+    const { rerender } = render(<Pagination page={99} pageCount={5} hrefFor={hrefFor} />);
+    expect(screen.getByText("Page 5 of 5")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Previous" })).toHaveAttribute("href", "/packs?page=4");
+    expect(screen.queryByRole("link", { name: "Next" })).not.toBeInTheDocument();
+    rerender(<Pagination page={-3} pageCount={5.9} hrefFor={hrefFor} />);
+    expect(screen.getByText("Page 1 of 5")).toBeInTheDocument();
+    rerender(<Pagination page={2.7} pageCount={5} hrefFor={hrefFor} />);
+    expect(screen.getByText("Page 2 of 5")).toBeInTheDocument();
   });
 
   it("shows only the next link on the first page", () => {
