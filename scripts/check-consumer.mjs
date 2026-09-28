@@ -225,6 +225,11 @@ try {
       ],
       [/<legend[^>]*>Who can see this pool<\/legend>/, "RadioGroup (client)"],
       [/>Type OWC 2026 to confirm<\/label>/, "TypeToConfirm (client)"],
+      [/<nav aria-label="What to search"/, "LinkTabs"],
+      [/<span class="sr-only">5\.23<!-- --> <!-- -->stars/, "StarRating"],
+      [/<abbr title="Approach rate">AR<\/abbr>/, "BeatmapStats"],
+      [/<span[^>]*class="[^"]*bg-amber-300[^"]*"[^>]*>HD2<\/span>/, "ModBadge"],
+      [/<button[^>]*aria-expanded="false"[^>]*>peppy<\/button>/, "HeaderMenu (client)"],
       [
         /<a\b(?=[^>]*href="https:\/\/discord\.gg\/example")(?=[^>]*aria-label="Discord")[^>]*><svg\b[^>]*viewBox="0 0 24 24"/,
         "SiteFooter's Discord link with DiscordIcon",

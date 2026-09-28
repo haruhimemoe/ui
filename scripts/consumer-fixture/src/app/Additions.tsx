@@ -1,8 +1,12 @@
 import {
   Badge,
+  BeatmapStats,
   Card,
   cx,
+  LinkTabs,
   linkClasses,
+  ModBadge,
+  StarRating,
   Table,
   TBody,
   Td,
@@ -25,6 +29,16 @@ export function Additions() {
       <button type="button" className={linkClasses()}>
         Looks like a link
       </button>
+      <LinkTabs
+        label="What to search"
+        items={[
+          { href: "/", label: "Pools", current: true },
+          { href: "/docs", label: "Maps" },
+        ]}
+      />
+      <StarRating value={5.23} label="with HR" />
+      <BeatmapStats cs={4} ar={9.3} od={8} hp={5} bpm={180} lengthSeconds={125} />
+      <ModBadge mod="HD2" />
       <Table caption="Slots" hideCaption>
         <THead>
           <tr>

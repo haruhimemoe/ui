@@ -5,6 +5,7 @@ import {
   Chip,
   ChoiceChips,
   Disclosure,
+  HeaderMenu,
   InlineConfirm,
   Pagination,
   RadioGroup,
@@ -23,6 +24,7 @@ export function ClientAdditions() {
       <Disclosure summary="Download options">
         <p>Include video</p>
       </Disclosure>
+      <HeaderMenu label="peppy" items={[{ href: "/docs", label: "Account" }]} />
       <Pagination page={page} pageCount={null} hasNext onPageChange={setPage} />
       <ChoiceChips
         label="Status"

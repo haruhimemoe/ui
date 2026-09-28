@@ -21,6 +21,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `TypeToConfirm`: a form whose submit stays off until a name is typed exactly, for actions that can't be undone.
 - `ChoiceChips`: single-select chips as native radios (arrow keys move and pick), with `Chip`'s look and `ChipGroup`'s `label` and `hideLabel`.
 - `Chip` and `ChipOption` take `unavailableReason`: the chip is blocked but stays focusable (`aria-disabled`), with the reason as its description and title.
+- `LinkTabs`: a named nav of pill links with `aria-current="page"` on the current one.
+- `HeaderMenu`: the header's account disclosure (button, links, extra controls), closed by Escape (focus back on the button), a click outside, a link, or focus leaving it.
+- osu! display pieces: `StarRating` (a pill on osu!'s star-rating spectrum that reads "5.23 stars"), `BeatmapStats` (CS, AR, OD, HP, BPM and length from plain numbers) and `ModBadge` (a slot pill colored by its mod bucket).
 - `Pagination` button mode: `onPageChange` instead of `hrefFor`, for results fetched in place. `pageCount` can be `null` (the status reads "Page X", and `hasNext` says whether Next works). The ends stay in place with `aria-disabled`, and the status is a polite live region.
 
 ### Changed

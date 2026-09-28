@@ -82,7 +82,22 @@ export {
 // Meta
 export { JsonLd, type JsonLdProps } from "./components/meta/JsonLd.js";
 
+// osu!
+export {
+  type BeatmapStatKey,
+  BeatmapStats,
+  type BeatmapStatsProps,
+} from "./components/osu/BeatmapStats.js";
+export { ModBadge, type ModBadgeProps } from "./components/osu/ModBadge.js";
+export { StarRating, type StarRatingProps } from "./components/osu/StarRating.js";
+
 // Shell
+export {
+  HeaderMenu,
+  type HeaderMenuItem,
+  type HeaderMenuProps,
+} from "./components/shell/HeaderMenu.js";
+export { type LinkTabItem, LinkTabs, type LinkTabsProps } from "./components/shell/LinkTabs.js";
 export type { SiteLinkItem } from "./components/shell/links.js";
 export { NavLinks, type NavLinksProps, type SiteNavAlign } from "./components/shell/NavLinks.js";
 export { PageShell, type PageShellProps } from "./components/shell/PageShell.js";

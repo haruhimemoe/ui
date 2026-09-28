@@ -153,7 +153,7 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup` and `TypeToConfirm`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
@@ -686,6 +686,28 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub ico
 | `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon at the same size. It stays white (`text-c1`) and dims on hover instead of changing color, since Discord's brand guidelines ask that the logo not be recolored. Since 0.3.0. |
 | `discordLabel` | `string` | `"Discord"` | The Discord link's accessible name. Since 0.4.0. |
 
+#### `LinkTabs`
+
+Since 0.4.0. A row of link tabs (Pools / Maps, All / Hidden): a named `<nav>` with a list of pill links. The current one gets `aria-current="page"` and a `b3` pill (underlined in forced colors mode). These are links, not ARIA tabs, since each loads its own URL. A Server Component: you say which is current. Every native `<nav>` prop except `children`. Type: `LinkTabItem`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | `string` | required | The nav landmark's accessible name. |
+| `items` | `readonly LinkTabItem[]` | required | `{ href: string; label: ReactNode; current?: boolean }` for each tab, each with its own href. |
+
+#### `HeaderMenu` (client)
+
+Since 0.4.0. The header's account menu: a button (an avatar and a name, say) that shows a small panel of links and extra controls such as a sign-out button. It is a disclosure, not an ARIA menu: the button has `aria-expanded` and `aria-controls`, and Tab moves through the panel. Escape closes it and puts focus back on the button; a click outside it, a click on one of its links, or focus leaving it closes it too. Every native `<div>` prop except `children`, for the wrapper. Type: `HeaderMenuItem`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | required | The button's content. |
+| `items` | `readonly HeaderMenuItem[]` | `[]` | `{ href: string; label: ReactNode }` links, top to bottom. |
+| `children` | `ReactNode` | none | Shown after the links, such as a sign-out button. |
+| `align` | `"start" \| "end"` | `"end"` | Which edge of the button the panel lines up with. |
+| `buttonLabel` | `string` | none | The button's accessible name, when its content is only an image. |
+| `buttonClassName` | `string` | none | Classes for the button, merged last. |
+
 #### `PageShell`
 
 The page frame: a skip link, the header, `<main>` and the footer, with the footer held to the bottom on short pages. Every native `<div>` prop; they and `ref` go on the outer wrapper `<div>`. Use `mainId` and `mainClassName` for `<main>`, and `document.getElementById(mainId)` to reach it from script.
@@ -698,6 +720,39 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 | `skipLabel` | `string` | `"Skip to content"` | The skip link's text. It is the first thing Tab reaches and shows only when focused. |
 | `mainId` | `string` | `"main"` | `<main>`'s id, which the skip link targets. |
 | `mainClassName` | `string` | none | Extra classes for `<main>`, e.g. `"max-w-7xl"`. |
+
+### osu!
+
+Since 0.4.0. Display pieces for beatmaps and mod pools. They take plain values (no osu! API types) and are Server Components.
+
+#### `StarRating`
+
+A star-rating pill colored on osu!'s difficulty spectrum: "★ 5.23" on the rating's color, dark text up to 6.5 and pale yellow above. The spectrum is osu!'s own, the same at every `--hue`, so the pill sets its colors inline. Screen readers hear "5.23 stars" and the `label` after it. Every native `<span>` prop except `children`; a `style` you pass merges over the colors.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `value` | `number` | required | The rating, shown with two decimals. `NaN` shows as "–" on grey. |
+| `label` | `ReactNode` | none | Read after the rating by screen readers, e.g. "with HR" (what a `title` tells mouse users). |
+| `unit` | `string` | `"stars"` | The word read after the number. |
+
+#### `BeatmapStats`
+
+A beatmap's CS, AR, OD, HP, BPM and length as a compact `<dl>`, in that order. Stats you leave out (or that aren't finite) don't show. CS, AR, OD, HP and BPM are `<abbr>`s titled with their full names. Every native `<dl>` prop except `children`. Type: `BeatmapStatKey`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `cs`, `ar`, `od`, `hp` | `number \| null` | none | Shown with at most one decimal. |
+| `bpm` | `number \| null` | none | Shown whole. |
+| `lengthSeconds` | `number \| null` | none | Shown as `m:ss`, or `h:mm:ss` from an hour. |
+| `labels` | `Partial<Record<BeatmapStatKey, ReactNode>>` | none | Replaces a label (`{ length: "Länge" }`). |
+
+#### `ModBadge`
+
+A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: NM sky, HD amber, HR rose, DT and NC violet, FM emerald, TB orange, with dark text. Anything else is a `b3` pill. Every native `<span>` prop; `children` replace the text, and `className` recolors it (`bg-pink-300` for a custom bucket).
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `mod` | `string` | required | The mod or slot label. |
 
 ### Tables
 

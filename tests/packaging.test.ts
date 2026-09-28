@@ -96,6 +96,7 @@ describe("shipped source", () => {
       "src/components/filters/RangeBox.tsx",
       "src/components/filters/RangeSlider.tsx",
       "src/components/forms/TypeToConfirm.tsx",
+      "src/components/shell/HeaderMenu.tsx",
       "src/components/shell/NavListClient.tsx",
     ]);
     for (const { name, text } of client) {
