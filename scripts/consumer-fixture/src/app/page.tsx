@@ -29,6 +29,7 @@ import {
   TextInput,
 } from "@haruhimemoe/ui";
 import Link from "next/link";
+import { Additions } from "./Additions";
 import { Filters } from "./Filters";
 
 const LINKS: SiteLinkItem[] = [
@@ -125,6 +126,7 @@ export default function Page() {
         <HaruhimeWordmark />
         <HaruhimeWordmarkLink />
       </Card>
+      <Additions />
       <Filters />
       <FilterPanel title="Server filters" resultCount="3 maps">
         <FilterRow label="Mode">

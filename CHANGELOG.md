@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - `SiteFooter` takes `discordLabel` (default "Discord"), the Discord link's accessible name, as `githubLabel` does for GitHub.
 - `HeadingLevel` (`2 | 3 | 4 | 5 | 6`), the type of `headingLevel` on `Card` and `FilterPanel`.
+- `TextLink` and `linkClasses`: a text link in two looks, `accent` (`h1`, underlined, for running text) and `plain` (bold `c1`, underlined on hover, for names in lists). Like `ButtonLink`, it is `next/link` inside the app and a plain `<a>` off-site.
+- `Badge`: a small pill for a status or tag, in `neutral`, `accent`, `warning` or `muted` (an outlined "beta" tag).
+- Table primitives: `Table` (a sideways-scrolling wrapper, and a caption that can be for screen readers only), `THead`, `TBody`, `Th` (`scope="col"` by default, bold for `scope="row"`) and `Td`, with `numeric` for `tabular-nums` cells. They carry the look the apps' tables share.
+- `cx`, the class merger the components use (tailwind-merge), and its `ClassValue` type.
 
 ### Changed
 

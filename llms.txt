@@ -12,13 +12,15 @@ The README describes version 0.3.0 and marks what 0.2.0 lacks with "since 0.3.0"
 - [Example](https://github.com/haruhimemoe/ui#example): a root layout with PageShell, SiteHeader and SiteFooter, and a page
 - [Server and client components](https://github.com/haruhimemoe/ui#server-and-client-components): which components are client ones, which navs hydrate, and where callback props must come from
 - [Props, classes and refs](https://github.com/haruhimemoe/ui#props-classes-and-refs): native props, `ref`, and how `className` merges
-- [Basics](https://github.com/haruhimemoe/ui#basics): Button, ButtonLink, buttonClasses, Card, PageHeader, Notice, Prose
+- [Basics](https://github.com/haruhimemoe/ui#basics): Button, ButtonLink, buttonClasses, Card, PageHeader, Notice, Prose, TextLink, linkClasses, Badge
 - [Forms](https://github.com/haruhimemoe/ui#forms): TextInput, Textarea, Select, Checkbox, fieldClasses and the shared field props
 - [Actions](https://github.com/haruhimemoe/ui#actions): CopyButton, Pagination
 - [Icons](https://github.com/haruhimemoe/ui#icons): DiscordIcon, GitHubIcon, HaruhimeWordmark, HaruhimeWordmarkLink
 - [Filters](https://github.com/haruhimemoe/ui#filters): Chip, ChipGroup, RangeSlider, FilterRow, FilterPanel, with a client example
 - [Meta](https://github.com/haruhimemoe/ui#meta): JsonLd, schema.org data in an escaped script tag
 - [Shell](https://github.com/haruhimemoe/ui#shell): SiteLinkItem, SiteHeader, NavLinks, SiteFooter, PageShell
+- [Tables](https://github.com/haruhimemoe/ui#tables): Table, THead, TBody, Th, Td, the apps' data table look with a caption
+- [Utilities](https://github.com/haruhimemoe/ui#utilities): cx, the tailwind-merge class merger the components use
 - [Accessibility](https://github.com/haruhimemoe/ui#accessibility): what the components do for screen readers, keyboards and forced colors
 - [Compatibility](https://github.com/haruhimemoe/ui#compatibility): supported versions and module format
 

@@ -13,6 +13,7 @@ export { CopyButton, type CopyButtonProps } from "./components/actions/CopyButto
 export { Pagination, type PaginationProps } from "./components/actions/Pagination.js";
 
 // Basics
+export { Badge, type BadgeProps, type BadgeTone } from "./components/basics/Badge.js";
 export { Button, type ButtonProps } from "./components/basics/Button.js";
 export { ButtonLink, type ButtonLinkProps } from "./components/basics/ButtonLink.js";
 export {
@@ -23,9 +24,15 @@ export {
 } from "./components/basics/buttonStyles.js";
 export { Card, type CardProps } from "./components/basics/Card.js";
 export type { HeadingLevel } from "./components/basics/cardStyles.js";
+export {
+  type LinkClassOptions,
+  linkClasses,
+  type TextLinkVariant,
+} from "./components/basics/linkStyles.js";
 export { Notice, type NoticeProps, type NoticeTone } from "./components/basics/Notice.js";
 export { PageHeader, type PageHeaderProps } from "./components/basics/PageHeader.js";
 export { Prose, type ProseProps } from "./components/basics/Prose.js";
+export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
 
 // Filters
 export { Chip, type ChipProps } from "./components/filters/Chip.js";
@@ -71,3 +78,13 @@ export {
   type SiteFooterProps,
 } from "./components/shell/SiteFooter.js";
 export { SiteHeader, type SiteHeaderProps } from "./components/shell/SiteHeader.js";
+
+// Tables
+export { Table, type TableProps } from "./components/tables/Table.js";
+export { TBody, type TBodyProps } from "./components/tables/TBody.js";
+export { Td, type TdProps } from "./components/tables/Td.js";
+export { THead, type THeadProps } from "./components/tables/THead.js";
+export { Th, type ThProps } from "./components/tables/Th.js";
+
+// Utilities
+export { type ClassValue, cx } from "./utils/cx.js";

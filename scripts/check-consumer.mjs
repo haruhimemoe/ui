@@ -206,6 +206,14 @@ try {
         "NavLinks on the server alone",
       ],
       [/<script type="application\/ld\+json">/, "JsonLd"],
+      [/<a\b(?=[^>]*href="\/docs")(?=[^>]*class="[^"]*text-h1)[^>]*>the docs<\/a>/, "TextLink"],
+      [
+        /<a\b(?=[^>]*href="https:\/\/osu\.ppy\.sh")(?=[^>]*rel="noreferrer")[^>]*>osu!<\/a>/,
+        "TextLink off-site",
+      ],
+      [/<span[^>]*class="[^"]*amber[^"]*"[^>]*>Unranked<\/span>/, "Badge"],
+      [/<caption class="sr-only">Slots<\/caption>/, "Table with a hidden caption"],
+      [/<th[^>]*scope="row"[^>]*>NM1<\/th>/, "Th as a row header"],
       [
         /<a\b(?=[^>]*href="https:\/\/discord\.gg\/example")(?=[^>]*aria-label="Discord")[^>]*><svg\b[^>]*viewBox="0 0 24 24"/,
         "SiteFooter's Discord link with DiscordIcon",

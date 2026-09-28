@@ -253,6 +253,33 @@ The first element inside gets no top margin (`[&>:first-child]:mt-0`, since 0.2.
 
 Later sections keep their heading margin, which spaces them apart.
 
+#### `TextLink`
+
+Since 0.4.0. A text link: `next/link` inside the app, a plain `<a>` off-site (with `rel="noreferrer"` in a new tab), like `ButtonLink`. Every `next/link` prop. Type: `TextLinkVariant`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `variant` | `"accent" \| "plain"` | `"accent"` | `accent` is `h1` and underlined, for links in running text (it doesn't rely on color alone). `plain` is bold `c1`, underlined on hover, for a name or title in a list or table. |
+
+```tsx
+<p>
+  Scripts can read public packs. <TextLink href="/docs/api">Read the API docs</TextLink>.
+</p>
+<TextLink href={`/packs/${pack.id}`} variant="plain">{pack.name}</TextLink>
+```
+
+#### `linkClasses`
+
+Since 0.4.0. `linkClasses({ variant?, className? }): string` returns the `TextLink` classes, for an element that should look like one (a `<button>` that reads as a link, say). Type: `LinkClassOptions`.
+
+#### `Badge`
+
+Since 0.4.0. A small pill for a status or tag ("Unranked", "beta", a count). A `<span>` with no role, so screen readers read it in line with the text around it. Every native `<span>` prop. Type: `BadgeTone`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `tone` | `"neutral" \| "accent" \| "warning" \| "muted"` | `"neutral"` | `neutral` is `b3` with `c2` text, `accent` is `h1` with dark bold text, `warning` is a faint amber with bold amber text, `muted` is an outlined pill in small bold capitals (a "beta" tag). |
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.
@@ -574,6 +601,45 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 | `skipLabel` | `string` | `"Skip to content"` | The skip link's text. It is the first thing Tab reaches and shows only when focused. |
 | `mainId` | `string` | `"main"` | `<main>`'s id, which the skip link targets. |
 | `mainClassName` | `string` | none | Extra classes for `<main>`, e.g. `"max-w-7xl"`. |
+
+### Tables
+
+Since 0.4.0. `Table`, `THead`, `TBody`, `Th` and `Td` give a data table the apps' look: full width, small left-aligned text, muted capitals in the head and a rule above each body row. They are Server Components, and each takes its element's native props, `className` (merged last) and `ref`. Use plain `<tr>` for rows.
+
+```tsx
+<Table caption="The pool's maps" hideCaption>
+  <THead>
+    <tr>
+      <Th>Slot</Th>
+      <Th numeric>Stars</Th>
+    </tr>
+  </THead>
+  <TBody>
+    {slots.map((slot) => (
+      <tr key={slot.label}>
+        <Th scope="row">{slot.label}</Th>
+        <Td numeric>{slot.stars}</Td>
+      </tr>
+    ))}
+  </TBody>
+</Table>
+```
+
+| Component | Extra props | What it renders |
+| --- | --- | --- |
+| `Table` | `caption?: ReactNode`, `hideCaption?: boolean` (default `false`), `wrapperClassName?: string` | A `<div>` that scrolls sideways on phones, around the `<table>`. `className` and `ref` go on the `<table>`. The caption names the table; `hideCaption` keeps it for screen readers only, when a heading already shows. |
+| `THead` | none | A `<thead>` in `c3`, `text-xs`, uppercase. |
+| `TBody` | none | A `<tbody>` whose rows get a `b4` top border. Add `[&>tr]:align-top` for rows of mixed height. |
+| `Th` | `numeric?: boolean` | A `<th>` with `scope="col"` by default. With `scope="row"` it is a row's heading, in bold `c1`. |
+| `Td` | `numeric?: boolean` | A `<td>`. `numeric` lines up digits (`tabular-nums`). |
+
+Cells get `py-2 pr-3`, and the last cell of a row no right padding.
+
+### Utilities
+
+#### `cx`
+
+Since 0.4.0. `cx(...classes: ClassValue[]): string` is the class merger every component uses: it skips falsy values and resolves Tailwind conflicts with tailwind-merge, so a later class wins (`cx("w-full", cond && "w-auto")`). Type: `ClassValue` (`string | false | null | undefined | 0`). It imports tailwind-merge, so a client file that uses it sends tailwind-merge to the browser.
 
 ## Accessibility
 
