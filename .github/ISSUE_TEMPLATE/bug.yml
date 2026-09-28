@@ -1,0 +1,31 @@
+name: Bug report
+description: A component renders, behaves or reads wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The smallest JSX that shows it, and the props you passed.
+      render: tsx
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: "@haruhimemoe/ui 0.4.0, next 16.3, react 19.3, tailwindcss 4.3"
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser, OS and assistive tech (if relevant)
+      placeholder: Firefox 143 on Windows 11 with NVDA

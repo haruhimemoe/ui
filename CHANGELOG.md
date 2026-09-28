@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Security
+
+- The release workflow pins every GitHub Action to a full commit SHA and npm to an exact version, since that job holds the npm publish token. It also runs the coverage floor and the consumer check before publishing, as CI does. Dependabot keeps the pins and the exact dependency versions current.
+- Report vulnerabilities through GitHub's private vulnerability reporting first, or by email (SECURITY.md).
+
 ## [0.3.0] - 2026-09-25
 
 ### Added

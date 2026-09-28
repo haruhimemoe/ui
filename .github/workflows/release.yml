@@ -1,8 +1,10 @@
 name: Release
 
 # Publishes @haruhimemoe/ui to npm when a GitHub release is published, using npm trusted
-# publishing (OIDC), so no token is stored in this repo. `npm publish` runs prepublishOnly first
-# (check, typecheck, test, build).
+# publishing (OIDC), so no token is stored in this repo. Before publishing it runs the same gates
+# as CI (the coverage floor and the consumer check); `npm publish` then runs prepublishOnly
+# (check, typecheck, test, build). Every action is pinned to a commit SHA, since this job holds
+# the publish token.
 
 on:
   release:
@@ -17,20 +19,20 @@ jobs:
     runs-on: ubuntu-latest
     environment: npm
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: package.json
 
-      # Trusted publishing needs npm 11.5.1 or later.
+      # Trusted publishing needs npm 11.5.1 or later. Pinned exactly: this job holds the OIDC token.
       - name: npm
-        run: npm install -g npm@^11.5.1
+        run: npm install -g npm@11.20.0
 
       - name: Install
         run: bun install --frozen-lockfile
@@ -39,6 +41,14 @@ jobs:
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: test "v$(node -p "require('./package.json').version")" = "$TAG"
+
+      # The gates CI runs that prepublishOnly doesn't: the 90% coverage floor, and the packed
+      # tarball in a throwaway Next.js app.
+      - name: Coverage
+        run: bun run test:coverage
+
+      - name: Consumer check
+        run: bun run check:consumer
 
       # A version with a prerelease part (a "-", e.g. 0.2.0-rc.1) publishes under the "next"
       # dist-tag, never "latest", whatever the GitHub release's prerelease checkbox says.

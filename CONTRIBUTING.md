@@ -34,4 +34,4 @@ bun run check:consumer
 
 ## Releases
 
-Releases are cut by the maintainers.
+Releases are cut by the maintainers. The release workflow runs the coverage floor and the consumer check again before `npm publish`. Its actions are pinned to commit SHAs; Dependabot opens the updates.
