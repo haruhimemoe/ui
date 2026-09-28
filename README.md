@@ -153,7 +153,7 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`. Each file starts with `"use client"`.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
@@ -201,7 +201,7 @@ The osu!-web panel: rounded, `b4` background, `p-5`. Every native `<section>` pr
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `title` | `ReactNode` | none | Rendered as a heading at the top (`<h2>` by default). It also names the section (`aria-labelledby`), which makes the card a region landmark. |
-| `headingLevel` | `2 \| 3 \| 4` | `2` | The title's heading level. Use `3` or `4` for a card that sits under another heading, such as a card inside a titled card. Since 0.2.0. |
+| `headingLevel` | `2 \| 3 \| 4 \| 5 \| 6` | `2` | The title's heading level (type `HeadingLevel`). Use `3` or lower for a card that sits under another heading, such as a card inside a titled card. Since 0.2.0; `5` and `6` since 0.4.0. |
 
 #### `PageHeader`
 
@@ -329,14 +329,6 @@ Previous and next pill links around "Page X of Y". Renders nothing when there is
 A `page` or `pageCount` straight from a URL is safe to pass (since 0.4.0): `NaN` reads as page 1 (and a `NaN` count as one page), a page past either end is pulled back inside, and fractions are dropped. `Number("abc")` shows page 1 with a Next link, and page 99 of 5 shows page 5.
 
 The links use `next/link` with `rel="prev"` and `rel="next"`. On the first and last page one link goes away. If it had keyboard focus (Next pressed on page 4 of 5), focus moves to the "Page X of Y" text instead of falling back to the top of the page. `Pagination` stays a Server Component; that text is a small client component inside it.
-
-#### `JsonLd`
-
-schema.org structured data in a `<script type="application/ld+json">`. Every `<` in the output is escaped, so a string in the data can't close the tag. Every native `<script>` prop except `children`, `dangerouslySetInnerHTML`, `type` and `src` (`id` and `nonce` pass through).
-
-| Prop | Type | Default | What it does |
-| --- | --- | --- | --- |
-| `data` | `Record<string, unknown>` | required | The schema.org object. `@context` defaults to `https://schema.org`; set it in `data` to change it. |
 
 ### Icons
 
@@ -470,8 +462,8 @@ Two thumbs on one track with an editable box at each end, for star rating, lengt
 | --- | --- | --- | --- |
 | `label` | `string` | required | Names the group, and the ends as "Minimum *label*" and "Maximum *label*". |
 | `hideLabel` | `boolean` | `false` | For use inside a `FilterRow`, which names the row: the label doesn't show and the fieldset isn't a group of its own (`role="none"`). The ends keep their "Minimum *label*" and "Maximum *label*" names. |
-| `min`, `max` | `number` | required | The bounds. |
-| `step` | `number` | `1` | Step between values. Typed values snap to it. |
+| `min`, `max` | `number` | required | The bounds. Given the wrong way round (`max` below `min`), they swap (since 0.4.0). |
+| `step` | `number` | `1` | Step between values. Typed values snap to it. A step of `0`, below `0` or not finite counts as `1` (since 0.4.0), so `onChange` never gets `NaN`. |
 | `value` | `readonly [number, number \| null]` | required | The range. A `null` top means no upper limit. |
 | `onChange` | `(value: [number, number \| null]) => void` | required | Gets the new range. |
 | `openEnded` | `boolean` | `false` | The top end at `max` means "no upper limit": it shows `max+` (like `10+`) and reports `null`. |
@@ -498,12 +490,22 @@ A titled panel of `FilterRow`s with a live result count and a "Clear filters" bu
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `title` | `ReactNode` | required | The heading. It also names the panel and the phone toggle. |
-| `headingLevel` | `2 \| 3 \| 4 \| 5 \| 6` | `2` | The heading's level. |
+| `headingLevel` | `2 \| 3 \| 4 \| 5 \| 6` | `2` | The heading's level (type `HeadingLevel`). |
 | `resultCount` | `ReactNode` | none | Shown in a polite live region, so each new count is announced. |
 | `active` | `boolean` | `false` | Whether any filter is set. |
 | `onClear` | `() => void` | none | The clear button's action. The button shows only when `active` is true and this is set. |
 | `clearLabel` | `ReactNode` | `"Clear filters"` | The clear button's text. |
 | `defaultOpen` | `boolean` | `false` | Whether the rows start open on phones. |
+
+### Meta
+
+#### `JsonLd`
+
+schema.org structured data in a `<script type="application/ld+json">`. Every `<` in the output is escaped, so a string in the data can't close the tag. Every native `<script>` prop except `children`, `dangerouslySetInnerHTML`, `type` and `src` (`id` and `nonce` pass through).
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `data` | `Record<string, unknown>` | required | The schema.org object. `@context` defaults to `https://schema.org`; set it in `data` to change it. |
 
 ### Shell
 

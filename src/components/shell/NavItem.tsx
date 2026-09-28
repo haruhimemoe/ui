@@ -8,7 +8,7 @@
  * @modified Mon Sep 28, 2026
  */
 
-import { AutoLink } from "./AutoLink.js";
+import { AutoLink } from "../basics/AutoLink.js";
 import { LinkNote } from "./LinkNote.js";
 import type { SiteLinkItem } from "./links.js";
 

@@ -22,5 +22,11 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["scripts/consumer-fixture/**"],
+      "linter": { "rules": { "correctness": { "useImportExtensions": "off" } } }
+    }
+  ],
   "assist": { "actions": { "source": { "organizeImports": "on" } } }
 }

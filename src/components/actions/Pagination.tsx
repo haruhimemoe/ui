@@ -10,10 +10,9 @@
  * @modified Mon Sep 28, 2026
  */
 
-import Link from "next/link.js";
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
-import { buttonClasses } from "../basics/buttonStyles.js";
+import { ButtonLink } from "../basics/ButtonLink.js";
 import { PaginationStatus } from "./PaginationStatus.js";
 import { normalizePages } from "./pages.js";
 
@@ -61,25 +60,17 @@ export function Pagination({
       {...props}
     >
       {page > 1 ? (
-        <Link
-          href={hrefFor(page - 1)}
-          rel="prev"
-          className={buttonClasses({ variant: "secondary" })}
-        >
+        <ButtonLink href={hrefFor(page - 1)} rel="prev" variant="secondary">
           {previousLabel}
-        </Link>
+        </ButtonLink>
       ) : (
         <span />
       )}
       <PaginationStatus>{formatStatus(page, pageCount)}</PaginationStatus>
       {page < pageCount ? (
-        <Link
-          href={hrefFor(page + 1)}
-          rel="next"
-          className={buttonClasses({ variant: "secondary" })}
-        >
+        <ButtonLink href={hrefFor(page + 1)} rel="next" variant="secondary">
           {nextLabel}
-        </Link>
+        </ButtonLink>
       ) : (
         <span />
       )}

@@ -6,12 +6,13 @@
  *       status region that mounts with its text already inside may not be announced.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import type { ComponentProps } from "react";
 import { cx } from "../../utils/cx.js";
 
+/** The notice's color, and its live role: `info` is c3, `warning` amber, `error` rose. */
 export type NoticeTone = "info" | "warning" | "error";
 
 /** Every native `<p>` prop (including `ref`), plus a tone, a live flag and the element to render. */

@@ -1,5 +1,5 @@
 /**
- * @file tests/components/actions/JsonLd.test.tsx
+ * @file tests/components/meta/JsonLd.test.tsx
  * @desc Component tests for JsonLd: the script tag, @context, the "<" escape that keeps
  *       "</script>" in the data from closing the tag (in the DOM and in server HTML), native props.
  * @author David @dvhsh (https://dvh.sh)
@@ -10,7 +10,7 @@
 import { render } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { JsonLd } from "../../../src/components/actions/JsonLd.js";
+import { JsonLd } from "../../../src/components/meta/JsonLd.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
 const EVIL = "</script><script>alert(1)</script><!--";

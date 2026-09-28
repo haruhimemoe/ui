@@ -4,14 +4,14 @@
  *       in the tab order; the group reports the picked values in the options' order.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 "use client";
 
-import { type ComponentProps, type ReactNode, useId } from "react";
-import { cx } from "../../utils/cx.js";
+import type { ReactNode } from "react";
 import { Chip } from "./Chip.js";
+import { GroupFrame, type GroupFrameProps } from "./GroupFrame.js";
 
 /** One chip: the value it stands for, what it shows, and whether it can be toggled. */
 export type ChipOption = {
@@ -20,15 +20,11 @@ export type ChipOption = {
   disabled?: boolean | undefined;
 };
 
-/** Every native `<fieldset>` prop except `onChange` and `children`, plus label, options, value. */
-export type ChipGroupProps = Omit<ComponentProps<"fieldset">, "onChange" | "children"> & {
-  /** Names the group (`role="group"` + `aria-labelledby`). */
-  label: ReactNode;
-  /**
-   * Leave the name to a surrounding FilterRow: no label shows, and the fieldset is not a group
-   * of its own (role none), so screen readers hear the row's name once.
-   */
-  hideLabel?: boolean | undefined;
+/**
+ * Every native `<fieldset>` prop except `onChange` and `children`, plus `label` (names the group)
+ * and `hideLabel` (leave the name to a surrounding FilterRow), the options and the picked values.
+ */
+export type ChipGroupProps = Omit<GroupFrameProps, "onChange" | "children"> & {
   options: readonly ChipOption[];
   /** The picked values. */
   value: readonly string[];
@@ -66,30 +62,9 @@ const toggleValue = (
  * @returns {JSX.Element} a `<fieldset>` (role group) labeled by its label, one Chip per option.
  *          With `hideLabel`, the fieldset has role none and no label.
  */
-export function ChipGroup({
-  label,
-  hideLabel = false,
-  options,
-  value,
-  onChange,
-  className,
-  ...props
-}: ChipGroupProps) {
-  const labelId = useId();
+export function ChipGroup({ options, value, onChange, ...props }: ChipGroupProps) {
   return (
-    <fieldset
-      // Inside a FilterRow (hideLabel), the row's fieldset is the group. A second group with the
-      // same name would be read twice. The fieldset stays, so `disabled` still reaches every chip.
-      role={hideLabel ? "none" : undefined}
-      aria-labelledby={hideLabel ? undefined : labelId}
-      className={cx("flex flex-col gap-2", className)}
-      {...props}
-    >
-      {hideLabel ? null : (
-        <span id={labelId} className="font-bold text-c3 text-sm">
-          {label}
-        </span>
-      )}
+    <GroupFrame {...props}>
       <div className="flex flex-wrap items-center gap-1">
         {options.map((option) => (
           <Chip
@@ -102,6 +77,6 @@ export function ChipGroup({
           </Chip>
         ))}
       </div>
-    </fieldset>
+    </GroupFrame>
   );
 }

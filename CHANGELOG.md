@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - `SiteFooter` takes `discordLabel` (default "Discord"), the Discord link's accessible name, as `githubLabel` does for GitHub.
+- `HeadingLevel` (`2 | 3 | 4 | 5 | 6`), the type of `headingLevel` on `Card` and `FilterPanel`.
+
+### Changed
+
+- `Card` takes `headingLevel` `5` and `6` too, like `FilterPanel`.
 
 ### Fixed
 
@@ -17,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `CopyButton` reports only the latest press. A slow earlier copy that failed after a later one worked no longer replaces "Copied." with the failure.
 - `SiteHeader` and `NavLinks` key entries by label and href, as `SiteFooter` does, so two entries with the same href no longer share a React key.
 - `Checkbox` keeps an `aria-labelledby` you pass, after its own label. Before, it was dropped.
+- `RangeSlider` counts a `step` of `0`, below `0` or not finite as `1`, and swaps `min` and `max` given the wrong way round. Before, `step={0}` sent `NaN` to `onChange` on every key press or drag.
 
 ### Security
 

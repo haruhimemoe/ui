@@ -1,10 +1,10 @@
 /**
- * @file src/components/actions/JsonLd.tsx
+ * @file src/components/meta/JsonLd.tsx
  * @desc schema.org structured data as a JSON-LD script tag. Every "<" is escaped, so no string
  *       in the data (a user-supplied name, say) can close the tag or open a comment.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import type { ComponentProps } from "react";

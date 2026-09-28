@@ -4,17 +4,18 @@
  *       region. Server-safe (useId works in Server Components).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { type ComponentProps, type ReactNode, useId } from "react";
 import { cx } from "../../utils/cx.js";
+import { CARD, CARD_HEADING, type HeadingLevel } from "./cardStyles.js";
 
 /** Every native `<section>` prop (including `ref`), with `title` rendered as the card's heading. */
 export type CardProps = Omit<ComponentProps<"section">, "title"> & {
   title?: ReactNode | undefined;
-  /** Heading level for the title (default 2). Use 3 or 4 for a card under another heading. */
-  headingLevel?: 2 | 3 | 4 | undefined;
+  /** Heading level for the title (default 2). Use 3 or lower for a card under another heading. */
+  headingLevel?: HeadingLevel | undefined;
 };
 
 /**
@@ -29,11 +30,11 @@ export function Card({ title, headingLevel = 2, className, children, ...props }:
   return (
     <section
       aria-labelledby={title ? headingId : undefined}
-      className={cx("rounded-[10px] bg-b4 p-5 text-c2", className)}
+      className={cx(CARD, className)}
       {...props}
     >
       {title ? (
-        <Heading id={headingId} className="mb-2 font-bold text-c1 text-lg">
+        <Heading id={headingId} className={cx("mb-2", CARD_HEADING)}>
           {title}
         </Heading>
       ) : null}

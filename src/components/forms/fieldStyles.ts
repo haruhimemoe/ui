@@ -3,16 +3,20 @@
  * @desc Shared classes for inputs, selects, and textareas (osu!-web dark fields). Focus shows as
  *       an h1 border. On an invalid field it also gets an h1 ring, since rose to pink alone is
  *       hard to see. `outline-hidden` (not `outline-none`) leaves a transparent outline that
- *       forced-colors mode paints, so focus shows there too.
+ *       forced-colors mode paints, so focus shows there too. Also the one label look that fields,
+ *       groups and filter rows share.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { cx } from "../../utils/cx.js";
 
 const FIELD =
   "w-full rounded-md border border-b3 bg-b6 px-3 py-2 text-c1 text-sm placeholder:text-c4 focus-visible:border-h1 focus-visible:outline-hidden disabled:opacity-50 aria-invalid:border-rose-400 aria-invalid:focus-visible:border-h1 aria-invalid:focus-visible:ring-1 aria-invalid:focus-visible:ring-h1";
+
+/** A field or group label: bold c3 at text-sm (internal). */
+export const FIELD_LABEL = "font-bold text-c3 text-sm";
 
 /**
  * @function fieldClasses

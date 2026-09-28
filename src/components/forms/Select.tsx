@@ -4,11 +4,11 @@
  *       through aria-describedby and aria-invalid. Options come in as children. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import type { ComponentProps } from "react";
-import { FieldFrame, type FieldProps, fieldDescribedBy } from "./FieldFrame.js";
+import { FieldFrame, type FieldProps, fieldControlProps } from "./FieldFrame.js";
 import { fieldClasses } from "./fieldStyles.js";
 
 /** Every native `<select>` prop (including `ref`), plus a required id, label, hint and error. */
@@ -35,9 +35,7 @@ export function Select({
     <FieldFrame id={id} label={label} hint={hint} error={error} className={wrapperClassName}>
       <select
         {...props}
-        id={id}
-        aria-describedby={fieldDescribedBy(id, hint, error, describedBy)}
-        aria-invalid={error ? true : invalid}
+        {...fieldControlProps({ id, hint, error, describedBy, invalid })}
         className={fieldClasses(className)}
       />
     </FieldFrame>

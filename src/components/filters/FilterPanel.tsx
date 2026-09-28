@@ -1,24 +1,25 @@
 /**
  * @file src/components/filters/FilterPanel.tsx
  * @desc Filter panel (osu! beatmap listing style): a titled card of FilterRows with a live result
- *       count and a "Clear filters" link. On phones the rows fold away behind a disclosure button;
- *       from `sm` up they are always shown.
+ *       count and a "Clear filters" button. On phones the rows fold away behind a disclosure
+ *       button; from `sm` up they are always shown.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 "use client";
 
 import { type ComponentProps, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { cx } from "../../utils/cx.js";
+import { CARD, CARD_HEADING, type HeadingLevel } from "../basics/cardStyles.js";
 
 /** Every native `<section>` prop except `title`, plus the panel's title, count and clear action. */
 export type FilterPanelProps = Omit<ComponentProps<"section">, "title"> & {
   /** The panel heading; it also names the panel and its phone disclosure button. */
   title: ReactNode;
   /** Heading level for the title (default 2). */
-  headingLevel?: 2 | 3 | 4 | 5 | 6 | undefined;
+  headingLevel?: HeadingLevel | undefined;
   /** Shown in an `<output aria-live="polite">`, so screen readers hear each new count. */
   resultCount?: ReactNode;
   /** True while any filter is set; shows the clear button. */
@@ -74,17 +75,12 @@ export function FilterPanel({
   return (
     <section
       aria-labelledby={titleId}
-      className={cx("flex flex-col gap-4 rounded-[10px] bg-b4 p-5 text-c2", className)}
+      className={cx("flex flex-col gap-4", CARD, className)}
       {...props}
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="flex items-center gap-1">
-          <Heading
-            id={titleId}
-            ref={headingRef}
-            tabIndex={-1}
-            className="font-bold text-c1 text-lg"
-          >
+          <Heading id={titleId} ref={headingRef} tabIndex={-1} className={CARD_HEADING}>
             {title}
           </Heading>
           <button

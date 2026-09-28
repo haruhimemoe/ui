@@ -3,44 +3,44 @@
  * @desc Two-thumb range slider with an editable box at each end (star rating, length, BPM). Two
  *       native range inputs share one track; the thumbs can't cross. With `openEnded`, the top
  *       end at `max` means "no upper limit": it shows "max+" and reports `null`. When both thumbs
- *       sit on one value, a drag moves whichever end can go the way the pointer goes.
+ *       sit on one value, a drag moves whichever end can go the way the pointer goes. The math
+ *       lives in rangeMath.ts and the boxes in RangeBox.tsx.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 "use client";
 
-import {
-  type ChangeEvent,
-  type ComponentProps,
-  type HTMLAttributes,
-  type KeyboardEvent,
-  type ReactNode,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import type { ChangeEvent, HTMLAttributes, KeyboardEvent } from "react";
+import { useRef } from "react";
 import { cx } from "../../utils/cx.js";
+import { GroupFrame, type GroupFrameProps } from "./GroupFrame.js";
+import { RangeBox } from "./RangeBox.js";
+import {
+  defaultParse,
+  dragEnd,
+  type End,
+  nextRange,
+  normalizeRange,
+  percent,
+  type RangeSliderValue,
+  rangeBounds,
+  readDraft,
+  thumbTarget,
+} from "./rangeMath.js";
 
-/** A range as `[low, high]`. `high` is `null` for an open top end (no upper limit). */
-export type RangeSliderValue = [number, number | null];
+export type { RangeSliderValue };
 
 /** Every native `<fieldset>` prop except `onChange`, `children` and `inputMode`, plus the range. */
-export type RangeSliderProps = Omit<
-  ComponentProps<"fieldset">,
-  "onChange" | "children" | "inputMode"
-> & {
+export type RangeSliderProps = Omit<GroupFrameProps, "onChange" | "children" | "inputMode"> & {
   /** Names the group, and the ends as "Minimum <label>" and "Maximum <label>". */
   label: string;
-  /**
-   * Leave the group name to a surrounding FilterRow: no label shows, and the fieldset is not a
-   * group of its own (role none). The ends are still named from `label`.
-   */
-  hideLabel?: boolean | undefined;
+  /** The low bound. If it is above `max`, the two swap. */
   min: number;
+  /** The high bound. */
   max: number;
-  /** Step between values (default 1). Typed values snap to it. */
+  /** Step between values (default 1; 0, negative or NaN also mean 1). Typed values snap to it. */
   step?: number | undefined;
   /** The current range. A `null` top end means open (shown at `max`). */
   value: Readonly<RangeSliderValue>;
@@ -68,22 +68,6 @@ export type RangeSliderProps = Omit<
   disabled?: boolean | undefined;
 };
 
-type End = "low" | "high";
-
-const decimalsOf = (n: number): number => {
-  const text = String(n);
-  const dot = text.indexOf(".");
-  return dot === -1 ? 0 : text.length - dot - 1;
-};
-
-const clamp = (n: number, low: number, high: number): number => Math.min(Math.max(n, low), high);
-
-// A comma reads as the decimal point: comma-locale keypads (de, fr, pl, pt-BR, ru) type "5,5".
-const defaultParse = (text: string): number | null => {
-  const n = Number(text.replace(",", "."));
-  return Number.isFinite(n) ? n : null;
-};
-
 // Native range inputs, stacked on one track. Only the thumbs take the pointer, so either thumb
 // can be dragged wherever they sit. The focus ring goes on the thumb, not the full-width input:
 // solid h1, so it clears 3:1 on the panel. Forced-colors mode drops box-shadow rings, so the
@@ -93,11 +77,6 @@ const RANGE =
   "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:box-border [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-h1 [&::-webkit-slider-thumb]:bg-c1 " +
   "[&::-moz-range-track]:bg-transparent [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:box-border [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-h1 [&::-moz-range-thumb]:bg-c1 " +
   "focus-visible:[&::-webkit-slider-thumb]:ring-4 focus-visible:[&::-webkit-slider-thumb]:ring-h1 focus-visible:[&::-moz-range-thumb]:ring-4 focus-visible:[&::-moz-range-thumb]:ring-h1";
-
-// The field look (border b3 on b6, h1 border on focus), sized for a short value. The group dims
-// itself when disabled, so the boxes do not dim twice.
-const BOX =
-  "w-18 shrink-0 rounded-md border border-b3 bg-b6 px-2 py-1 text-center text-c1 text-sm tabular-nums placeholder:text-c4 focus-visible:border-h1 focus-visible:outline-hidden disabled:cursor-not-allowed";
 
 /**
  * @function RangeSlider
@@ -111,10 +90,9 @@ const BOX =
  */
 export function RangeSlider({
   label,
-  hideLabel = false,
-  min,
-  max,
-  step = 1,
+  min: rawMin,
+  max: rawMax,
+  step: rawStep = 1,
   value,
   onChange,
   format = String,
@@ -127,80 +105,26 @@ export function RangeSlider({
   className,
   ...props
 }: RangeSliderProps) {
-  const labelId = useId();
-  const [drafts, setDrafts] = useState<Record<End, string | null>>({ low: null, high: null });
   // The pointer drag in progress, and the end it moves (picked on its first change).
   const drag = useRef<{ end: End | null } | null>(null);
-
-  // Normalize what came in (it may come from a URL): inside the bounds, low <= high. A NaN or
-  // infinite end means no limit on that end, like an empty box.
-  const low = Number.isFinite(value[0]) ? clamp(value[0], min, max) : min;
-  const top = value[1] !== null && Number.isFinite(value[1]) ? value[1] : null;
-  const highOpen = openEnded && (top === null || top >= max);
-  const high = top === null ? max : clamp(top, low, max);
-  const highOut = highOpen ? null : high;
-
-  const decimals = Math.max(decimalsOf(step), decimalsOf(min));
-  const snap = (n: number) => Number((min + Math.round((n - min) / step) * step).toFixed(decimals));
-  const percent = (n: number) => (max === min ? 0 : ((n - min) / (max - min)) * 100);
+  const bounds = rangeBounds(rawMin, rawMax, rawStep);
+  const { min, max, step } = bounds;
+  const state = normalizeRange(value, bounds, openEnded);
+  const { low, high, highOpen } = state;
   const openText = `${format(max)}+`;
-  const text: Record<End, string> = {
-    low: format(low),
-    high: highOpen ? openText : format(high),
-  };
 
   const commit = (end: End, n: number) => {
-    if (end === "low") {
-      const next = clamp(snap(n), min, high);
-      if (next !== low) onChange([next, highOut]);
-      return;
-    }
-    const snapped = clamp(snap(n), low, max);
-    const next = openEnded && (n >= max || snapped >= max) ? null : snapped;
-    if (next !== highOut) onChange([low, next]);
+    const next = nextRange(end, n, state, bounds, openEnded);
+    if (next) onChange(next);
   };
 
-  const setDraft = (end: End, draft: string | null) =>
-    setDrafts((current) => ({ ...current, [end]: draft }));
-
-  const commitDraft = (end: End) => {
-    const draft = drafts[end];
-    if (draft === null) return;
-    setDraft(end, null);
-    const trimmed = draft.trim().replace(/\+$/, "").trim();
-    // An empty box means no limit on that end.
-    if (trimmed === "") {
-      commit(end, end === "low" ? min : max);
-      return;
-    }
-    const n = parse(trimmed);
-    if (n !== null && Number.isFinite(n)) commit(end, n);
-  };
-
-  const onBoxKeyDown = (end: End) => (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      commitDraft(end);
-    } else if (event.key === "Escape" && drafts[end] !== null) {
-      event.preventDefault();
-      setDraft(end, null);
-    }
+  const commitDraft = (end: End) => (draft: string) => {
+    const n = readDraft(draft, end, bounds, parse);
+    if (n !== null) commit(end, n);
   };
 
   const onThumbKeyDown = (end: End) => (event: KeyboardEvent<HTMLInputElement>) => {
-    const current = end === "low" ? low : high;
-    const big = step * 10;
-    const moves: Record<string, number> = {
-      ArrowLeft: current - step,
-      ArrowDown: current - step,
-      ArrowRight: current + step,
-      ArrowUp: current + step,
-      PageDown: current - big,
-      PageUp: current + big,
-      Home: min,
-      End: max,
-    };
-    const next = moves[event.key];
+    const next = thumbTarget(event.key, end === "low" ? low : high, bounds);
     if (next === undefined) return;
     event.preventDefault();
     commit(end, next);
@@ -217,57 +141,49 @@ export function RangeSlider({
     window.addEventListener("pointercancel", done);
   };
 
-  // With both thumbs on one value, only the top one can be grabbed, and it can only move one way.
-  // So a drag's first move picks the end: toward the other thumb's side, the other end moves.
-  // The drag keeps that end until the pointer lifts. Changes without a pointer (assistive tech
-  // stepping a slider) always move their own end.
+  // A drag keeps the end its first move picked until the pointer lifts. Changes without a
+  // pointer (assistive tech stepping a slider) always move their own end.
   const onThumbChange = (end: End) => (event: ChangeEvent<HTMLInputElement>) => {
     const n = Number(event.currentTarget.value);
     const gesture = drag.current;
-    if (gesture && gesture.end === null) {
-      const parked = low === high;
-      gesture.end =
-        parked && end === "high" && n < low
-          ? "low"
-          : parked && end === "low" && n > high
-            ? "high"
-            : end;
-    }
+    if (gesture && gesture.end === null) gesture.end = dragEnd(end, n, state);
     commit(gesture?.end ?? end, n);
   };
 
-  const box = (end: End): ReactNode => (
-    <input
-      type="text"
+  const thumb = (end: End) => ({
+    type: "range" as const,
+    "aria-label": end === "low" ? minLabel : maxLabel,
+    "aria-valuetext": end === "low" ? format(low) : highOpen ? openText : format(high),
+    min,
+    max,
+    step,
+    value: end === "low" ? low : high,
+    disabled,
+    onChange: onThumbChange(end),
+    onKeyDown: onThumbKeyDown(end),
+    onPointerDown: onThumbPointerDown,
+  });
+
+  const box = (end: End) => (
+    <RangeBox
+      label={end === "low" ? minLabel : maxLabel}
+      text={end === "low" ? format(low) : highOpen ? openText : format(high)}
       inputMode={inputMode}
-      autoComplete="off"
-      aria-label={end === "low" ? minLabel : maxLabel}
       disabled={disabled}
-      value={drafts[end] ?? text[end]}
-      onChange={(event) => setDraft(end, event.currentTarget.value)}
-      onBlur={() => commitDraft(end)}
-      onKeyDown={onBoxKeyDown(end)}
-      className={BOX}
+      onCommit={commitDraft(end)}
     />
   );
 
-  const lowPercent = percent(low);
-  const highPercent = highOpen ? 100 : percent(high);
+  const lowPercent = percent(low, bounds);
+  const highPercent = highOpen ? 100 : percent(high, bounds);
 
   return (
-    <fieldset
-      // Inside a FilterRow (hideLabel), the row's fieldset is the group; see ChipGroup.
-      role={hideLabel ? "none" : undefined}
-      aria-labelledby={hideLabel ? undefined : labelId}
+    <GroupFrame
+      label={label}
       disabled={disabled}
-      className={cx("flex flex-col gap-2 disabled:opacity-50", className)}
+      className={cx("disabled:opacity-50", className)}
       {...props}
     >
-      {hideLabel ? null : (
-        <span id={labelId} className="font-bold text-c3 text-sm">
-          {label}
-        </span>
-      )}
       <div className="flex items-center gap-3">
         {box("low")}
         <div className="relative h-5 min-w-0 flex-1">
@@ -283,39 +199,13 @@ export function RangeSlider({
               style={{ left: `${lowPercent}%`, right: `${100 - highPercent}%` }}
             />
           </div>
-          <input
-            type="range"
-            aria-label={minLabel}
-            aria-valuetext={format(low)}
-            min={min}
-            max={max}
-            step={step}
-            value={low}
-            disabled={disabled}
-            onChange={onThumbChange("low")}
-            onKeyDown={onThumbKeyDown("low")}
-            onPointerDown={onThumbPointerDown}
-            // Past the middle, the low thumb sits on top, so two thumbs parked at the top end can
-            // still be pulled apart.
-            className={cx(RANGE, lowPercent > 50 && "z-10")}
-          />
-          <input
-            type="range"
-            aria-label={maxLabel}
-            aria-valuetext={highOpen ? openText : format(high)}
-            min={min}
-            max={max}
-            step={step}
-            value={high}
-            disabled={disabled}
-            onChange={onThumbChange("high")}
-            onKeyDown={onThumbKeyDown("high")}
-            onPointerDown={onThumbPointerDown}
-            className={RANGE}
-          />
+          {/* Past the middle, the low thumb sits on top, so two thumbs parked at the top end can
+              still be pulled apart. */}
+          <input {...thumb("low")} className={cx(RANGE, lowPercent > 50 && "z-10")} />
+          <input {...thumb("high")} className={RANGE} />
         </div>
         {box("high")}
       </div>
-    </fieldset>
+    </GroupFrame>
   );
 }

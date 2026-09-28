@@ -3,12 +3,15 @@
  * @desc Shared class builder for Button and ButtonLink (osu!-web pill buttons).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { cx } from "../../utils/cx.js";
 
+/** The pill's colors: `primary` is h2 (h1 on hover), `secondary` b3, `ghost` transparent. */
 export type ButtonVariant = "primary" | "secondary" | "ghost";
+
+/** The pill's height, padding and text size: `md` is h-9 and text-sm, `lg` h-11 and text-base. */
 export type ButtonSize = "md" | "lg";
 
 /** Options for {@link buttonClasses}. */

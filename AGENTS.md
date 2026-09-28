@@ -6,19 +6,21 @@
 
 - `src/index.ts`: the public API. Export only what apps should use.
 - `src/theme.css`: the palette as Tailwind colors (driven by `--hue`, `--h1-l`, `--h2-l`), the `font-sans` stack, the focus ring, and the `@source "./"` line that points an app's Tailwind at `dist/`.
-- `src/components/<group>/<Name>.tsx`: one exported component per file. Groups: `basics`, `forms`, `actions`, `icons`, `filters`, `shell`.
-- `src/components/<group>/<name>Styles.ts`: class builders shared by several components (`buttonClasses`, `fieldClasses`).
-- Internal files. `src/index.ts` exports none of their runtime code, only two types from them, `FieldProps` and `SiteLinkItem`, which are public API (the README documents both):
-  - `forms/FieldFrame.tsx`: the label, hint and error layout (`FieldFrame`, `FieldError`), the `<id>-hint` / `<id>-error` ids the fields share (`hintId`, `errorId`, `fieldDescribedBy`), and the public `FieldProps` type.
+- `src/components/<group>/<Name>.tsx`: one exported component per file. Groups: `basics`, `forms`, `actions`, `icons`, `filters`, `meta` (`JsonLd`: no UI, only a `<script>`), `shell`.
+- `src/components/<group>/<name>Styles.ts`: class builders and class constants shared by several components (`buttonClasses`, `fieldClasses` and `FIELD_LABEL`, `basics/cardStyles.ts` with `CARD`, `CARD_HEADING` and the public `HeadingLevel` type).
+- Internal files. `src/index.ts` exports none of their runtime code, only a few types from them, which are public API (the README documents each): `FieldProps`, `SiteLinkItem`, `RangeSliderValue` (re-exported through `RangeSlider.tsx`) and `HeadingLevel`.
+  - `forms/FieldFrame.tsx`: the label, hint and error layout (`FieldFrame`, `FieldError`), the `<id>-hint` / `<id>-error` ids the fields share (`hintId`, `errorId`, `fieldDescribedBy`), `fieldControlProps` (the id, `aria-describedby` and `aria-invalid` every control gets), and the public `FieldProps` type.
+  - `basics/AutoLink.tsx`: next/link or a plain `<a>`, by href, with `rel="noreferrer"` on an off-site new tab and next/link's own props dropped there. `ButtonLink`, the nav and the footer render it.
+  - `filters/GroupFrame.tsx`: the labelled fieldset (`hideLabel` gives role none) that `ChipGroup` and `RangeSlider` share. `filters/rangeMath.ts`: RangeSlider's pure math (guarded bounds and step, normalizing, snapping, keys, drags, typed boxes). `filters/RangeBox.tsx`: one of its edit boxes, holding the draft.
   - `actions/PaginationStatus.tsx`: the client "Page X of Y" text that takes focus when a Pagination link goes away. `actions/pages.ts`: `normalizePages`, which cleans a page and page count from a URL.
-  - `shell/links.ts` (the public `SiteLinkItem` type, plus `canBeCurrent`, `ariaCurrentFor` and `linkItemKey`, the one React key for nav and footer entries), `shell/AutoLink.tsx` (next/link or a plain `<a>`, by href), `shell/NavItem.tsx` (one nav entry), `shell/LinkNote.tsx` (the "soon" note beside an entry) and `shell/NavListClient.tsx` (the client list that sets `aria-current`).
+  - `shell/links.ts` (the public `SiteLinkItem` type, plus `canBeCurrent`, `ariaCurrentFor` and `linkItemKey`, the one React key for nav and footer entries), `shell/NavItem.tsx` (one nav entry), `shell/LinkNote.tsx` (the "soon" note beside an entry) and `shell/NavListClient.tsx` (the client list that sets `aria-current`).
 - `src/utils/`: `cx.ts` (`cx`, tailwind-merge) and `href.ts` (`isExternalHref`, re-exported from `shell/links.ts`).
-- `tests/components/<group>/`: tests in the same group as their source, `<Name>.test.tsx` for components and `<name>.test.ts` for plain modules (`forms/fieldStyles.test.ts`, `shell/links.test.ts`, which also covers `isExternalHref`). Some internal files have their own test (`shell/AutoLink.test.tsx`); the rest are covered through the components that use them.
+- `tests/components/<group>/`: tests in the same group as their source, `<Name>.test.tsx` for components and `<name>.test.ts` for plain modules (`forms/fieldStyles.test.ts`, `shell/links.test.ts`, which also covers `isExternalHref`, `filters/rangeMath.test.ts`). Some internal files have their own test (`basics/AutoLink.test.tsx`); the rest are covered through the components that use them. A suite that grows past about 200 lines splits by topic, `<Name>.<topic>.test.tsx` (`RangeSlider.keyboard.test.tsx`, `RangeSlider.boxes.test.tsx`), with its shared setup in `tests/helpers/` (`rangeSlider.tsx`).
 - `tests/utils/cx.test.ts`, `tests/helpers/axe.ts` (`expectNoAxeViolations`), `tests/setup/dom.ts` (jest-dom matchers, cleanup).
 - `tests/environment.test.tsx`: guards the test setup itself. `next/link` renders in jsdom without a router, and the axe helper catches a real violation.
 - `tests/packaging.test.ts`: what ships. `.js` on next imports, `"use client"` on every file with hooks or browser APIs, no tailwind-merge in client files that server components render, the Tailwind peer range, no declaration maps, and the changelog's shape.
 - `tests/theme.test.ts`: the theme's variables and the contrast values the README gives for other hues.
-- `scripts/check-consumer.mjs`: the consumer check. It packs the package into a throwaway Next.js app, runs `next build`, and checks the README's claims about which navs hydrate and where tailwind-merge ships.
+- `scripts/check-consumer.mjs`: the consumer check. It packs the package into a throwaway Next.js app, runs `next build`, and checks the README's claims about which navs hydrate and where tailwind-merge ships. The app's source is real files in `scripts/consumer-fixture/src/`: Biome lints them, and `bun run typecheck` checks them against `src/` through `scripts/consumer-fixture/tsconfig.json`. Render every new export there.
 
 ## Rules
 

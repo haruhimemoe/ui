@@ -13,14 +13,17 @@
  *       an app's own Client Component brings tailwind-merge. Before the build, plain Node
  *       imports the installed package, the way Vitest in a consuming app does. Usage:
  *       `node scripts/check-consumer.mjs [--keep]` (--keep leaves the app in the temp dir). Needs
- *       the npm registry and Google Fonts.
+ *       the npm registry and Google Fonts. The app's source lives in scripts/consumer-fixture/
+ *       as real files; this script writes only the config that depends on the pins and the temp
+ *       dir, then runs the build and the assertions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { execFileSync } from "node:child_process";
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -88,248 +91,9 @@ const LIBRARY_CLASSES = [
   [".text-c3", "labels and nav links"],
 ];
 
-const PAGE = `import {
-  Button,
-  ButtonLink,
-  buttonClasses,
-  Card,
-  Checkbox,
-  Chip,
-  CopyButton,
-  DiscordIcon,
-  FilterPanel,
-  FilterRow,
-  fieldClasses,
-  GitHubIcon,
-  HaruhimeWordmark,
-  HaruhimeWordmarkLink,
-  JsonLd,
-  NavLinks,
-  Notice,
-  PageHeader,
-  PageShell,
-  Pagination,
-  Prose,
-  Select,
-  SiteFooter,
-  type SiteFooterColumn,
-  SiteHeader,
-  type SiteLinkItem,
-  Textarea,
-  TextInput,
-} from "@haruhimemoe/ui";
-import Link from "next/link";
-import { Filters } from "./Filters";
-
-const LINKS: SiteLinkItem[] = [
-  { label: "Home", href: "/" },
-  { label: "Docs", href: "/docs" },
-  { label: "osu!", href: "https://osu.ppy.sh" },
-  { label: "Sheets", note: "soon" },
-];
-
-// No path in the app, so NavLinks renders these on the server with no client list.
-const OFFSITE: SiteLinkItem[] = [
-  { label: "osu! wiki", href: "https://osu.ppy.sh/wiki" },
-  { label: "Sheets", note: "soon" },
-];
-
-const COLUMNS: SiteFooterColumn[] = [
-  { title: "Site", items: [{ label: "Home", href: "/" }, { label: "Sheets", note: "soon" }] },
-  { title: "Elsewhere", items: [{ label: "osu!", href: "https://osu.ppy.sh" }] },
-];
-
-export default function Page() {
-  return (
-    <PageShell
-      header={
-        <SiteHeader
-          brand={<Link href="/">consumer</Link>}
-          links={LINKS}
-          actions={<Button variant="ghost">Sign in</Button>}
-        />
-      }
-      footer={
-        <SiteFooter
-          columns={COLUMNS}
-          finePrint="Not affiliated with osu!."
-          discordHref="https://discord.gg/example"
-        />
-      }
-    >
-      <JsonLd data={{ "@type": "WebSite", name: "consumer" }} />
-      <PageHeader
-        title="Consumer check"
-        lead="Every component, from the packed tarball."
-        meta="${pkg.version}"
-        actions={<ButtonLink href="/docs">Docs</ButtonLink>}
-      />
-      <nav aria-label="Secondary">
-        <NavLinks links={LINKS} align="center" />
-      </nav>
-      <nav aria-label="Elsewhere">
-        <NavLinks links={OFFSITE} />
-      </nav>
-      <Card title="Basics">
-        <Button>Primary</Button>
-        <ButtonLink href="https://osu.ppy.sh" variant="secondary" target="_blank">
-          osu!
-        </ButtonLink>
-        <a href="/plain" className={buttonClasses({ variant: "ghost", size: "lg" })}>
-          Plain link
-        </a>
-        <Notice tone="warning" live>
-          Heads up.
-        </Notice>
-        <Prose>
-          <h2>Prose</h2>
-          <p>
-            Text with <code>code</code>.
-          </p>
-        </Prose>
-      </Card>
-      <Card title="Forms">
-        <TextInput id="name" label="Name" hint="Shown on the pack." defaultValue="" />
-        <Textarea id="notes" label="Notes" error="Too long." />
-        <Select id="mode" label="Mode" defaultValue="osu">
-          <option value="osu">osu!</option>
-          <option value="taiko">osu!taiko</option>
-        </Select>
-        <Checkbox id="video" label="Include video" hint="Bigger download" defaultChecked />
-        <select aria-label="Move to" className={fieldClasses("w-auto")}>
-          <option>Top</option>
-        </select>
-      </Card>
-      <Card title="Actions">
-        <CopyButton text="https://example.com" label="Copy link" />
-        <Pagination page={2} pageCount={3} hrefFor={(page) => \`/?page=\${page}\`} />
-        <Chip pressed>HD</Chip>
-        <DiscordIcon />
-        <GitHubIcon />
-        <HaruhimeWordmark />
-        <HaruhimeWordmarkLink />
-      </Card>
-      <Filters />
-      <FilterPanel title="Server filters" resultCount="3 maps">
-        <FilterRow label="Mode">
-          <Chip pressed={false}>osu!taiko</Chip>
-        </FilterRow>
-      </FilterPanel>
-    </PageShell>
-  );
-}
-`;
-
-// Callbacks can't cross from a Server Component, so the stateful filters live in a client file.
-const FILTERS = `"use client";
-
-import {
-  ChipGroup,
-  type ChipOption,
-  FilterPanel,
-  FilterRow,
-  RangeSlider,
-  type RangeSliderValue,
-} from "@haruhimemoe/ui";
-import { useState } from "react";
-
-const MODS: ChipOption[] = [
-  { value: "HD", label: "HD" },
-  { value: "HR", label: "HR" },
-  { value: "DT", label: "DT" },
-];
-
-export function Filters() {
-  const [mods, setMods] = useState<string[]>(["HD"]);
-  const [stars, setStars] = useState<RangeSliderValue>([0, null]);
-  const active = mods.length > 0 || stars[0] > 0 || stars[1] !== null;
-  return (
-    <FilterPanel
-      title="Filters"
-      resultCount="12 packs"
-      active={active}
-      onClear={() => {
-        setMods([]);
-        setStars([0, null]);
-      }}
-    >
-      <FilterRow label="Mods">
-        <ChipGroup label="Mods" hideLabel options={MODS} value={mods} onChange={setMods} />
-      </FilterRow>
-      <FilterRow label="Star rating">
-        <RangeSlider
-          label="Star rating"
-          hideLabel
-          min={0}
-          max={10}
-          step={0.1}
-          openEnded
-          value={stars}
-          onChange={setStars}
-        />
-      </FilterRow>
-    </FilterPanel>
-  );
-}
-`;
-
-// A page with nothing but the header, so its scripts are the header's own.
-const headerPage = (links) => `import { SiteHeader } from "@haruhimemoe/ui";
-
-export default function Page() {
-  return <SiteHeader brand={<a href="/">consumer</a>} links={${JSON.stringify(links)}} />;
-}
-`;
-
-// A header of the app's own that is a Client Component (for a menu toggle), with NavLinks in it.
-const CLIENT_NAV = `"use client";
-
-import { NavLinks } from "@haruhimemoe/ui";
-import { useState } from "react";
-
-export function ClientNav() {
-  const [open, setOpen] = useState(true);
-  return (
-    <nav aria-label="Main">
-      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
-        Menu
-      </button>
-      {open ? <NavLinks links={[{ label: "Client nav", href: "/client-nav" }]} /> : null}
-    </nav>
-  );
-}
-`;
-
-const CLIENT_NAV_PAGE = `import { ClientNav } from "./ClientNav";
-
-export default function Page() {
-  return <ClientNav />;
-}
-`;
-
-// No library code at all: the client modules it references are Next's own, on every page.
-const BARE_PAGE = `export default function Page() {
-  return <p>bare</p>;
-}
-`;
-
-const LAYOUT = `import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
-import type { ReactNode } from "react";
-import "./globals.css";
-
-const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: "swap" });
-
-export const metadata: Metadata = { title: "consumer" };
-
-export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en" className={nunito.variable}>
-      <body className="bg-b5 font-sans text-c2 antialiased">{children}</body>
-    </html>
-  );
-}
-`;
+// The fixture app's pages, layout and stylesheet: real files that Biome lints and
+// `bun run typecheck` checks (scripts/consumer-fixture/tsconfig.json maps the package to src/).
+const FIXTURE = path.join(root, "scripts", "consumer-fixture", "src");
 
 try {
   console.log("consumer: building and packing");
@@ -392,37 +156,7 @@ try {
   );
   write("next.config.mjs", `export default { turbopack: { root: ${JSON.stringify(dir)} } };\n`);
   write("postcss.config.mjs", `export default { plugins: { "@tailwindcss/postcss": {} } };\n`);
-  write(
-    "src/app/globals.css",
-    `@import "tailwindcss";\n@import "@haruhimemoe/ui/theme.css";\n\n:root {\n  --hue: 200;\n  --h2-l: 42%;\n}\n`,
-  );
-  write("src/app/layout.tsx", LAYOUT);
-  write("src/app/page.tsx", PAGE);
-  write("src/app/Filters.tsx", FILTERS);
-  write(
-    "src/app/header/page.tsx",
-    headerPage([
-      { label: "Header", href: "/header" },
-      { label: "osu!", href: "https://osu.ppy.sh" },
-    ]),
-  );
-  write(
-    "src/app/offsite/page.tsx",
-    headerPage([
-      { label: "osu!", href: "https://osu.ppy.sh" },
-      { label: "Sheets", note: "soon" },
-    ]),
-  );
-  write(
-    "src/app/relative/page.tsx",
-    headerPage([
-      { label: "Top", href: "#main" },
-      { label: "osu!", href: "https://osu.ppy.sh" },
-    ]),
-  );
-  write("src/app/client-nav/page.tsx", CLIENT_NAV_PAGE);
-  write("src/app/client-nav/ClientNav.tsx", CLIENT_NAV);
-  write("src/app/bare/page.tsx", BARE_PAGE);
+  cpSync(FIXTURE, path.join(dir, "src"), { recursive: true });
 
   console.log(`consumer: installing into ${dir}`);
   run("bun", ["install", "--no-progress"]);

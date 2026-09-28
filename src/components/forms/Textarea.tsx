@@ -4,12 +4,12 @@
  *       an optional hint and error wired through aria-describedby and aria-invalid. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import type { ComponentProps } from "react";
 import { cx } from "../../utils/cx.js";
-import { FieldFrame, type FieldProps, fieldDescribedBy } from "./FieldFrame.js";
+import { FieldFrame, type FieldProps, fieldControlProps } from "./FieldFrame.js";
 import { fieldClasses } from "./fieldStyles.js";
 
 /** Every native `<textarea>` prop (including `ref`), plus a required id, label, hint and error. */
@@ -36,9 +36,7 @@ export function Textarea({
     <FieldFrame id={id} label={label} hint={hint} error={error} className={wrapperClassName}>
       <textarea
         {...props}
-        id={id}
-        aria-describedby={fieldDescribedBy(id, hint, error, describedBy)}
-        aria-invalid={error ? true : invalid}
+        {...fieldControlProps({ id, hint, error, describedBy, invalid })}
         className={fieldClasses(cx("min-h-24 resize-y", className))}
       />
     </FieldFrame>

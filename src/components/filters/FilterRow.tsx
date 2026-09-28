@@ -4,11 +4,12 @@
  *       the left and the controls on the right from `sm` up, stacked on phones.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 import { type ComponentProps, type ReactNode, useId } from "react";
 import { cx } from "../../utils/cx.js";
+import { FIELD_LABEL } from "../forms/fieldStyles.js";
 
 /** Every native `<fieldset>` prop (including `ref`), plus the row's label. */
 export type FilterRowProps = ComponentProps<"fieldset"> & {
@@ -31,7 +32,7 @@ export function FilterRow({ label, className, children, ...props }: FilterRowPro
       className={cx("flex flex-col gap-2 sm:flex-row sm:items-baseline sm:gap-4", className)}
       {...props}
     >
-      <span id={labelId} className="shrink-0 font-bold text-c3 text-sm sm:w-28">
+      <span id={labelId} className={`shrink-0 sm:w-28 ${FIELD_LABEL}`}>
         {label}
       </span>
       <div className="min-w-0 flex-1">{children}</div>

@@ -5,12 +5,11 @@
  *       their own "use client" directive, so this barrel is safe to import from Server Components.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 // Actions
 export { CopyButton, type CopyButtonProps } from "./components/actions/CopyButton.js";
-export { JsonLd, type JsonLdProps } from "./components/actions/JsonLd.js";
 export { Pagination, type PaginationProps } from "./components/actions/Pagination.js";
 
 // Basics
@@ -23,6 +22,7 @@ export {
   buttonClasses,
 } from "./components/basics/buttonStyles.js";
 export { Card, type CardProps } from "./components/basics/Card.js";
+export type { HeadingLevel } from "./components/basics/cardStyles.js";
 export { Notice, type NoticeProps, type NoticeTone } from "./components/basics/Notice.js";
 export { PageHeader, type PageHeaderProps } from "./components/basics/PageHeader.js";
 export { Prose, type ProseProps } from "./components/basics/Prose.js";
@@ -57,6 +57,9 @@ export {
   HaruhimeWordmarkLink,
   type HaruhimeWordmarkLinkProps,
 } from "./components/icons/HaruhimeWordmarkLink.js";
+
+// Meta
+export { JsonLd, type JsonLdProps } from "./components/meta/JsonLd.js";
 
 // Shell
 export type { SiteLinkItem } from "./components/shell/links.js";

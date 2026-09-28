@@ -11,10 +11,10 @@
 
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
+import { AutoLink } from "../basics/AutoLink.js";
 import { DiscordIcon } from "../icons/DiscordIcon.js";
 import { GitHubIcon } from "../icons/GitHubIcon.js";
 import { HaruhimeWordmarkLink } from "../icons/HaruhimeWordmarkLink.js";
-import { AutoLink } from "./AutoLink.js";
 import { LinkNote } from "./LinkNote.js";
 import { linkItemKey, type SiteLinkItem } from "./links.js";
 

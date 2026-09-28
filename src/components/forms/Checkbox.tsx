@@ -11,7 +11,7 @@
 
 import type { ComponentProps } from "react";
 import { cx } from "../../utils/cx.js";
-import { FieldError, type FieldProps, fieldDescribedBy, hintId } from "./FieldFrame.js";
+import { FieldError, type FieldProps, fieldControlProps, hintId } from "./FieldFrame.js";
 
 /** Every native checkbox `<input>` prop (including `ref`), plus an id, label, hint and error. */
 export type CheckboxProps = Omit<ComponentProps<"input">, "id" | "type"> & FieldProps;
@@ -41,11 +41,9 @@ export function Checkbox({
         <input
           {...props}
           type="checkbox"
-          id={id}
+          {...fieldControlProps({ id, hint, error, describedBy, invalid })}
           // The label first, then the caller's own ids: a plain join, since these are ids.
           aria-labelledby={labelledBy ? `${labelId} ${labelledBy}` : labelId}
-          aria-describedby={fieldDescribedBy(id, hint, error, describedBy)}
-          aria-invalid={error ? true : invalid}
           className={cx("mt-1 accent-h1", className)}
         />
         <span>
