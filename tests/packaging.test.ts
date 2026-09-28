@@ -86,8 +86,12 @@ describe("shipped source", () => {
       ),
     );
     expect(client.map(({ name }) => name).sort()).toEqual([
+      "src/components/actions/AsyncButton.tsx",
       "src/components/actions/CopyButton.tsx",
+      "src/components/actions/InlineConfirm.tsx",
       "src/components/actions/PaginationStatus.tsx",
+      "src/components/actions/useLatestStatus.ts",
+      "src/components/basics/Disclosure.tsx",
       "src/components/filters/FilterPanel.tsx",
       "src/components/filters/RangeBox.tsx",
       "src/components/filters/RangeSlider.tsx",
@@ -115,6 +119,7 @@ describe("shipped source", () => {
       expect([...loadsOf(name)], name).not.toContain("src/utils/cx.ts");
     }
     expect(rendered).toEqual([
+      "src/components/actions/PaginationButton.tsx",
       "src/components/actions/PaginationStatus.tsx",
       "src/components/shell/NavListClient.tsx",
     ]);

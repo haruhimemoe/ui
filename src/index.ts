@@ -9,7 +9,9 @@
  */
 
 // Actions
+export { AsyncButton, type AsyncButtonProps } from "./components/actions/AsyncButton.js";
 export { CopyButton, type CopyButtonProps } from "./components/actions/CopyButton.js";
+export { InlineConfirm, type InlineConfirmProps } from "./components/actions/InlineConfirm.js";
 export { Pagination, type PaginationProps } from "./components/actions/Pagination.js";
 
 // Basics
@@ -24,6 +26,7 @@ export {
 } from "./components/basics/buttonStyles.js";
 export { Card, type CardProps } from "./components/basics/Card.js";
 export type { HeadingLevel } from "./components/basics/cardStyles.js";
+export { Disclosure, type DisclosureProps } from "./components/basics/Disclosure.js";
 export {
   type LinkClassOptions,
   linkClasses,

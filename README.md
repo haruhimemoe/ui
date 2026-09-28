@@ -153,11 +153,11 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm` and `Disclosure`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
-A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere.
+A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere. Its button mode (`onPageChange`) is a callback, so render that from a `"use client"` file.
 
 ## Props, classes and refs
 
@@ -253,6 +253,18 @@ The first element inside gets no top margin (`[&>:first-child]:mt-0`, since 0.2.
 
 Later sections keep their heading margin, which spaces them apart.
 
+#### `Disclosure` (client)
+
+Since 0.4.0. A button that shows and hides a panel below it, with `aria-expanded` and `aria-controls` and a ▾ / ▴ arrow. The closed panel stays in the page, hidden, so fields inside keep their values. Every native `<div>` prop except `children`, for the wrapper.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `summary` | `ReactNode` | required | The button's text. It can change with the state. |
+| `children` | `ReactNode` | required | The panel. |
+| `defaultOpen` | `boolean` | `false` | Whether it starts open. |
+| `open`, `onOpenChange` | `boolean`, `(open: boolean) => void` | none | Control the state from outside. |
+| `buttonClassName`, `panelClassName` | `string` | none | Classes for the button and the panel, merged last. |
+
 #### `TextLink`
 
 Since 0.4.0. A text link: `next/link` inside the app, a plain `<a>` off-site (with `rel="noreferrer"` in a new tab), like `ButtonLink`. Every `next/link` prop. Type: `TextLinkVariant`.
@@ -342,20 +354,56 @@ A button that copies text, with the result in an `<output>` beside it that scree
 
 #### `Pagination`
 
-Previous and next pill links around "Page X of Y". Renders nothing when there is one page or none. Every native `<nav>` prop except `children`; `aria-label` defaults to `"Pages"`.
+Previous and next pills around "Page X of Y": links (`hrefFor`), or since 0.4.0 buttons (`onPageChange`). Renders nothing when there is one page or none. Every native `<nav>` prop except `children`; `aria-label` defaults to `"Pages"`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `page` | `number` | required | The current page, starting at 1. |
 | `pageCount` | `number` | required | How many pages there are. |
-| `hrefFor` | `(page: number) => string` | required | Builds a page's URL, e.g. `` (p) => `/packs?page=${p}` ``. |
+| `hrefFor` | `(page: number) => string` | one of the two | Link mode: builds a page's URL, e.g. `` (p) => `/packs?page=${p}` ``. |
+| `onPageChange` | `(page: number) => void` | one of the two | Button mode (since 0.4.0): called with the page to show, for results fetched in place. `pageCount` may be `null` there. |
+| `hasNext` | `boolean` | `false` | Button mode with `pageCount={null}`: whether a page comes after this one. |
 | `previousLabel` | `ReactNode` | `"Previous"` | Text of the link to the page before. |
 | `nextLabel` | `ReactNode` | `"Next"` | Text of the link to the page after. |
-| `formatStatus` | `(page: number, pageCount: number) => ReactNode` | `"Page X of Y"` | The text in the middle. |
+| `formatStatus` | `(page: number, pageCount: number) => ReactNode` | `"Page X of Y"` | The text in the middle. In button mode `pageCount` can be `null`, and the default reads "Page X". |
 
 A `page` or `pageCount` straight from a URL is safe to pass (since 0.4.0): `NaN` reads as page 1 (and a `NaN` count as one page), a page past either end is pulled back inside, and fractions are dropped. `Number("abc")` shows page 1 with a Next link, and page 99 of 5 shows page 5.
 
 The links use `next/link` with `rel="prev"` and `rel="next"`. On the first and last page one link goes away. If it had keyboard focus (Next pressed on page 4 of 5), focus moves to the "Page X of Y" text instead of falling back to the top of the page. `Pagination` stays a Server Component; that text is a small client component inside it.
+
+In button mode, Previous and Next are `<button>`s. At the first or last page they stay in place, dimmed, with `aria-disabled="true"`: they keep focus and ignore presses. The status is a polite live region there, so each new page is announced.
+
+```tsx
+<Pagination page={page} pageCount={null} hasNext={data.hasMore} onPageChange={setPage} />
+```
+
+#### `AsyncButton` (client)
+
+Since 0.4.0. A button that runs an async action and reports how it went in an `<output>` beside it that screen readers announce, like `CopyButton`. While it runs, the button keeps focus but ignores presses (`aria-disabled`). Every `Button` prop except `onClick`; the children are its text.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `action` | `() => ReactNode \| Promise<ReactNode>` | required | Runs on press. What it returns is the message ("Done."). |
+| `pendingLabel` | `ReactNode` | the children | The button's text while the action runs. |
+| `failedMessage` | `ReactNode \| ((error: unknown) => ReactNode)` | `"Something went wrong. Try again."` | Shown in `text-rose-300` when the action throws or rejects. |
+| `wrapperClassName` | `string` | none | Classes for the wrapper around the button and the message. |
+
+#### `InlineConfirm` (client)
+
+Since 0.4.0. A two-step confirm in the page, no dialog: a trigger button, then the question with a cancel and a confirm button in its place. Opening moves focus to cancel, the safe choice. Cancel or Escape closes it and puts focus back on the trigger, and so does a confirm that resolves. The open confirm is a `<fieldset>` (a group) named by the question, so screen readers hear the question when focus arrives. Every native `<div>` prop except `children`, for the wrapper.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `trigger` | `ReactNode` | required | The first button's text. |
+| `question` | `ReactNode` | required | Shown once the trigger is pressed. |
+| `onConfirm` | `() => void \| Promise<void>` | required | Runs on confirm. While it runs, both buttons keep focus but ignore presses. If it throws or rejects, the confirm stays open: show the error yourself. |
+| `confirmLabel`, `cancelLabel` | `ReactNode` | `"Confirm"`, `"Cancel"` | The two buttons' text. |
+| `pendingLabel` | `ReactNode` | `confirmLabel` | The confirm button's text while `onConfirm` runs. |
+| `onCancel` | `() => void` | none | Called when it closes without confirming. |
+| `triggerProps` | `ButtonProps` | none | Props for the trigger (`aria-label`, `variant`, `disabled`). It is `secondary` by default. |
+| `confirmVariant` | `"primary" \| "secondary" \| "ghost"` | `"secondary"` | The confirm button's look. Cancel is always `ghost`. |
+
+If a confirm removes the item (and the `InlineConfirm` with it), move focus somewhere sensible yourself, such as the list's heading.
 
 ### Icons
 

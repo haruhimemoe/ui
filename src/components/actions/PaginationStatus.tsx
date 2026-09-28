@@ -2,10 +2,11 @@
  * @file src/components/actions/PaginationStatus.tsx
  * @desc Pagination's "Page X of Y" text (internal). It also keeps keyboard focus in place: when
  *       the link that had focus goes away (Next on the last page, Previous on the first), focus
- *       moves here instead of falling back to the page body.
+ *       moves here instead of falling back to the page body. In button mode it is a polite live
+ *       region, since the page changes without a navigation.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Mon Sep 28, 2026
  */
 
 "use client";
@@ -14,11 +15,18 @@ import { type ReactNode, useEffect, useRef } from "react";
 
 /**
  * @function PaginationStatus
- * @param props {{ children: ReactNode }} the status text
+ * @param props {{ children: ReactNode; live?: boolean }} the status text, and whether to announce
+ *        its changes
  * @returns {JSX.Element} a `<span aria-current="page">` that script can focus (tabIndex -1), so
  *          it stays out of the tab order
  */
-export function PaginationStatus({ children }: { children: ReactNode }) {
+export function PaginationStatus({
+  children,
+  live = false,
+}: {
+  children: ReactNode;
+  live?: boolean;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
   const lastFocused = useRef<Element | null>(null);
 
@@ -43,7 +51,13 @@ export function PaginationStatus({ children }: { children: ReactNode }) {
   });
 
   return (
-    <span ref={ref} tabIndex={-1} aria-current="page" className="text-c4">
+    <span
+      ref={ref}
+      tabIndex={-1}
+      aria-current="page"
+      aria-live={live ? "polite" : undefined}
+      className="text-c4"
+    >
       {children}
     </span>
   );

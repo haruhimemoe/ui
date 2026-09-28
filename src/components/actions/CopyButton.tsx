@@ -12,9 +12,11 @@
 
 "use client";
 
-import { type ReactNode, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
 import { Button, type ButtonProps } from "../basics/Button.js";
+import { StatusOutput } from "./StatusOutput.js";
+import { useLatestStatus } from "./useLatestStatus.js";
 
 /** Every Button prop (native button props, variant, size) except children and onClick. */
 export type CopyButtonProps = Omit<ButtonProps, "children" | "onClick"> & {
@@ -45,22 +47,16 @@ export function CopyButton({
   variant = "secondary",
   ...props
 }: CopyButtonProps) {
-  const [status, setStatus] = useState<{ result: "copied" | "failed"; press: number } | null>(null);
-  const presses = useRef(0);
+  const { status, start, settle } = useLatestStatus<"copied" | "failed">();
 
   const copy = async () => {
-    // Empty the live region, then fill it with a fresh node: a status that never changes (the
-    // same "Copied." twice) is not announced again.
-    setStatus(null);
-    const press = ++presses.current;
-    let result: "copied" | "failed" = "copied";
+    const run = start();
     try {
       await navigator.clipboard.writeText(text);
+      settle(run, "copied");
     } catch {
-      result = "failed";
+      settle(run, "failed");
     }
-    // A later press owns the status now; this one settled too late to say anything.
-    if (press === presses.current) setStatus({ result, press });
   };
 
   return (
@@ -68,13 +64,9 @@ export function CopyButton({
       <Button variant={variant} onClick={copy} {...props}>
         {label}
       </Button>
-      <output className="text-c3 text-sm">
-        {status ? (
-          <span key={status.press}>
-            {status.result === "copied" ? copiedMessage : failedMessage}
-          </span>
-        ) : null}
-      </output>
+      <StatusOutput run={status?.run ?? null}>
+        {status?.result === "copied" ? copiedMessage : failedMessage}
+      </StatusOutput>
     </div>
   );
 }

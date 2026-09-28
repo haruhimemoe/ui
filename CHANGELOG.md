@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `Badge`: a small pill for a status or tag, in `neutral`, `accent`, `warning` or `muted` (an outlined "beta" tag).
 - Table primitives: `Table` (a sideways-scrolling wrapper, and a caption that can be for screen readers only), `THead`, `TBody`, `Th` (`scope="col"` by default, bold for `scope="row"`) and `Td`, with `numeric` for `tabular-nums` cells. They carry the look the apps' tables share.
 - `cx`, the class merger the components use (tailwind-merge), and its `ClassValue` type.
+- `InlineConfirm`: a two-step confirm in the page. Opening moves focus to cancel; cancel, Escape or a confirm that resolves puts it back on the trigger, so focus never falls to the page body. The open confirm is a group named by its question. A pending confirm keeps focus and ignores presses; a failed one stays open.
+- `AsyncButton`: runs an async action and announces its result (or a failure, in rose) in an `<output>`, one run at a time, with an optional pending label.
+- `Disclosure`: a button with `aria-expanded` and `aria-controls` that shows and hides a panel, which stays in the page while hidden. Uncontrolled, or controlled with `open` and `onOpenChange`.
+- `Pagination` button mode: `onPageChange` instead of `hrefFor`, for results fetched in place. `pageCount` can be `null` (the status reads "Page X", and `hasNext` says whether Next works). The ends stay in place with `aria-disabled`, and the status is a polite live region.
 
 ### Changed
 

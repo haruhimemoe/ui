@@ -214,6 +214,10 @@ try {
       [/<span[^>]*class="[^"]*amber[^"]*"[^>]*>Unranked<\/span>/, "Badge"],
       [/<caption class="sr-only">Slots<\/caption>/, "Table with a hidden caption"],
       [/<th[^>]*scope="row"[^>]*>NM1<\/th>/, "Th as a row header"],
+      [/>Delete pack<\/button>/, "InlineConfirm (client)"],
+      [/>Refresh pages<\/button>/, "AsyncButton (client)"],
+      [/<button[^>]*aria-expanded="false"[^>]*>Download options/, "Disclosure (client)"],
+      [/aria-live="polite"[^>]*>Page 2<\/span>/, "Pagination buttons (client)"],
       [
         /<a\b(?=[^>]*href="https:\/\/discord\.gg\/example")(?=[^>]*aria-label="Discord")[^>]*><svg\b[^>]*viewBox="0 0 24 24"/,
         "SiteFooter's Discord link with DiscordIcon",
