@@ -1,7 +1,8 @@
 /**
  * @file src/components/shell/SiteFooter.tsx
  * @desc Site footer: labelled link columns from data (entries without an href show as text with
- *       a small note, like "soon"), an optional extra slot, one line of fine print, the
+ *       a small note, like "soon"), an optional "haruhime tools" column linking the other tools,
+ *       an optional extra slot, one line of fine print, the
  *       haruhime.moe wordmark linking the parent site, a GitHub icon link, and an optional
  *       Discord icon link beside it (white, as Discord's brand guidelines ask).
  * @author David @dvhsh (https://dvh.sh)
@@ -15,6 +16,7 @@ import { AutoLink } from "../basics/AutoLink.js";
 import { DiscordIcon } from "../icons/DiscordIcon.js";
 import { GitHubIcon } from "../icons/GitHubIcon.js";
 import { HaruhimeWordmarkLink } from "../icons/HaruhimeWordmarkLink.js";
+import { type HaruhimeToolsOptions, haruhimeToolsColumn } from "./haruhimeTools.js";
 import { LinkNote } from "./LinkNote.js";
 import { linkItemKey, type SiteLinkItem } from "./links.js";
 
@@ -28,6 +30,11 @@ export type SiteFooterColumn = {
 export type SiteFooterProps = Omit<ComponentProps<"footer">, "children"> & {
   /** Link columns, left to right. Internal hrefs use `next/link`, external ones a plain `<a>`. */
   columns?: readonly SiteFooterColumn[] | undefined;
+  /**
+   * Adds the "haruhime tools" column (haruhimeToolsColumn): the other haruhime.moe tools and
+   * "All tools". `current` leaves this tool out; `position` places it (default 1).
+   */
+  tools?: HaruhimeToolsOptions | undefined;
   /** Rendered above the fine print, e.g. a "clear local data" control. */
   extra?: ReactNode;
   /** One line of small print, e.g. a trademark notice. */
@@ -58,12 +65,13 @@ const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-
 
 /**
  * @function SiteFooter
- * @param props {SiteFooterProps} columns, extra slot, fine print, parent, GitHub and Discord
+ * @param props {SiteFooterProps} columns, the tools column, extra slot, fine print, parent, GitHub and Discord
  *        links and their names, and native footer props
  * @returns {JSX.Element} the footer: columns on top, then extra, fine print and the brand row
  */
 export function SiteFooter({
-  columns = [],
+  columns: ownColumns = [],
+  tools,
   extra,
   finePrint,
   parentLink = true,
@@ -75,6 +83,11 @@ export function SiteFooter({
   className,
   ...props
 }: SiteFooterProps) {
+  const columns = [...ownColumns];
+  if (tools) {
+    const at = Math.max(0, Math.min(tools.position ?? 1, columns.length));
+    columns.splice(at, 0, haruhimeToolsColumn(tools));
+  }
   const fine = finePrint ? <p className="text-c4 text-xs">{finePrint}</p> : null;
   const github = githubHref ? (
     <a href={githubHref} aria-label={githubLabel} className={ICON_LINK}>

@@ -760,6 +760,7 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub ico
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `columns` | `readonly SiteFooterColumn[]` | `[]` | Each column is a `<nav>` named by its title, which shows above the list. Up to four columns side by side from `sm` up. |
+| `tools` | `HaruhimeToolsOptions` | none | Adds a "haruhime tools" column: the other live haruhime.moe tools as "name: blurb" links, then "All tools" on www. Options: `current` (the tool this footer is on, left out), `title` (`"haruhime tools"`), `allLabel` (`"All tools"`, `false` drops it), `allHref` (`"https://www.haruhime.moe"`), `position` (where among `columns`, default `1`, clamped). Since 0.6.0. |
 | `extra` | `ReactNode` | none | Shown above the fine print, e.g. a "clear local data" button. |
 | `finePrint` | `ReactNode` | none | One line of small print, in a `<p>`. |
 | `parentLink` | `boolean` | `true` | Show the haruhime.moe wordmark linking the parent site. With it, the last row holds the wordmark and the icons, and the fine print sits above. Without it, the fine print shares the row with the icons. |
@@ -768,6 +769,8 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub ico
 | `githubLabel` | `string` | `"haruhimemoe on GitHub"` | The GitHub link's accessible name. |
 | `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon at the same size. It stays white (`text-c1`) and dims on hover instead of changing color, since Discord's brand guidelines ask that the logo not be recolored. Since 0.3.0. |
 | `discordLabel` | `string` | `"Discord"` | The Discord link's accessible name. Since 0.4.0. |
+
+`HARUHIME_TOOLS` (each `{ id, name, href, blurb }`, type `HaruhimeTool`, ids `HaruhimeToolId`: `"packs" | "pools" | "bb"`) and `haruhimeToolsColumn(options)` (the same column as plain data, for a footer you lay out yourself) are exported too. Since 0.6.0. They are the one place outside the wordmark that names the haruhime.moe tools: a tool joins the list when it goes live.
 
 #### `LinkTabs`
 

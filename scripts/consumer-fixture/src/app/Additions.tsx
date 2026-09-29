@@ -3,6 +3,8 @@ import {
   BeatmapStats,
   Card,
   cx,
+  HARUHIME_TOOLS,
+  haruhimeToolsColumn,
   LinkTabs,
   linkClasses,
   ModBadge,
@@ -36,6 +38,9 @@ export function Additions() {
           { href: "/docs", label: "Maps" },
         ]}
       />
+      <p>
+        {HARUHIME_TOOLS.length} tools; footer column {haruhimeToolsColumn({ current: "bb" }).title}
+      </p>
       <StarRating value={5.23} label="with HR" />
       <BeatmapStats cs={4} ar={9.3} od={8} hp={5} bpm={180} lengthSeconds={125} />
       <ModBadge mod="HD2" />

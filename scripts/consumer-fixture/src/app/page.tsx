@@ -71,6 +71,7 @@ export default function Page() {
       footer={
         <SiteFooter
           columns={COLUMNS}
+          tools={{ current: "packs" }}
           finePrint="Not affiliated with osu!."
           discordHref="https://discord.gg/example"
         />

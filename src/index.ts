@@ -113,6 +113,13 @@ export {
   type HeaderMenuItem,
   type HeaderMenuProps,
 } from "./components/shell/HeaderMenu.js";
+export {
+  HARUHIME_TOOLS,
+  type HaruhimeTool,
+  type HaruhimeToolId,
+  type HaruhimeToolsOptions,
+  haruhimeToolsColumn,
+} from "./components/shell/haruhimeTools.js";
 export { type LinkTabItem, LinkTabs, type LinkTabsProps } from "./components/shell/LinkTabs.js";
 export type { SiteLinkItem } from "./components/shell/links.js";
 export { NavLinks, type NavLinksProps, type SiteNavAlign } from "./components/shell/NavLinks.js";

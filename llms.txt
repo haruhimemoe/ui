@@ -18,7 +18,7 @@ The README describes version 0.5.0 and marks what 0.4.0 lacks with "since 0.5.0"
 - [Icons](https://github.com/haruhimemoe/ui#icons): DiscordIcon, GitHubIcon, HaruhimeWordmark, HaruhimeWordmarkLink
 - [Filters](https://github.com/haruhimemoe/ui#filters): Chip (with a focusable unavailable state), ChipGroup, ChoiceChips (single-select radio chips), RangeSlider, FilterRow, FilterPanel, with a client example
 - [Meta](https://github.com/haruhimemoe/ui#meta): JsonLd, schema.org data in an escaped script tag
-- [Shell](https://github.com/haruhimemoe/ui#shell): SiteLinkItem, SiteHeader, NavLinks, SiteFooter, LinkTabs, HeaderMenu (account disclosure menu), PageShell
+- [Shell](https://github.com/haruhimemoe/ui#shell): SiteLinkItem, SiteHeader, NavLinks, SiteFooter (with the "haruhime tools" column: HARUHIME_TOOLS, haruhimeToolsColumn), LinkTabs, HeaderMenu (account disclosure menu), PageShell
 - [osu!](https://github.com/haruhimemoe/ui#osu): StarRating (spectrum-colored pill), BeatmapStats (CS/AR/OD/HP/BPM/length), ModBadge (slot pill by mod bucket)
 - [Tables](https://github.com/haruhimemoe/ui#tables): Table, THead, TBody, Th, Td, the apps' data table look with a caption
 - [Utilities](https://github.com/haruhimemoe/ui#utilities): cx, the tailwind-merge class merger the components use
