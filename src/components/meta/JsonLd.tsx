@@ -1,7 +1,8 @@
 /**
  * @file src/components/meta/JsonLd.tsx
- * @desc schema.org structured data as a JSON-LD script tag. Every "<" is escaped, so no string
- *       in the data (a user-supplied name, say) can close the tag or open a comment.
+ * @desc schema.org structured data as a JSON-LD script tag. "<", ">", "&" and the line and
+ *       paragraph separators (U+2028, U+2029) are written as JSON escapes, so no string in the
+ *       data (a user-supplied name, say) can close the tag, open a comment or break the script.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Mon Sep 28, 2026
@@ -18,13 +19,20 @@ export type JsonLdProps = Omit<
   data: Record<string, unknown>;
 };
 
+/** Characters written as JSON unicode escapes inside the script tag. */
+const UNSAFE = /[<>&\u2028\u2029]/g;
+
 /**
  * @function jsonLdString
  * @param data {Record<string, unknown>} a schema.org object
- * @returns {string} JSON with `@context` added and every "<" written as the escape `\u003c`
+ * @returns {string} JSON with `@context` added and "<", ">", "&", U+2028 and U+2029 written as
+ *          `\uXXXX` escapes (still the same JSON once parsed)
  */
 const jsonLdString = (data: Record<string, unknown>): string =>
-  JSON.stringify({ "@context": "https://schema.org", ...data }).replace(/</g, "\\u003c");
+  JSON.stringify({ "@context": "https://schema.org", ...data }).replace(
+    UNSAFE,
+    (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`,
+  );
 
 /**
  * @function JsonLd
@@ -36,7 +44,7 @@ export function JsonLd({ data, ...props }: JsonLdProps) {
     <script
       {...props}
       type="application/ld+json"
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD must be raw JSON; jsonLdString escapes "<".
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD must be raw JSON; jsonLdString escapes the unsafe characters.
       dangerouslySetInnerHTML={{ __html: jsonLdString(data) }}
     />
   );

@@ -39,8 +39,19 @@ describe("JsonLd", () => {
     expect(scripts).toHaveLength(1);
     const raw = scripts[0]?.innerHTML ?? "";
     expect(raw).not.toContain("<");
-    expect(raw).toContain("\\u003c/script>");
+    expect(raw).toContain("\\u003c/script\\u003e");
     expect(JSON.parse(raw).name).toBe(EVIL);
+  });
+
+  it("escapes '>', '&' and the line and paragraph separators, and parses back unchanged", () => {
+    const tricky = "a > b & c\u2028d\u2029e";
+    const { container } = render(<JsonLd data={{ name: tricky }} />);
+    const raw = container.querySelector("script")?.innerHTML ?? "";
+    for (const char of [">", "&", "\u2028", "\u2029"]) expect(raw).not.toContain(char);
+    expect(raw).toContain("\\u003e");
+    expect(raw).toContain("\\u0026");
+    expect(raw).toContain("\\u2028");
+    expect(JSON.parse(raw).name).toBe(tricky);
   });
 
   it("keeps the escape in server-rendered HTML", () => {
