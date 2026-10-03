@@ -4,9 +4,9 @@
  *       (case-insensitive). Each matched character scores 10 at a word start, 8 when it follows
  *       the previous match, 4 otherwise, minus one per skipped character; a query that prefixes
  *       the text adds 20. A command's score is the best of its title, keywords (0.7), subtitle
- *       (0.5) and group (0.3). Left to right, each character takes the first word-start or
- *       consecutive occurrence that still leaves the rest of the query matchable, else the first
- *       occurrence: "cpu" lands on "Copy page URL"'s initials, not the p inside "Copy".
+ *       (0.5) and group (0.3). A letter or digit may only match at a word start or right after
+ *       the previous match, so "cpu" lands on "Copy page URL"'s initials and "go" never finds
+ *       "Sign out"; punctuation may match anywhere. Backtracking, left to right.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Sat Oct 3, 2026
@@ -30,35 +30,31 @@ const isWordStart = (text: string, at: number): boolean => {
   return before === before.toLowerCase() && here !== here.toLowerCase();
 };
 
-/** Whether `rest` is a subsequence of `t` starting at `from`. */
-const isSubsequence = (rest: string, t: string, from: number): boolean => {
-  let at = from;
-  for (const ch of rest) {
-    at = t.indexOf(ch, at);
-    if (at < 0) return false;
-    at += 1;
-  }
-  return true;
-};
+const ALNUM = /[\p{L}\p{N}]/u;
 
 /**
- * Where `ch` should match in `t` from `from` on: the first occurrence that starts a word or
- * continues the previous match, provided the rest of the query still fits after it; otherwise
- * the first occurrence at all (or -1).
+ * The positions where the query's characters match, found left to right with backtracking.
+ * A letter or digit may only match at a word start or right after the previous match (so "go"
+ * never lands on the g inside "Sign out"); punctuation may match anywhere. Null when the
+ * query can't be placed.
  */
-const pickMatch = (
-  ch: string,
+const place = (
+  chars: readonly string[],
+  i: number,
   from: number,
   prev: number,
   text: string,
   t: string,
-  rest: string,
-): number => {
+): number[] | null => {
+  const ch = chars[i];
+  if (ch === undefined) return [];
   for (let at = t.indexOf(ch, from); at >= 0; at = t.indexOf(ch, at + 1)) {
-    const preferred = (prev >= 0 && at === prev + 1) || isWordStart(text, at);
-    if (preferred && isSubsequence(rest, t, at + 1)) return at;
+    const allowed = !ALNUM.test(ch) || (prev >= 0 && at === prev + 1) || isWordStart(text, at);
+    if (!allowed) continue;
+    const rest = place(chars, i + 1, at + 1, at, text, t);
+    if (rest) return [at, ...rest];
   }
-  return t.indexOf(ch, from);
+  return null;
 };
 
 /**
@@ -72,14 +68,12 @@ export function fuzzyScore(query: string, text: string): FuzzyMatch | null {
   const q = query.trim().toLowerCase();
   if (q.length === 0) return { score: 0, ranges: [] };
   const t = text.toLowerCase();
+  const positions = place([...q], 0, 0, -1, text, t);
+  if (!positions) return null;
   let score = 0;
-  let from = 0;
   let prev = -1;
   const ranges: [number, number][] = [];
-  const chars = [...q];
-  for (const [i, ch] of chars.entries()) {
-    const at = pickMatch(ch, from, prev, text, t, chars.slice(i + 1).join(""));
-    if (at < 0) return null;
+  for (const at of positions) {
     if (prev >= 0 && at === prev + 1) score += 8;
     else if (isWordStart(text, at)) score += 10;
     else score += 4;
@@ -88,7 +82,6 @@ export function fuzzyScore(query: string, text: string): FuzzyMatch | null {
     if (last && last[1] === at) last[1] = at + 1;
     else ranges.push([at, at + 1]);
     prev = at;
-    from = at + 1;
   }
   if (t.startsWith(q)) score += 20;
   return { score, ranges };
