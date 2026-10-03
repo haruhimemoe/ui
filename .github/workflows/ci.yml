@@ -51,3 +51,7 @@ jobs:
       # component on one page, runs `next build`, then axe in Chromium with contrast on.
       - name: Consumer check
         run: bun run check:consumer
+
+      # Builds the playground against src/ and runs axe over the palette's states in Chromium.
+      - name: Playground axe
+        run: bun run play:axe

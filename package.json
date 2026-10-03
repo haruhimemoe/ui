@@ -50,11 +50,14 @@
     "build": "bun run clean && tsc -p tsconfig.build.json && node -e \"require('node:fs').copyFileSync('src/theme.css','dist/theme.css')\"",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "typecheck": "tsc --noEmit && tsc -p scripts/consumer-fixture/tsconfig.json",
+    "typecheck": "tsc --noEmit && tsc -p scripts/consumer-fixture/tsconfig.json && tsc -p playground/tsconfig.json",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "check:consumer": "node scripts/check-consumer.mjs",
+    "play": "next dev playground --webpack",
+    "play:build": "next build playground --webpack",
+    "play:axe": "node scripts/axe-playground.mjs",
     "prepublishOnly": "bun run check && bun run typecheck && bun run test && bun run build"
   },
   "dependencies": {

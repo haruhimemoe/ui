@@ -5,3 +5,5 @@ coverage/
 *.tgz
 .DS_Store
 .scratch/
+playground/.next/
+playground/next-env.d.ts

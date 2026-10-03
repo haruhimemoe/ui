@@ -24,7 +24,7 @@
   },
   "overrides": [
     {
-      "includes": ["scripts/consumer-fixture/**"],
+      "includes": ["scripts/consumer-fixture/**", "playground/**"],
       "linter": { "rules": { "correctness": { "useImportExtensions": "off" } } }
     }
   ],
