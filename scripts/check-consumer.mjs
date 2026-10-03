@@ -238,7 +238,10 @@ try {
       [/>Type OWC 2026 to confirm<\/label>/, "TypeToConfirm (client)"],
       [/<nav aria-label="What to search"/, "LinkTabs"],
       [/<span class="sr-only">5\.23<!-- --> <!-- -->stars/, "StarRating"],
-      [/<abbr title="Approach rate"><span aria-hidden="true">AR<\/span><span class="sr-only">Approach rate<\/span><\/abbr>/, "BeatmapStats"],
+      [
+        /<abbr title="Approach rate"><span aria-hidden="true">AR<\/span><span class="sr-only">Approach rate<\/span><\/abbr>/,
+        "BeatmapStats",
+      ],
       [/<span[^>]*class="[^"]*bg-amber-300[^"]*"[^>]*>HD2<\/span>/, "ModBadge"],
       [/<button[^>]*aria-expanded="false"[^>]*>peppy<\/button>/, "HeaderMenu (client)"],
       [
