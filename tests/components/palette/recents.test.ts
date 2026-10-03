@@ -72,7 +72,8 @@ describe("openCommandPalette", () => {
     const page = { title: "Maps" };
     openCommandPalette(page);
     expect(listener).toHaveBeenCalledOnce();
-    expect((listener.mock.calls[0]?.[0] as CustomEvent).detail).toEqual({ page });
+    const event = listener.mock.calls[0]?.[0] as CustomEvent;
+    expect(event.detail).toEqual({ page });
     window.removeEventListener(PALETTE_EVENT, listener);
   });
 });

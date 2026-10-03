@@ -9,7 +9,7 @@
  *       holds only fixes in a 0.x patch release.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -98,6 +98,11 @@ describe("shipped source", () => {
       "src/components/filters/RangeSlider.tsx",
       "src/components/forms/ReportDisclosure.tsx",
       "src/components/forms/TypeToConfirm.tsx",
+      "src/components/palette/CommandPalette.tsx",
+      "src/components/palette/PaletteList.tsx",
+      "src/components/palette/paletteEvents.ts",
+      "src/components/palette/platform.ts",
+      "src/components/palette/useProviderSearch.ts",
       "src/components/shell/HeaderMenu.tsx",
       "src/components/shell/NavListClient.tsx",
     ]);
