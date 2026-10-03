@@ -5,7 +5,7 @@
  *       colors), with native props and accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -13,7 +13,11 @@ import { describe, expect, it } from "vitest";
 import { BeatmapStats } from "../../../src/components/osu/BeatmapStats.js";
 import { ModBadge } from "../../../src/components/osu/ModBadge.js";
 import { StarRating } from "../../../src/components/osu/StarRating.js";
-import { starRatingColor, starRatingTextColor } from "../../../src/components/osu/starColors.js";
+import {
+  contrastRatio,
+  starRatingColor,
+  starRatingTextColor,
+} from "../../../src/components/osu/starColors.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
 describe("star colors", () => {
@@ -25,6 +29,16 @@ describe("star colors", () => {
     expect(starRatingColor(12)).toBe("rgb(0 0 0)");
     expect(starRatingTextColor(5)).toBe("rgb(0 0 0)");
     expect(starRatingTextColor(7)).toBe("rgb(255 217 102)");
+    expect(starRatingTextColor(6.8)).toBe("rgb(255 255 255)");
+  });
+
+  it("keeps the text at 4.5:1 on the pill at every tenth of a star", () => {
+    const rgb = (s: string) => (s.match(/\d+/g) ?? []).map(Number) as [number, number, number];
+    for (let tenths = 0; tenths <= 100; tenths++) {
+      const stars = tenths / 10;
+      const ratio = contrastRatio(rgb(starRatingTextColor(stars)), rgb(starRatingColor(stars)));
+      expect(ratio, `${stars} stars`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });
 
@@ -60,10 +74,18 @@ describe("BeatmapStats", () => {
       />,
     );
     const terms = screen.getAllByRole("term").map((t) => t.textContent);
-    expect(terms).toEqual(["CS", "AR", "OD", "BPM", "Length"]);
+    expect(terms).toEqual([
+      "CSCircle size",
+      "ARApproach rate",
+      "ODOverall difficulty",
+      "BPMBeats per minute",
+      "Length",
+    ]);
+    expect(screen.getByText("Circle size")).toHaveClass("sr-only");
+    expect(screen.getByText("CS")).toHaveAttribute("aria-hidden", "true");
     const values = screen.getAllByRole("definition").map((d) => d.textContent);
     expect(values).toEqual(["4.2", "9.3", "8", "180", "1:02:05"]);
-    expect(screen.getByTitle("Approach rate")).toHaveTextContent("AR");
+    expect(screen.getByTitle("Approach rate")).toHaveTextContent("ARApproach rate");
   });
 
   it("takes labels and short lengths, and has no axe violations", async () => {

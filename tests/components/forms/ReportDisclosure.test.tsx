@@ -5,7 +5,7 @@
  *       time, the words and limits, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -38,10 +38,14 @@ describe("ReportDisclosure", () => {
     expect(field).toHaveAttribute("rows", "3");
     await expectNoAxeViolations(container);
     await user.type(field, "  spam links  ");
+    expect(screen.getByRole("status")).toHaveTextContent("");
     await user.click(screen.getByRole("button", { name: "Send report" }));
     expect(onSubmit).toHaveBeenCalledWith("spam links");
-    expect(await screen.findByRole("status")).toHaveTextContent("Thanks. Your report was sent.");
+    const status = await screen.findByRole("status");
+    expect(status).toHaveTextContent("Thanks. Your report was sent.");
+    expect(status).toHaveFocus();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    await expectNoAxeViolations(container);
   });
 
   it("shows the caller's done message (already reported)", async () => {
@@ -67,7 +71,7 @@ describe("ReportDisclosure", () => {
     const field = await open(user);
     await user.type(field, "broken");
     await user.click(screen.getByRole("button", { name: "Send report" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Too many reports.");
+    expect(await screen.findByText("Too many reports.")).toHaveAttribute("role", "status");
     expect(field).toHaveAttribute("aria-invalid", "true");
     expect(field).toHaveValue("broken");
     await user.click(screen.getByRole("button", { name: "Send report" }));

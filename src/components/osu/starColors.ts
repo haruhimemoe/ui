@@ -5,7 +5,7 @@
  *       They are the same at every --hue, like the wordmark's brand colors.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 type Rgb = readonly [number, number, number];
@@ -49,5 +49,43 @@ export const starRatingColor = (stars: number): string => {
  * @returns {string} text that reads on `starRatingColor(stars)`: black up to 6.5, then osu!'s pale
  *          yellow on the dark end of the spectrum
  */
-export const starRatingTextColor = (stars: number): string =>
-  stars >= 6.5 ? css([255, 217, 102]) : css([0, 0, 0]);
+const BLACK: Rgb = [0, 0, 0];
+const GOLD: Rgb = [255, 217, 102];
+const WHITE: Rgb = [255, 255, 255];
+
+const luminance = ([r, g, b]: Rgb): number => {
+  const channel = (v: number) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+};
+
+/**
+ * @function contrastRatio
+ * @param a {Rgb} one color
+ * @param b {Rgb} the other
+ * @returns {number} the WCAG contrast ratio between them, 1 to 21
+ */
+export const contrastRatio = (a: Rgb, b: Rgb): number => {
+  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
+  return (light + 0.05) / (dark + 0.05);
+};
+
+const parse = (color: string): Rgb =>
+  (color.match(/\d+/g) ?? ["0", "0", "0"]).slice(0, 3).map(Number) as unknown as Rgb;
+
+/**
+ * @function starRatingTextColor
+ * @param stars {number} the rating
+ * @returns {string} the text color on {@link starRatingColor}'s pill: osu!'s black up to the
+ *          dark end, its pale gold from there, white only where neither clears 4.5:1 (the violet
+ *          band around 6.5 to 7 stars)
+ */
+export const starRatingTextColor = (stars: number): string => {
+  const pill = parse(starRatingColor(stars));
+  if (stars < 6.5 && contrastRatio(BLACK, pill) >= 4.5) return css(BLACK);
+  if (contrastRatio(GOLD, pill) >= 4.5) return css(GOLD);
+  if (contrastRatio(BLACK, pill) >= 4.5) return css(BLACK);
+  return css(WHITE);
+};

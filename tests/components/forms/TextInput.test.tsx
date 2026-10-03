@@ -57,7 +57,7 @@ describe("TextInput", () => {
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(input).toHaveAttribute("aria-describedby", "key-hint key-error");
     expect(input).toHaveAccessibleDescription("Starts with pk1. That key is malformed.");
-    const alert = screen.getByRole("alert");
+    const alert = screen.getByRole("status");
     expect(alert).toHaveTextContent("That key is malformed.");
     expect(alert).toHaveClass("text-rose-300", "text-sm");
   });
@@ -93,7 +93,7 @@ describe("TextInput", () => {
         }
       />,
     );
-    expect(screen.getByRole("alert")).toHaveTextContent("Too short.No spaces.");
+    expect(screen.getByRole("status")).toHaveTextContent("Too short.No spaces.");
     expect(logged).not.toHaveBeenCalled();
     logged.mockRestore();
   });

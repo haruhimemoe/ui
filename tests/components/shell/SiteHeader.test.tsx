@@ -5,7 +5,7 @@
  *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -81,7 +81,7 @@ describe("SiteHeader", () => {
     expect(packs).toHaveAttribute("href", "https://packs.haruhime.moe");
     expect(packs).toHaveClass("text-c2", "hover:text-c1");
     expect(packs).not.toHaveAttribute("aria-current");
-    expect(within(nav).getByText("sheets")).toHaveAttribute("aria-disabled", "true");
+    expect(within(nav).getByText("sheets")).not.toHaveAttribute("aria-disabled");
     expect(usePathname).not.toHaveBeenCalled();
   });
 

@@ -7,7 +7,7 @@
  *       aria-invalid.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
@@ -105,7 +105,7 @@ export const fieldControlProps = ({
  */
 export function FieldError({ id, error }: { id: string; error?: ReactNode | undefined }) {
   return error ? (
-    <div id={errorId(id)} role="alert" className="text-rose-300 text-sm">
+    <div id={errorId(id)} role="status" className="text-rose-300 text-sm">
       {error}
     </div>
   ) : null;

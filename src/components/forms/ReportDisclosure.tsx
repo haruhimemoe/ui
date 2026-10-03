@@ -6,12 +6,12 @@
  *       at a time; a throw reads as `failedMessage`. Moved from bb.haruhime.moe (ReportForm).
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 "use client";
 
-import { type FormEvent, type ReactNode, useId, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { cx } from "../../utils/cx.js";
 import { Button } from "../basics/Button.js";
 import { Disclosure } from "../basics/Disclosure.js";
@@ -73,13 +73,12 @@ export function ReportDisclosure({
   const [error, setError] = useState<ReactNode>(null);
   const [done, setDone] = useState<ReactNode>(null);
   const running = useRef(false);
-  if (done !== null) {
-    return (
-      <p role="status" className={cx("text-c2 text-sm", className)}>
-        {done}
-      </p>
-    );
-  }
+  const status = useRef<HTMLParagraphElement>(null);
+  // The form goes away with the button that had focus, so focus lands on the outcome instead
+  // of falling to the body.
+  useEffect(() => {
+    if (done !== null) status.current?.focus();
+  }, [done]);
   const send = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (running.current) return;
@@ -97,24 +96,37 @@ export function ReportDisclosure({
     setPending(false);
   };
   return (
-    <Disclosure summary={summary} className={className}>
-      <form className="flex flex-col gap-2" onSubmit={send}>
-        <Textarea
-          id={`${id}-reason`}
-          label={label}
-          hint={hint}
-          error={error ?? undefined}
-          value={reason}
-          rows={rows}
-          minLength={minLength}
-          maxLength={maxLength}
-          required
-          onChange={(event) => setReason(event.currentTarget.value)}
-        />
-        <Button type="submit" variant="secondary" disabled={pending} className="self-start">
-          {pending ? pendingLabel : submitLabel}
-        </Button>
-      </form>
-    </Disclosure>
+    <div className={cx("flex flex-col gap-2", className)}>
+      {done === null ? (
+        <Disclosure summary={summary}>
+          <form className="flex flex-col gap-2" onSubmit={send}>
+            <Textarea
+              id={`${id}-reason`}
+              label={label}
+              hint={hint}
+              error={error ?? undefined}
+              value={reason}
+              rows={rows}
+              minLength={minLength}
+              maxLength={maxLength}
+              required
+              onChange={(event) => setReason(event.currentTarget.value)}
+            />
+            <Button type="submit" variant="secondary" disabled={pending} className="self-start">
+              {pending ? pendingLabel : submitLabel}
+            </Button>
+          </form>
+        </Disclosure>
+      ) : null}
+      {/* Mounted from the start (empty), so the outcome is announced when it arrives. */}
+      <p
+        ref={status}
+        role="status"
+        tabIndex={-1}
+        className={done === null ? "sr-only" : "text-c2 text-sm"}
+      >
+        {done}
+      </p>
+    </div>
   );
 }

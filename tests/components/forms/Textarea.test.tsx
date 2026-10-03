@@ -46,7 +46,7 @@ describe("Textarea", () => {
     expect(textarea).toHaveAttribute("aria-describedby", "desc-hint desc-error");
     expect(textarea).toHaveAttribute("aria-invalid", "true");
     expect(textarea).toHaveAccessibleDescription("12/500 Too long.");
-    expect(screen.getByRole("alert")).toHaveTextContent("Too long.");
+    expect(screen.getByRole("status")).toHaveTextContent("Too long.");
   });
 
   it("keeps a caller aria-describedby and a caller aria-invalid", () => {

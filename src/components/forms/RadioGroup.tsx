@@ -7,7 +7,7 @@
  *       native radios do. Controlled (`value`) or uncontrolled (`defaultValue`).
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 "use client";
@@ -91,7 +91,6 @@ export function RadioGroup({
                 : { checked: option.value === value })}
               disabled={option.disabled}
               required={required}
-              aria-invalid={error ? true : undefined}
               aria-labelledby={`${optionId}-label`}
               aria-describedby={option.hint ? hintId(optionId) : undefined}
               onChange={() => onChange?.(option.value)}

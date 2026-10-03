@@ -5,7 +5,7 @@
  *       browser, so both lists print the same markup.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Sep 24, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { AutoLink } from "../basics/AutoLink.js";
@@ -30,7 +30,7 @@ export function NavItem({ item, current, linkClassName }: NavItemProps) {
   if (!item.href) {
     return (
       <li>
-        <span aria-disabled="true" className="text-c4">
+        <span className="text-c4">
           {item.label}
           <LinkNote note={item.note} />
         </span>

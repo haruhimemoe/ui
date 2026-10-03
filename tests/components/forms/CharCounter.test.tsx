@@ -4,7 +4,7 @@
  *       the unit, native props, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -30,6 +30,17 @@ describe("CharCounter", () => {
     render(<CharCounter count={61500} limit={60000} />);
     const text = screen.getByText("61,500 / 60,000 characters: 1,500 over the limit");
     expect(text).toHaveClass("font-bold", "text-rose-300");
+  });
+
+  it("with live, announces only the over-limit text through an output", async () => {
+    const { container, rerender } = render(<CharCounter count={3} limit={5} live />);
+    const output = screen.getByRole("status");
+    expect(output).toHaveTextContent("");
+    expect(output).toHaveClass("sr-only");
+    expect(screen.getByText("3 / 5 characters")).toHaveAttribute("aria-hidden", "true");
+    rerender(<CharCounter count={7} limit={5} live />);
+    expect(screen.getByRole("status")).toHaveTextContent("2 over the limit");
+    await expectNoAxeViolations(container);
   });
 
   it("takes a unit, native props and classes", () => {

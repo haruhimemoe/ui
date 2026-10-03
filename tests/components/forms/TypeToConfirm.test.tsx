@@ -63,7 +63,7 @@ describe("TypeToConfirm", () => {
     await act(async () => fail());
     expect(screen.getByRole("button", { name: "Transfer" })).toBeEnabled();
     expect(screen.getByRole("textbox")).toHaveValue("abc");
-    expect(screen.getByRole("alert")).toHaveTextContent("The pool is still yours.");
+    expect(screen.getByRole("status")).toHaveTextContent("The pool is still yours.");
   });
 
   it("has no axe violations", async () => {

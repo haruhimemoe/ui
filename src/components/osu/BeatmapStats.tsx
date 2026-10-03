@@ -5,7 +5,7 @@
  *       not finite doesn't show. The short names are `<abbr>`s with the full name as a title.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
@@ -32,7 +32,13 @@ export type BeatmapStatsProps = Omit<ComponentProps<"dl">, "children"> & {
   labels?: Partial<Record<BeatmapStatKey, ReactNode>> | undefined;
 };
 
-const abbr = (short: string, full: string) => <abbr title={full}>{short}</abbr>;
+// The short form shows (and titles a tooltip); screen readers get the full name instead.
+const abbr = (short: string, full: string) => (
+  <abbr title={full}>
+    <span aria-hidden="true">{short}</span>
+    <span className="sr-only">{full}</span>
+  </abbr>
+);
 
 const LABELS: Record<BeatmapStatKey, ReactNode> = {
   cs: abbr("CS", "Circle size"),

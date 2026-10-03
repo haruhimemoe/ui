@@ -4,7 +4,7 @@
  *       and uncontrolled use, the group's hint and error, required and disabled, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -65,10 +65,10 @@ describe("RadioGroup", () => {
     );
     const group = screen.getByRole("group", { name: "Vis" });
     expect(group).toHaveAccessibleDescription("You can change it later. Pick one.");
-    expect(screen.getByRole("alert")).toHaveTextContent("Pick one.");
+    expect(screen.getByRole("status")).toHaveTextContent("Pick one.");
     for (const radio of screen.getAllByRole("radio")) {
       expect(radio).toBeRequired();
-      expect(radio).toHaveAttribute("aria-invalid", "true");
+      expect(radio).not.toHaveAttribute("aria-invalid");
     }
   });
 

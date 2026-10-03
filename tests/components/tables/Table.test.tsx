@@ -5,7 +5,7 @@
  *       native props and refs, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -48,6 +48,25 @@ describe("Table", () => {
     expect(table).toHaveClass("w-full", "text-left", "text-sm");
     expect(table.parentElement).toHaveClass("overflow-x-auto", "mt-4");
     expect(screen.getByText("The pool's maps")).toHaveClass("font-bold", "text-c3");
+  });
+
+  it("makes the scrolling wrapper a focusable region named by the caption, or by scrollLabel", () => {
+    const { rerender } = render(<Slots />);
+    const region = screen.getByRole("region", { name: "The pool's maps" });
+    expect(region).toHaveAttribute("tabindex", "0");
+    expect(region).toContainElement(screen.getByRole("table"));
+    rerender(
+      <Table scrollLabel="Results">
+        <TBody />
+      </Table>,
+    );
+    expect(screen.getByRole("region", { name: "Results" })).toHaveAttribute("tabindex", "0");
+    rerender(
+      <Table>
+        <TBody />
+      </Table>,
+    );
+    expect(screen.getByRole("region", { name: "Table" })).toBeInTheDocument();
   });
 
   it("keeps the caption for screen readers only with hideCaption", () => {

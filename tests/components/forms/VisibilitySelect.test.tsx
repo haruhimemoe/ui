@@ -82,7 +82,7 @@ describe("VisibilitySelect", () => {
     const { rerender } = render(
       <VisibilitySelect value="private" onChange={() => {}} error="Pick one." disabled />,
     );
-    expect(screen.getByRole("alert")).toHaveTextContent("Pick one.");
+    expect(screen.getByRole("status")).toHaveTextContent("Pick one.");
     for (const radio of screen.getAllByRole("radio")) expect(radio).toBeDisabled();
     rerender(<VisibilitySelect as="select" value="private" onChange={() => {}} disabled />);
     expect(screen.getByRole("combobox")).toBeDisabled();

@@ -28,7 +28,7 @@ describe("Checkbox", () => {
         }
       />,
     );
-    expect(screen.getByRole("alert")).toHaveTextContent("Required.");
+    expect(screen.getByRole("status")).toHaveTextContent("Required.");
     expect(logged).not.toHaveBeenCalled();
     logged.mockRestore();
   });
@@ -73,7 +73,7 @@ describe("Checkbox", () => {
     expect(box).toHaveAttribute("aria-invalid", "true");
     expect(box).toHaveAttribute("aria-describedby", "terms-hint terms-error");
     expect(box).toHaveAccessibleDescription("Required. Tick this to go on.");
-    expect(screen.getByRole("alert")).toHaveClass("text-rose-300", "text-sm");
+    expect(screen.getByRole("status")).toHaveClass("text-rose-300", "text-sm");
   });
 
   it("keeps a caller aria-describedby and a caller aria-invalid", () => {

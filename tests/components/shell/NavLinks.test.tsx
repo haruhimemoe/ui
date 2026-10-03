@@ -5,7 +5,7 @@
  *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -84,7 +84,7 @@ describe("NavLinks", () => {
     render(<NavLinks links={[...LINKS, { label: "stats" }]} />);
     expect(screen.getAllByRole("link")).toHaveLength(3);
     const sheets = screen.getByText("sheets");
-    expect(sheets).toHaveAttribute("aria-disabled", "true");
+    expect(sheets).not.toHaveAttribute("aria-disabled");
     expect(sheets).toHaveClass("text-c4");
     expect(sheets).toHaveTextContent("sheets soon");
     expect(screen.getByText("soon")).toHaveClass("text-xs", "uppercase");

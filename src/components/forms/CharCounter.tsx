@@ -5,7 +5,7 @@
  *       length), so it fits any rule. Server-safe. Moved from bb.haruhime.moe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -19,6 +19,8 @@ export type CharCounterProps = Omit<ComponentProps<"p">, "children"> & {
   limit: number;
   /** What is counted (default "characters"). */
   unit?: string | undefined;
+  /** Announce "N over the limit" to screen readers when the count goes over (and silence when it comes back). */
+  live?: boolean | undefined;
 };
 
 const format = (value: number): string => value.toLocaleString("en-US");
@@ -32,10 +34,13 @@ export function CharCounter({
   count,
   limit,
   unit = "characters",
+  live = false,
   className,
   ...props
 }: CharCounterProps) {
   const over = count - limit;
+  const overText = over > 0 ? `${format(over)} over the limit` : "";
+  const shown = `${format(count)} / ${format(limit)} ${unit}${over > 0 ? `: ${overText}` : ""}`;
   return (
     <p
       className={cx(
@@ -45,8 +50,17 @@ export function CharCounter({
       )}
       {...props}
     >
-      {`${format(count)} / ${format(limit)} ${unit}`}
-      {over > 0 ? `: ${format(over)} over the limit` : ""}
+      {live ? (
+        <>
+          <span aria-hidden="true">{shown}</span>
+          {/* Only the over-limit text is live, so typing isn't read out number by number. */}
+          <output aria-live="polite" className="sr-only">
+            {overText}
+          </output>
+        </>
+      ) : (
+        shown
+      )}
     </p>
   );
 }
