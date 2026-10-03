@@ -1,8 +1,8 @@
 # @haruhimemoe/ui
 
-> React components for the haruhime.moe osu! tools on Next.js 16 (app router), React 19 and Tailwind CSS 4.1+. It ships the osu!-web-style palette as a Tailwind theme (`@haruhimemoe/ui/theme.css`, colors `b1`-`b6`, `c1`-`c4`, `h1`, `h2` from one `--hue`), plus buttons, links, badges, form fields, inline and type-to-confirm confirms, a character counter, a visibility picker, a report form, in-page tabs, filter controls (chips, choice chips, a two-thumb range slider, a filter panel), tables, osu! display pieces (star rating, beatmap stats, mod badges) and the site header, footer, link tabs, account menu and page frame. ESM only. Most components are Server Components; the client ones carry `"use client"` in their own files, so everything imports from `@haruhimemoe/ui`. MIT license.
+> React components for the haruhime.moe osu! tools on Next.js 16 (app router), React 19 and Tailwind CSS 4.1+. It ships the osu!-web-style palette as a Tailwind theme (`@haruhimemoe/ui/theme.css`, colors `b1`-`b6`, `c1`-`c4`, `h1`, `h2` from one `--hue`), plus buttons, links, badges, form fields, inline and type-to-confirm confirms, a character counter, a visibility picker, a report form, in-page tabs, filter controls (chips, choice chips, a two-thumb range slider, a filter panel), tables, osu! display pieces (star rating, beatmap stats, mod badges), a command palette (mod+k) and the site header, footer, link tabs, account menu and page frame. ESM only. Most components are Server Components; the client ones carry `"use client"` in their own files, so everything imports from `@haruhimemoe/ui`. MIT license.
 
-The README describes version 0.5.0 and marks what 0.4.0 lacks with "since 0.5.0", what 0.3.0 lacks with "since 0.4.0", what 0.2.0 lacks with "since 0.3.0" and what 0.1.0 lacks with "since 0.2.0". An app sets it up by loading Tailwind through `@tailwindcss/postcss`, adding `@import "@haruhimemoe/ui/theme.css";` after `@import "tailwindcss";`, and loading Nunito from `next/font` as the `--font-nunito` variable (without it, the system font).
+The README describes version 0.8.0 and marks what each earlier version lacks with "since x.y.0". An app sets it up by loading Tailwind through `@tailwindcss/postcss`, adding `@import "@haruhimemoe/ui/theme.css";` after `@import "tailwindcss";`, and loading Nunito from `next/font` as the `--font-nunito` variable (without it, the system font).
 
 ## Docs
 
@@ -20,6 +20,7 @@ The README describes version 0.5.0 and marks what 0.4.0 lacks with "since 0.5.0"
 - [Meta](https://github.com/haruhimemoe/ui#meta): JsonLd, schema.org data in an escaped script tag
 - [Shell](https://github.com/haruhimemoe/ui#shell): SiteLinkItem, SiteHeader, NavLinks, SiteFooter (with the "haruhime tools" column: HARUHIME_TOOLS, haruhimeToolsColumn), LinkTabs, HeaderMenu (account disclosure menu), PageShell
 - [osu!](https://github.com/haruhimemoe/ui#osu): StarRating (spectrum-colored pill), BeatmapStats (CS/AR/OD/HP/BPM/length), ModBadge (slot pill by mod bucket)
+- [Palette](https://github.com/haruhimemoe/ui#palette-client): CommandPalette (mod+k, fuzzy search, nested pages, async providers, argument prompts, recents, a calculator), Command and Provider, openCommandPalette, CommandPaletteButton, siteCommands (the defaults every tool gets), fuzzyScore, evaluate and formatResult
 - [Tables](https://github.com/haruhimemoe/ui#tables): Table, THead, TBody, Th, Td, the apps' data table look with a caption
 - [Utilities](https://github.com/haruhimemoe/ui#utilities): cx, the tailwind-merge class merger the components use
 - [Accessibility](https://github.com/haruhimemoe/ui#accessibility): what the components do for screen readers, keyboards and forced colors

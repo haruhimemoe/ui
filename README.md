@@ -2,11 +2,11 @@
 
 # @haruhimemoe/ui
 
-React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, links, badges, form fields and confirms, filter controls (toggle and choice chips, a two-thumb range slider, a filter panel), tables, osu! beatmap display pieces and the site header, footer, tabs, account menu and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
+React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, links, badges, form fields and confirms, filter controls (toggle and choice chips, a two-thumb range slider, a filter panel), tables, osu! beatmap display pieces, a command palette (mod+k, with the defaults every tool shares) and the site header, footer, tabs, account menu and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
 
 See every component in its states at [haruhime.moe/ui](https://www.haruhime.moe/ui). The page names the version it runs.
 
-This README describes version 0.7.0. Anything marked "since 0.7.0" is not in 0.6.0, anything marked "since 0.6.0" is not in 0.5.0, anything marked "since 0.5.0" is not in 0.4.0, anything marked "since 0.4.0" is not in 0.3.0, anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
+This README describes version 0.8.0. Anything marked "since 0.8.0" is not in 0.7.0, anything marked "since 0.7.0" is not in 0.6.0, anything marked "since 0.6.0" is not in 0.5.0, anything marked "since 0.5.0" is not in 0.4.0, anything marked "since 0.4.0" is not in 0.3.0, anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
 
 ## Requirements
 
@@ -153,7 +153,7 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
@@ -845,6 +845,108 @@ A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: N
 | --- | --- | --- | --- |
 | `mod` | `string` | required | The mod or slot label. |
 
+### Palette (client)
+
+Since 0.8.0. A command palette: press Ctrl K (⌘K on a Mac) anywhere on the page and a dialog opens with a search box over everything the app can do. It is one component for every haruhime tool: `CommandPalette` is the engine, `siteCommands` the defaults every site shares, and each app plugs in its own commands, pages and search providers through the same `Command` and `Provider` types. No new dependency.
+
+Mount it once, from a client file, since commands carry functions. The button goes in `SiteHeader`'s `actions`:
+
+```tsx
+// src/components/Palette.tsx
+"use client";
+
+import { type Command, CommandPalette, siteCommands } from "@haruhimemoe/ui";
+import { HEADER_LINKS } from "@/constants/nav";
+
+const COMMANDS: Command[] = [
+  ...siteCommands({ pages: HEADER_LINKS, tools: "packs", repo: "https://github.com/haruhimemoe/packs.haruhime.moe" }),
+  { id: "pack.new", title: "New pack", group: "Packs", shortcut: "g n", run: (ctx) => ctx.navigate("/new") },
+];
+
+export function Palette() {
+  return <CommandPalette storageKey="packs" commands={COMMANDS} />;
+}
+```
+
+```tsx
+// app/layout.tsx
+<SiteHeader brand={...} links={HEADER_LINKS} actions={<CommandPaletteButton>Search</CommandPaletteButton>} />
+<Palette />
+```
+
+#### `CommandPalette`
+
+The dialog. Renders nothing until opened, then a native `<dialog>` (modal, backdrop, scroll locked) with a combobox over a listbox. Mount one per app.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `commands` | `readonly Command[]` | required | The root rows. Read on every open, so a command's `when` and titles can change. |
+| `providers` | `readonly Provider[]` | none | Searched at the root as you type, once the query reaches each one's `minLength`. |
+| `storageKey` | `string` | `"default"` | Namespaces the recents in `localStorage` (`haruhime:palette:<key>`). |
+| `hotkey` | `string` | `"mod+k"` | The toggle, in shortcut syntax. `mod` is ⌘ on a Mac and Ctrl elsewhere. |
+| `placeholder` | `string` | `"Search commands…"` | The root input's placeholder. |
+| `label` | `string` | `"Command palette"` | The dialog's and the input's accessible name. |
+| `calculator` | `boolean` | `true` | A `= 42` row for a query that computes (`2*21`), first in the list; Enter copies the result. |
+| `recents` | `boolean` | `true` | A Recent group of the last five commands run, and a ranking boost by how often each ran. |
+| `className` | `string` | none | Classes for the panel. |
+
+Keys: ↑ ↓ move (wrapping), Home and End jump, Enter runs the active row, Escape goes back a level and then closes, Backspace on an empty input goes back a level, Tab stays put (focus never leaves the input), and the hotkey toggles the palette from anywhere, a field included, without typing into it. A click on the backdrop closes it. Focus returns to whatever had it.
+
+Typing filters the rows with a fuzzy match: every character must start a word or follow the previous match ("cpu" finds "Copy page URL"), the title weighs most, then `keywords`, `subtitle` and `group`. Matched letters are marked. With an empty query every command is listed under its group, in order, after the Recent group.
+
+#### `Command`
+
+| Field | Type | What it does |
+| --- | --- | --- |
+| `id` | `string` | Unique in the app. Recents are stored by it, so keep it stable when a title changes. |
+| `title` | `string` | The row. |
+| `subtitle?` | `string` | A smaller second line. |
+| `icon?` | `ReactNode` | A 20px slot before the title. |
+| `keywords?` | `string[]` | Matched at a lower weight than the title. |
+| `group?` | `string` | The heading the row sits under. Default `"Commands"`. |
+| `shortcut?` | `string` | Shown as keys on the row, and active while the palette is mounted and closed: a combo (`"mod+shift+c"`, `"?"`) or a chord of two bare keys (`"g p"`, within 800 ms). Never fires from a field. |
+| `when?` | `(ctx) => boolean` | Hidden when false. Read on every render of the list. |
+| `run?` | `(ctx, args) => void \| Promise<void>` | What it does. A rejection is logged; the palette stays usable. |
+| `page?` | `Page` | Instead of `run`: Enter pushes this page (its `commands` and `providers`), with the page's title as a crumb. |
+| `args?` | `ArgSpec[]` | Prompts collected before `run`, one at a time: `{ name, label, type: "text" \| "number" \| "choice", choices?, validate? }`. A `choice` lists its `choices` as rows (fuzzy-filtered); `text` and `number` take the input on Enter; `validate` returns a message to block it. `run` gets them as `args[name]`. |
+| `closeOnRun?` | `boolean` | Default `true`. |
+
+`PaletteContext` (the `ctx` a command runs with): `navigate(href)` (`router.push`), `close()`, `push(page)` (opens the palette first when closed), `copy(text)` (clipboard, announcing "Copied" or the failure), `pathname`, and `commands` (every root command, so a page can list them).
+
+#### `Provider`
+
+`{ id, group?, minLength? = 2, debounceMs? = 200, search(query, signal) }`. `search` returns `Command[]` for the query and must honor the `AbortSignal`: a newer query aborts the older search, and a late result is dropped. Its rows sit under `group` after the static matches; while it runs the list says "Searching…", and an error says "Couldn't search, try again". `fuzzyScore(query, text)` is exported so a provider can rank its rows the way the palette does.
+
+#### `openCommandPalette(page?)`
+
+Opens the mounted palette from anywhere (a button, a tour), onto `page` when given. It dispatches a `window` event, so it works from a Server Component's client child without a ref.
+
+#### `CommandPaletteButton` (client)
+
+A ghost `Button` with a magnifier, your `children` beside it and the hotkey hint (`Ctrl K`, or `⌘K` once a Mac is detected after mount). `label` is the accessible name (default "Open command palette"). Every `Button` prop except `onClick`.
+
+#### `siteCommands(options)`
+
+The defaults every tool gets, in order: Navigate, Page, Account, Help. Pass only what the app has.
+
+| Option | Type | What it builds |
+| --- | --- | --- |
+| `pages` | `SiteLinkItem[]` | "Go to <label>" per linked nav item (`site.go.<slug>`). |
+| `tools` | `HaruhimeToolId \| false` | "Open <tool>" for every other tool in `HARUHIME_TOOLS` plus "Open haruhime.moe" (`site.tool.<id>`, `site.tool.home`). `false` leaves them out. |
+| `repo` | `string` | "Open on GitHub" (`site.github`) and "Report a bug" (`site.report`, the repo's new-issue page). |
+| `account` | `{ signedIn, signInHref, accountHref?, signOutHref? }` | "Sign in" (`site.sign-in`) while signed out; "My account" (`site.account`) and "Sign out" (`site.sign-out`, navigated, as next-kit's route expects) while signed in. |
+| `include` | `("navigate" \| "page" \| "account" \| "help")[]` | Which groups. Default all. |
+
+Always there: "Copy page URL" (`site.copy-url`, mod+shift+c), "Go back" (`site.back`), "Scroll to top" (`site.top`, instant under reduced motion), "Reload page" (`site.reload`) and "Keyboard shortcuts" (`site.shortcuts`, `?`), a page listing every command that has a shortcut, the app's included.
+
+#### Calculator
+
+`evaluate(expression)` and `formatResult(value)` are exported. The grammar: `+ - * / % ^`, unary minus, parentheses, `k` and `m` suffixes (`1.5k`), `pi` and `e`, and `sqrt`, `abs`, `round`, `floor`, `ceil`, `min` and `max`. Anything else, and a result that isn't finite, is `null`. In the palette a bare number or word is a search, not a sum.
+
+#### Accessibility
+
+The input is a `combobox` over a `listbox`; the active row is named by `aria-activedescendant`, so focus never leaves the input. The active row shows an `h1` left edge as well as a tint, the input row's bottom border turns `h1` while it has focus, hint rows ("Searching…", "No matching commands") are disabled options, an argument's error is an always-mounted `role="status"`, group headings aren't uppercase, rows are 36px, and the footer's `<output>` reads the result count and the copy outcome. `bun run play:axe` runs axe-core in Chromium over the open palette's states with contrast on.
+
 ### Tables
 
 Since 0.4.0. `Table`, `THead`, `TBody`, `Th` and `Td` give a data table the apps' look: full width, small left-aligned text, muted capitals in the head and a rule above each body row. They are Server Components, and each takes its element's native props, `className` (merged last) and `ref`. Use plain `<tr>` for rows.
@@ -894,6 +996,7 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 - **Color never carries meaning alone.** Accent links are underlined, a pressed `Chip` is `aria-pressed`, the current nav link is `aria-current`, `CharCounter` says "over the limit" in words, errors are text.
 - **Live regions exist before they speak.** `CopyButton`, `AsyncButton`, `CharCounter live`, `FilterPanel`'s count and `ReportDisclosure`'s outcome render their `<output>` or `role="status"` node up front, empty, and swap the text in. Field errors are `role="status"` (polite); `Notice live tone="error"` is the one `role="alert"`.
 - **Focus never falls to the body.** When the control you pressed goes away, focus moves somewhere sensible: `FilterPanel` to its heading, `Pagination` to "Page X of Y", `InlineConfirm` back to its trigger, `ReportDisclosure` to its outcome line. Pending buttons use `aria-disabled`, not `disabled`, so focus stays.
+- **The palette is a combobox.** `CommandPalette` keeps focus on its input and names the active row with `aria-activedescendant`; the row shows its state with an `h1` edge, the input row shows focus, and `bun run play:axe` checks its open states in a real browser (since 0.8.0).
 - **Landmarks are few and named.** `PageShell` gives a skip link and `<main>`; `SiteHeader` one `<nav>` (`navLabel`, default "Main"); `SiteFooter` one `<nav>` (`navLabel`, default "Footer") with a headed `<section>` per column; `Pagination` and `LinkTabs` are labelled `<nav>`s. Give two of a kind different labels.
 - **Scrollable regions take focus.** `Table`'s wrapper is a focusable named section. Do the same for a `pre` inside `Prose`.
 - **Native first.** Fields are native inputs, selects and textareas; radios and checkboxes are native with a visible label; `RangeSlider`'s thumbs are native range inputs with `aria-valuetext` ("10+" reads as it shows); `Disclosure` and `HeaderMenu` are buttons with `aria-expanded` and `aria-controls`; `Tabs` follows the ARIA tabs pattern (one tab in the Tab order, arrows, Home and End, `aria-controls`). ARIA only where HTML has no element.
@@ -914,7 +1017,7 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 
 ## Changelog and contributing
 
-See [CHANGELOG.md](./CHANGELOG.md) for what changed in each version and [CONTRIBUTING.md](./CONTRIBUTING.md) to work on the package. Report security issues as described in [SECURITY.md](./SECURITY.md). Bring questions and feedback to the haruhime.moe [Discord server](https://discord.gg/bKy9kjMV4y).
+See [CHANGELOG.md](./CHANGELOG.md) for what changed in each version and [CONTRIBUTING.md](./CONTRIBUTING.md) to work on the package. `bun run play` serves `playground/`, a small Next.js app in the repo that renders the components straight from `src/`, for trying a change by hand. Report security issues as described in [SECURITY.md](./SECURITY.md). Bring questions and feedback to the haruhime.moe [Discord server](https://discord.gg/bKy9kjMV4y).
 
 ## License
 

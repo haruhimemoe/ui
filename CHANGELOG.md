@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `CommandPalette`: a mod+k command palette in a native `<dialog>`. Fuzzy search over commands with group headings and marked matches, nested pages (Backspace or Escape go back), async providers that search as you type (debounced, aborted when superseded), argument prompts (text, number, choice) before a command runs, a Recent group from localStorage, and a calculator row (`2*21` → `= 42`, Enter copies). Command shortcuts (`mod+shift+c`, chords like `g p`) work while the palette is closed. `openCommandPalette(page?)` opens it from anywhere; `CommandPaletteButton` is the header button with the platform hint. Built as a combobox over a listbox, with an `h1` edge on the active row, a focus cue on the input row, status errors and a polite result count.
+- `siteCommands(options)`: the defaults every tool gets: Go to each nav page, Open each other haruhime tool, Copy page URL, Go back, Scroll to top, Reload, Open on GitHub, Sign in / My account / Sign out, Keyboard shortcuts, Report a bug.
+- `fuzzyScore` and `evaluate` / `formatResult` are public, so an app can rank its provider rows the same way and reuse the calculator.
+- `playground/`: a Next.js app in the repo that renders the components from `src/` (`bun run play`), and `bun run play:axe`, which builds it and runs axe-core in Chromium over the palette's states. Not published.
+
 ### Changed
 
 - `Checkbox` and `RadioGroup` boxes are 24px (WCAG 2.2 target size; they were the browser's 13px), centered on the first line of their label. `Disclosure` and `HeaderMenu` buttons are at least 24px tall.
