@@ -142,7 +142,8 @@ describe("siteCommands", () => {
     byId(list, "site.shortcuts").run?.(c, {});
     const page = (c.push as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
     expect(page.title).toBe("Keyboard shortcuts");
-    expect(page.commands.map((x: Command) => x.id)).toEqual(["site.shortcuts", "x"]);
+    // Itself left out: selecting it there would only push another shortcuts page.
+    expect(page.commands.map((x: Command) => x.id)).toEqual(["x"]);
   });
 
   it("scrolls without smooth under reduced motion", () => {
@@ -151,5 +152,15 @@ describe("siteCommands", () => {
     byId(siteCommands({ include: ["page"] }), "site.top").run?.(ctx(), {});
     expect(scroll).toHaveBeenCalledWith({ top: 0, behavior: "auto" });
     vi.unstubAllGlobals();
+  });
+
+  it("the shortcuts page leaves itself out", () => {
+    const list = siteCommands();
+    const push = vi.fn();
+    const shortcuts = byId(list, "site.shortcuts");
+    shortcuts?.run?.(ctx({ push, commands: list }), {});
+    const page = push.mock.calls[0]?.[0];
+    expect(page.commands.map((c: { id: string }) => c.id)).not.toContain("site.shortcuts");
+    expect(page.commands.map((c: { id: string }) => c.id)).toContain("site.copy-url");
   });
 });

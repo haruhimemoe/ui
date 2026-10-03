@@ -890,9 +890,9 @@ The dialog. Renders nothing until opened, then a native `<dialog>` (modal, backd
 | `recents` | `boolean` | `true` | A Recent group of the last five commands run, and a ranking boost by how often each ran. |
 | `className` | `string` | none | Classes for the panel. |
 
-Keys: ↑ ↓ move (wrapping), Home and End jump, Enter runs the active row, Escape goes back a level and then closes, Backspace on an empty input goes back a level, Tab stays put (focus never leaves the input), and the hotkey toggles the palette from anywhere, a field included, without typing into it. A click on the backdrop closes it. Focus returns to whatever had it.
+Keys: ↑ ↓ move (wrapping), Home and End jump, Enter runs the active row, Escape goes back a level and then closes, Backspace on an empty input goes back a level, Tab stays put (focus never leaves the input), and the hotkey (a combo, not a chord) toggles the palette from anywhere, a field included, without typing into it. A click on the backdrop closes it, and so does the browser (a back gesture on Android). Focus returns to whatever had it. The footer reads the result count, or the copy outcome until the query changes.
 
-Typing filters the rows with a fuzzy match: every character must start a word or follow the previous match ("cpu" finds "Copy page URL"), the title weighs most, then `keywords`, `subtitle` and `group`. Matched letters are marked. With an empty query every command is listed under its group, in order, after the Recent group.
+Typing filters the rows with a fuzzy match: a letter or digit must start a word or follow the previous match ("cpu" finds "Copy page URL", "go" doesn't find "Sign out"), except in scripts without case or spaces (kanji, kana), which match anywhere; the title weighs most, then `keywords`, `subtitle` and `group`. Matched letters are marked. With an empty query every command is listed under its group, in order, after the Recent group.
 
 #### `Command`
 
@@ -915,7 +915,7 @@ Typing filters the rows with a fuzzy match: every character must start a word or
 
 #### `Provider`
 
-`{ id, group?, minLength? = 2, debounceMs? = 200, search(query, signal) }`. `search` returns `Command[]` for the query and must honor the `AbortSignal`: a newer query aborts the older search, and a late result is dropped. Its rows sit under `group` after the static matches; while it runs the list says "Searching…", and an error says "Couldn't search, try again". `fuzzyScore(query, text)` is exported so a provider can rank its rows the way the palette does.
+`{ id, group?, minLength? = 2, debounceMs? = 200, search(query, signal) }`. `search` returns `Command[]` for the query and must honor the `AbortSignal`: a newer query aborts the older search, and a late result is dropped. Its rows sit under `group` (default "Results") after the static matches; while it runs the list is `aria-busy`, says "Searching…" and keeps the last rows in place, so nothing flashes per keystroke; an error says "Couldn't search, try again". `fuzzyScore(query, text)` is exported so a provider can rank its rows the way the palette does.
 
 #### `openCommandPalette(page?)`
 
@@ -923,7 +923,7 @@ Opens the mounted palette from anywhere (a button, a tour), onto `page` when giv
 
 #### `CommandPaletteButton` (client)
 
-A ghost `Button` with a magnifier, your `children` beside it and the hotkey hint (`Ctrl K`, or `⌘K` once a Mac is detected after mount). `label` is the accessible name (default "Open command palette"). Every `Button` prop except `onClick`.
+A ghost `Button` with a magnifier, your `children` beside it and the hotkey hint (`Ctrl K`, or `⌘K` once a Mac is detected after mount; decorative, so it isn't part of the name). With `children`, that text is the button's name; without, `label` is (default "Open command palette"). Every `Button` prop except `onClick`.
 
 #### `siteCommands(options)`
 

@@ -43,6 +43,12 @@ describe("fuzzyScore", () => {
     );
   });
 
+  it("matches inside unspaced scripts, where there are no word starts", () => {
+    expect(fuzzyScore("方", "東方 Bad Apple!!")).not.toBeNull();
+    expect(fuzzyScore("花火", "紅葉花火")).not.toBeNull();
+    expect(fuzzyScore("go", "Sign out")).toBeNull();
+  });
+
   it("survives regex characters in the query", () => {
     expect(fuzzyScore("(*", "a (b*)")).not.toBeNull();
     expect(fuzzyScore("[", "no brackets")).toBeNull();

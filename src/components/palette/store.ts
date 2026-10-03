@@ -105,6 +105,8 @@ export function reduce(state: PaletteState, action: PaletteAction): PaletteState
         : withTop(state, { query: action.value, active: 0 });
     case "active": {
       const index = clamp(action.index, action.count);
+      const current = state.arg ? state.arg.active : topFrame(state)?.active;
+      if (index === current) return state;
       return state.arg ? withArg(state, { active: index }) : withTop(state, { active: index });
     }
     case "move": {
@@ -156,9 +158,15 @@ export function reduce(state: PaletteState, action: PaletteAction): PaletteState
     case "provided": {
       const target = state.stack[action.depth];
       if (!target) return state;
+      // A search that starts keeps the previous rows on screen until the new ones land.
+      const previous = target.providers[action.providerId];
+      const result =
+        action.result.state === "loading" && previous
+          ? { ...action.result, rows: previous.rows }
+          : action.result;
       const updated = {
         ...target,
-        providers: { ...target.providers, [action.providerId]: action.result },
+        providers: { ...target.providers, [action.providerId]: result },
       };
       return { ...state, stack: state.stack.map((f, i) => (i === action.depth ? updated : f)) };
     }

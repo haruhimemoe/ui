@@ -21,6 +21,8 @@ export type PaletteListProps = {
   active: number;
   mac: boolean;
   optionId: (index: number) => string;
+  /** A provider is searching: the listbox is aria-busy. */
+  busy?: boolean | undefined;
   onActivate: (index: number) => void;
   onSelect: (command: Command) => void;
 };
@@ -60,14 +62,24 @@ export function PaletteList({
   active,
   mac,
   optionId,
+  busy,
   onActivate,
   onSelect,
 }: PaletteListProps) {
+  // Runs for a new list too (its first row changes), so it scrolls back up when active stays 0.
+  const first = rows[0]?.id;
   useEffect(() => {
+    if (first === undefined) return;
     document.getElementById(optionId(active))?.scrollIntoView?.({ block: "nearest" });
-  }, [active, optionId]);
+  }, [active, optionId, first]);
   return (
-    <div id={id} role="listbox" aria-label="Results" className="min-h-0 flex-1 overflow-y-auto p-2">
+    <div
+      id={id}
+      role="listbox"
+      aria-label="Results"
+      aria-busy={busy ? true : undefined}
+      className="min-h-0 flex-1 overflow-y-auto p-2"
+    >
       {segments(rows).map((segment) =>
         segment.kind === "hint" ? (
           // A listbox may only own options and groups, so a hint is a disabled option: it reads

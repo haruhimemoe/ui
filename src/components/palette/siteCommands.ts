@@ -162,7 +162,7 @@ const help = (options: SiteCommandsOptions): Command[] => {
         ctx.push({
           title: "Keyboard shortcuts",
           placeholder: "Filter shortcuts…",
-          commands: ctx.commands.filter((c) => c.shortcut),
+          commands: ctx.commands.filter((c) => c.shortcut && c.id !== "site.shortcuts"),
         }),
     },
   ];

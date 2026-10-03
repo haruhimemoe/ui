@@ -4,9 +4,10 @@
  *       (case-insensitive). Each matched character scores 10 at a word start, 8 when it follows
  *       the previous match, 4 otherwise, minus one per skipped character; a query that prefixes
  *       the text adds 20. A command's score is the best of its title, keywords (0.7), subtitle
- *       (0.5) and group (0.3). A letter or digit may only match at a word start or right after
- *       the previous match, so "cpu" lands on "Copy page URL"'s initials and "go" never finds
- *       "Sign out"; punctuation may match anywhere. Backtracking, left to right.
+ *       (0.5) and group (0.3). A cased letter or digit may only match at a word start or right
+ *       after the previous match, so "cpu" lands on "Copy page URL"'s initials and "go" never
+ *       finds "Sign out"; punctuation and uncased scripts (kanji, kana) match anywhere, since
+ *       they have no word starts. Backtracking, left to right, memoized.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Sat Oct 3, 2026
@@ -30,13 +31,19 @@ const isWordStart = (text: string, at: number): boolean => {
   return before === before.toLowerCase() && here !== here.toLowerCase();
 };
 
-const ALNUM = /[\p{L}\p{N}]/u;
+/**
+ * A character the word-start rule applies to: a digit or a letter with case. Scripts without
+ * case (kanji, kana, hangul) have no spaces to start words at, so they may match anywhere.
+ */
+const isStrict = (ch: string): boolean =>
+  /\p{N}/u.test(ch) || (/\p{L}/u.test(ch) && ch.toLowerCase() !== ch.toUpperCase());
 
 /**
- * The positions where the query's characters match, found left to right with backtracking.
- * A letter or digit may only match at a word start or right after the previous match (so "go"
- * never lands on the g inside "Sign out"); punctuation may match anywhere. Null when the
- * query can't be placed.
+ * The positions where the query's characters match, found left to right with backtracking,
+ * memoized on (index, from, consecutive) so a repetitive query stays polynomial. A cased letter
+ * or a digit may only match at a word start or right after the previous match (so "go" never
+ * lands on the g inside "Sign out"); punctuation and uncased letters may match anywhere. Null
+ * when the query can't be placed.
  */
 const place = (
   chars: readonly string[],
@@ -45,16 +52,25 @@ const place = (
   prev: number,
   text: string,
   t: string,
+  memo: Map<string, number[] | null>,
 ): number[] | null => {
   const ch = chars[i];
   if (ch === undefined) return [];
+  const key = `${i}:${from}:${prev === from - 1 ? 1 : 0}`;
+  const seen = memo.get(key);
+  if (seen !== undefined) return seen;
+  let found: number[] | null = null;
   for (let at = t.indexOf(ch, from); at >= 0; at = t.indexOf(ch, at + 1)) {
-    const allowed = !ALNUM.test(ch) || (prev >= 0 && at === prev + 1) || isWordStart(text, at);
+    const allowed = !isStrict(ch) || (prev >= 0 && at === prev + 1) || isWordStart(text, at);
     if (!allowed) continue;
-    const rest = place(chars, i + 1, at + 1, at, text, t);
-    if (rest) return [at, ...rest];
+    const rest = place(chars, i + 1, at + 1, at, text, t, memo);
+    if (rest) {
+      found = [at, ...rest];
+      break;
+    }
   }
-  return null;
+  memo.set(key, found);
+  return found;
 };
 
 /**
@@ -68,7 +84,7 @@ export function fuzzyScore(query: string, text: string): FuzzyMatch | null {
   const q = query.trim().toLowerCase();
   if (q.length === 0) return { score: 0, ranges: [] };
   const t = text.toLowerCase();
-  const positions = place([...q], 0, 0, -1, text, t);
+  const positions = place([...q], 0, 0, -1, text, t, new Map());
   if (!positions) return null;
   let score = 0;
   let prev = -1;

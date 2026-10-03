@@ -75,6 +75,8 @@ export function CommandPalette({
   const opener = useRef<Element | null>(null);
   const chord = useRef<{ key: string; at: number } | null>(null);
   const { status, start, settle } = useLatestStatus<string>();
+  // The copy status reads until the query changes or the palette reopens, then the count again.
+  const [statusShown, setStatusShown] = useState(false);
   const baseId = useId();
   const listId = `${baseId}-list`;
   const optionId = useCallback((index: number) => `${baseId}-option-${index}`, [baseId]);
@@ -88,11 +90,13 @@ export function CommandPalette({
 
   const open = useCallback(
     (page?: Page) => {
-      opener.current = document.activeElement;
+      // Opening onto a page while already open keeps the original opener.
+      if (!state.open) opener.current = document.activeElement;
       if (recentsOn) setRecents(readRecents(storageKey));
+      setStatusShown(false);
       dispatch({ type: "open", root, page });
     },
-    [root, recentsOn, storageKey],
+    [root, recentsOn, storageKey, state.open],
   );
   const close = useCallback(() => dispatch({ type: "close" }), []);
 
@@ -103,6 +107,7 @@ export function CommandPalette({
       push: (page) => (state.open ? dispatch({ type: "push", page }) : open(page)),
       copy: async (text) => {
         const run = start();
+        setStatusShown(true);
         try {
           await navigator.clipboard.writeText(text);
           settle(run, "Copied");
@@ -341,6 +346,8 @@ export function CommandPalette({
         back();
       }}
       onKeyDown={onKeyDown}
+      // The browser can close the dialog itself (a back gesture, a close watcher): follow it.
+      onClose={close}
       onClick={(event) => {
         if (event.target === event.currentTarget) close();
       }}
@@ -356,7 +363,10 @@ export function CommandPalette({
             listId={listId}
             activeId={count > 0 ? optionId(active) : undefined}
             error={state.arg?.error}
-            onChange={(value) => dispatch({ type: "query", value })}
+            onChange={(value) => {
+              setStatusShown(false);
+              dispatch({ type: "query", value });
+            }}
           />
           <PaletteList
             id={listId}
@@ -364,14 +374,15 @@ export function CommandPalette({
             active={active}
             mac={mac}
             optionId={optionId}
+            busy={Object.values(frame.providers).some((result) => result.state === "loading")}
             onActivate={(index) => dispatch({ type: "active", index, count })}
             onSelect={select}
           />
           <PaletteFooter
             count={count}
             nested={depth > 0 || state.arg !== null}
-            status={status?.result ?? null}
-            statusRun={status?.run ?? null}
+            status={statusShown ? (status?.result ?? null) : null}
+            statusRun={statusShown ? (status?.run ?? null) : null}
           />
         </div>
       ) : null}

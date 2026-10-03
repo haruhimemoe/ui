@@ -86,4 +86,32 @@ describe("CommandPalette providers", () => {
     await user.keyboard("{Escape}");
     expect(pageSearch).toHaveBeenCalledOnce();
   });
+
+  it("keeps the last rows while a new search runs, marks the list busy, and keys two providers apart", async () => {
+    const warn = vi.spyOn(console, "error").mockImplementation(() => {});
+    const a: Provider = { id: "a", group: "A", debounceMs: 50, search: async () => [row("a row")] };
+    const b: Provider = { id: "b", group: "B", debounceMs: 50, search: async () => [row("b row")] };
+    const { user } = renderPalette({ providers: [a, b] });
+    await pressHotkey(user);
+    await user.keyboard("g");
+    // Two "Type 2 characters" hints, one per provider, with distinct keys: no React warning.
+    expect(screen.getAllByText("Type 2 characters to search")).toHaveLength(2);
+    expect(warn).not.toHaveBeenCalled();
+    await user.keyboard("o");
+    await act(async () => {
+      vi.advanceTimersByTime(50);
+    });
+    expect(options().map((o) => o.textContent)).toEqual(["Go homeGH", "a row", "b row"]);
+    expect(screen.getByRole("listbox")).not.toHaveAttribute("aria-busy");
+    await user.keyboard("x");
+    // Searching again: the old rows stay under a Searching… hint and the list is busy.
+    expect(screen.getAllByText("Searching…")).toHaveLength(2);
+    expect(options().map((o) => o.textContent)).toEqual(["a row", "b row"]);
+    expect(screen.getByRole("listbox")).toHaveAttribute("aria-busy", "true");
+    await act(async () => {
+      vi.advanceTimersByTime(50);
+    });
+    expect(screen.getByRole("listbox")).not.toHaveAttribute("aria-busy");
+    expect(screen.queryByText("Searching…")).toBeNull();
+  });
 });

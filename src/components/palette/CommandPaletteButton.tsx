@@ -40,7 +40,8 @@ export function CommandPaletteButton({
     <Button
       type="button"
       variant={variant}
-      aria-label={label}
+      // Visible text names the button (WCAG 2.5.3 Label in Name); the label is for icon-only use.
+      aria-label={children === undefined || children === null ? label : undefined}
       onClick={() => openCommandPalette()}
       {...props}
     >
@@ -56,7 +57,10 @@ export function CommandPaletteButton({
         <path d="m13 13 4 4" strokeLinecap="round" />
       </svg>
       {children}
-      <kbd className={KBD}>{mac ? "⌘K" : "Ctrl K"}</kbd>
+      {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: a kbd is never focusable; the hint is decoration, so the name stays the visible text */}
+      <kbd aria-hidden="true" className={KBD}>
+        {mac ? "⌘K" : "Ctrl K"}
+      </kbd>
     </Button>
   );
 }

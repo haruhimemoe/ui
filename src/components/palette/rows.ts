@@ -52,7 +52,11 @@ const option = (
   group,
 });
 
-const hint = (text: string): Row => ({ kind: "hint", id: `hint:${text}`, text });
+const hint = (text: string, scope = ""): Row => ({
+  kind: "hint",
+  id: `hint:${scope}${text}`,
+  text,
+});
 
 const visible = (commands: readonly Command[], ctx: PaletteContext): Command[] =>
   commands.filter((command) => {
@@ -104,12 +108,15 @@ const providerRows = (input: RowsInput): Row[] =>
   input.providers.flatMap((provider) => {
     const group = provider.group ?? "Results";
     const min = provider.minLength ?? DEFAULT_MIN;
-    if (input.query.trim().length < min) return [hint(`Type ${min} characters to search`)];
+    const scope = `${provider.id}:`;
+    if (input.query.trim().length < min) return [hint(`Type ${min} characters to search`, scope)];
     const result = input.providerResults[provider.id];
-    if (!result || result.state === "loading") return [hint("Searching…")];
-    if (result.state === "error") return [hint("Couldn't search, try again")];
-    if (result.rows.length === 0) return [hint(`No results for “${input.query.trim()}”`)];
-    return result.rows.map((command) => option(command, group, [], `${provider.id}:`));
+    const rows = (result?.rows ?? []).map((command) => option(command, group, [], scope));
+    // Searching: the last rows stay under the hint, so the list doesn't flash per keystroke.
+    if (!result || result.state === "loading") return [hint("Searching…", scope), ...rows];
+    if (result.state === "error") return [hint("Couldn't search, try again", scope)];
+    if (rows.length === 0) return [hint(`No results for “${input.query.trim()}”`, scope)];
+    return rows;
   });
 
 /**

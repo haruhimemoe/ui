@@ -70,4 +70,16 @@ describe("CommandPalette opening", () => {
     await user.keyboard("{Control>}j{/Control}");
     expect(dialog()).toHaveAttribute("open");
   });
+
+  it("resyncs when the browser closes the dialog itself (back gesture, close watcher)", async () => {
+    const { user } = renderPalette();
+    await pressHotkey(user);
+    expect(document.documentElement.style.overflow).toBe("hidden");
+    act(() => dialog().close());
+    expect(document.documentElement.style.overflow).toBe("");
+    expect(screen.queryByRole("combobox")).toBeNull();
+    await pressHotkey(user);
+    expect(dialog()).toHaveAttribute("open");
+    expect(input()).toHaveFocus();
+  });
 });

@@ -61,4 +61,15 @@ describe("CommandPalette calculator", () => {
     await off.user.keyboard("1+1");
     expect(screen.queryByText("= 2")).toBeNull();
   });
+
+  it("goes back to counting results once the query changes after a copy", async () => {
+    const { user } = renderPalette();
+    clipboard(async () => {});
+    await pressHotkey(user);
+    await user.keyboard("2*21{Enter}");
+    expect(await screen.findByText("Copied")).toBeInTheDocument();
+    await user.keyboard("+1");
+    expect(screen.queryByText("Copied")).toBeNull();
+    expect(screen.getByText("1 result")).toBeInTheDocument();
+  });
 });

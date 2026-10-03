@@ -33,9 +33,12 @@ describe("CommandPaletteButton", () => {
 
   it("says ⌘K on a Mac and takes a custom label", () => {
     vi.stubGlobal("navigator", { ...navigator, platform: "MacIntel", userAgentData: undefined });
-    render(<CommandPaletteButton label="Search">Find</CommandPaletteButton>);
-    const button = screen.getByRole("button", { name: "Search" });
+    render(<CommandPaletteButton>Find</CommandPaletteButton>);
+    // Visible text names the button (WCAG 2.5.3); the key hint is decoration.
+    const button = screen.getByRole("button", { name: "Find" });
+    expect(button).not.toHaveAttribute("aria-label");
     expect(button).toHaveTextContent("Find");
     expect(button).toHaveTextContent("⌘K");
+    expect(button.querySelector("kbd")).toHaveAttribute("aria-hidden", "true");
   });
 });
