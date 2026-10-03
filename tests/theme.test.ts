@@ -31,12 +31,13 @@ const contrast = (a: number, b: number): number =>
 // The palette as theme.css defines it, with the lightness overrides.
 const c1 = (hue: number) => luminance(hue, 40, 100);
 const b4 = (hue: number) => luminance(hue, 10, 20);
-const h1 = (hue: number, l = 70) => luminance(hue, 100, l);
+const b5 = (hue: number) => luminance(hue, 10, 15);
+const h1 = (hue: number, l = 76) => luminance(hue, 100, l);
 const h2 = (hue: number, l = 45) => luminance(hue, 50, l);
 
 describe("theme.css", () => {
   it("lets an app set the h1 and h2 lightness", () => {
-    expect(theme).toContain("--color-h1: hsl(var(--hue) 100% var(--h1-l, 70%));");
+    expect(theme).toContain("--color-h1: hsl(var(--hue) 100% var(--h1-l, 76%));");
     expect(theme).toContain("--color-h2: hsl(var(--hue) 50% var(--h2-l, 45%));");
   });
 
@@ -57,6 +58,12 @@ describe("theme.css", () => {
     expect(contrast(c1(150), h2(150, 35))).toBeGreaterThanOrEqual(4.5);
     expect(contrast(h1(240), b4(240))).toBeLessThan(4.5);
     expect(contrast(h1(240, 77), b4(240))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("keeps h1 text on b5 (links in cards and prose) at 4.5:1 at every hue by default", () => {
+    for (let hue = 0; hue < 360; hue++) {
+      expect(contrast(h1(hue), b5(hue)), `hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
   it("covers every hue with the README's worst-case values", () => {

@@ -11,21 +11,18 @@ import { describe, expect, it } from "vitest";
 import { fieldClasses } from "../../../src/components/forms/fieldStyles.js";
 
 const PACKS_FIELD =
-  "w-full rounded-md border border-b3 bg-b6 px-3 py-2 text-c1 text-sm placeholder:text-c4 focus-visible:border-h1 focus-visible:outline-hidden disabled:opacity-50 aria-invalid:border-rose-400 aria-invalid:focus-visible:border-h1 aria-invalid:focus-visible:ring-1 aria-invalid:focus-visible:ring-h1";
+  "w-full rounded-md border border-b3 bg-b6 px-3 py-2 text-c1 text-sm placeholder:text-c4 focus-visible:border-h1 disabled:opacity-50 aria-invalid:border-rose-400 aria-invalid:focus-visible:border-h1";
 
 describe("fieldClasses", () => {
-  it("shows focus on an invalid field: the h1 border and a ring beat the rose border", () => {
+  it("shows focus on an invalid field: the h1 border beats the rose border", () => {
     const classes = fieldClasses().split(" ");
     expect(classes).toContain("aria-invalid:border-rose-400");
     expect(classes).toContain("aria-invalid:focus-visible:border-h1");
-    expect(classes).toContain("aria-invalid:focus-visible:ring-1");
-    expect(classes).toContain("aria-invalid:focus-visible:ring-h1");
   });
 
-  it("hides the outline with outline-hidden, which forced-colors mode still paints", () => {
+  it("keeps the theme's 2px focus outline: no outline-hidden, no outline-none", () => {
     const classes = fieldClasses().split(" ");
-    expect(classes).toContain("focus-visible:outline-hidden");
-    expect(classes).not.toContain("focus-visible:outline-none");
+    expect(classes.some((c) => c.includes("outline-"))).toBe(false);
   });
 
   it("returns the packs field classes with no extras", () => {

@@ -4,7 +4,7 @@
  *       outside the bounds, the track fill, and focus styles.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -170,13 +170,25 @@ describe("RangeSlider labels and values", () => {
 });
 
 describe("RangeSlider focus styles", () => {
-  it("hides outlines with outline-hidden, which forced-colors mode still paints", () => {
+  it("hides the thumbs' outlines with outline-hidden (forced-colors still paints it); boxes keep the theme outline", () => {
     stars();
-    for (const control of [lowThumb(), highThumb(), lowBox(), highBox()]) {
+    for (const control of [lowThumb(), highThumb()]) {
       const classes = control.className.split(/\s+/);
       expect(classes).toContain("focus-visible:outline-hidden");
       expect(classes).not.toContain("focus-visible:outline-none");
     }
+    for (const control of [lowBox(), highBox()]) {
+      expect(control.className.split(/\s+/).some((c) => c.includes("outline-"))).toBe(false);
+    }
+  });
+
+  it("draws 24px thumbs on a 24px track box, the WCAG 2.2 target size", () => {
+    stars();
+    const classes = lowThumb().className.split(/\s+/);
+    expect(classes).toContain("[&::-webkit-slider-thumb]:size-6");
+    expect(classes).toContain("[&::-moz-range-thumb]:size-6");
+    expect(classes).toContain("h-6");
+    expect(lowThumb().parentElement).toHaveClass("h-6");
   });
 
   it("rings a focused thumb in solid h1, not a see-through one", () => {

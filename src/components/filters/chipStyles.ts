@@ -5,11 +5,12 @@
  *       colors, so on and off still look different.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 /** The pill: rounded, px-2.5 py-0.5, bold text-xs. */
-export const CHIP = "rounded-full px-2.5 py-0.5 font-bold text-xs transition-colors";
+// py-1 with the text-xs line height makes a 24px pill: WCAG 2.2's minimum target size.
+export const CHIP = "rounded-full px-2.5 py-1 font-bold text-xs transition-colors";
 
 /** A chip that is on (pressed or checked). */
 export const CHIP_ON =
