@@ -18,7 +18,7 @@
  *       dir, then runs the build and the assertions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { execFileSync } from "node:child_process";
@@ -223,7 +223,7 @@ try {
         "TextLink off-site",
       ],
       [/<span[^>]*class="[^"]*amber[^"]*"[^>]*>Unranked<\/span>/, "Badge"],
-      [/<caption class="sr-only">Slots<\/caption>/, "Table with a hidden caption"],
+      [/<caption id="[^"]+" class="sr-only">Slots<\/caption>/, "Table with a hidden caption"],
       [/<th[^>]*scope="row"[^>]*>NM1<\/th>/, "Th as a row header"],
       [/>Delete pack<\/button>/, "InlineConfirm (client)"],
       [/>Refresh pages<\/button>/, "AsyncButton (client)"],
@@ -238,7 +238,7 @@ try {
       [/>Type OWC 2026 to confirm<\/label>/, "TypeToConfirm (client)"],
       [/<nav aria-label="What to search"/, "LinkTabs"],
       [/<span class="sr-only">5\.23<!-- --> <!-- -->stars/, "StarRating"],
-      [/<abbr title="Approach rate">AR<\/abbr>/, "BeatmapStats"],
+      [/<abbr title="Approach rate"><span aria-hidden="true">AR<\/span><span class="sr-only">Approach rate<\/span><\/abbr>/, "BeatmapStats"],
       [/<span[^>]*class="[^"]*bg-amber-300[^"]*"[^>]*>HD2<\/span>/, "ModBadge"],
       [/<button[^>]*aria-expanded="false"[^>]*>peppy<\/button>/, "HeaderMenu (client)"],
       [

@@ -80,7 +80,7 @@ const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: 
 At some hues the defaults drop below 4.5:1 contrast, so check yours. Two variables fix it:
 
 - `--h2-l` sets the lightness of `h2` (default `45%`). White text on `h2` (primary buttons, the skip link) is under 4.5:1 for hues from about 23 to 205. Use `42%` at hue 200, `35%` at hue 150, or `31%` for any hue.
-- `--h1-l` sets the lightness of `h1` (default `70%`). `h1` text on `b4` (card links, "Clear filters") is under 4.5:1 for hues from about 222 to 283. Use `77%` there.
+- `--h1-l` sets the lightness of `h1` (default `76%` since 0.7.0, `70%` before). At `76%`, `h1` text on `b5` (links in cards and prose) is at or above 4.5:1 at every hue. On `b4` ("Clear filters" in a filter panel) it dips under for hues from about 238 to 248. Use `77%` there.
 
 The theme is dark only (`color-scheme: dark`).
 
@@ -234,7 +234,7 @@ An error notice (`role="alert"`) is announced either way.
 
 #### `Prose`
 
-Long-form typography for MDX, docs and legal pages. A `max-w-3xl` `<div>` that styles the `h2`, `h3`, `p`, `a`, `strong`, `ul`, `ol`, `li`, `code`, `pre`, `hr` and `table` elements inside it. Every native `<div>` prop.
+Long-form typography for MDX, docs and legal pages. A `max-w-3xl` `<div>` that styles the `h2`, `h3`, `p`, `a`, `strong`, `ul`, `ol`, `li`, `code`, `pre`, `hr` and `table` elements inside it. Every native `<div>` prop. A `pre` scrolls sideways, so give it `tabIndex={0}` (through your Markdown renderer's `components` map) so keyboard users can reach the scroll; CSS can't add that.
 
 The first element inside gets no top margin (`[&>:first-child]:mt-0`, since 0.2.0), so a heading that opens the block sits flush with what's above it instead of taking the `h2` or `h3` gap. The rule reaches direct children only. If you wrap the content in `<section>`s, the heading at the top of the first section keeps its margin. Reach one level deeper for that:
 
@@ -322,7 +322,7 @@ Shared props (type `FieldProps`), taken by `TextInput`, `Textarea`, `Select` and
 | `id` | `string` | required | The control's id. The label points at it. The hint gets `<id>-hint` and the error `<id>-error`. |
 | `label` | `ReactNode` | required | The visible label. |
 | `hint` | `ReactNode` | none | Help text in a `<div>`, linked with `aria-describedby`. On `Checkbox` the hint sits inline inside the label, so keep it to text there. |
-| `error` | `ReactNode` | none | Error text in a `role="alert"` `<div>` (`text-rose-300`), so a list of errors is fine. Sets `aria-invalid` and links the text with `aria-describedby`. |
+| `error` | `ReactNode` | none | Error text in a `role="status"` `<div>` (`text-rose-300`; `role="alert"` before 0.7.0), so a list of errors is fine. Sets `aria-invalid` and links the text with `aria-describedby`. |
 | `wrapperClassName` | `string` | none | Classes for the wrapper around the label, control, hint and error, for layout (`min-w-48 flex-1`). |
 
 `className` goes on the control itself. Your own `aria-describedby` is kept after the hint and error ids.
@@ -358,7 +358,7 @@ Since 0.4.0. A native radio group on the `Checkbox` look: a `<fieldset>` named b
 | `value` / `defaultValue` | `string` | none | The picked value, held by you (`value`, with `onChange`) or by the group (`defaultValue`). |
 | `onChange` | `(value: string) => void` | none | Gets the picked option's value. |
 | `name` | `string` | generated | The radios' name, for a form. |
-| `hint`, `error` | `ReactNode` | none | Under the options, linked to the group with `aria-describedby`. An error is a `role="alert"` and marks the radios `aria-invalid`. |
+| `hint`, `error` | `ReactNode` | none | Under the options, linked to the group with `aria-describedby`. An error is a `role="status"` line (since 0.7.0; before, `role="alert"` and `aria-invalid` on each radio). |
 | `required` | `boolean` | `false` | Every radio gets `required`. |
 
 #### `TypeToConfirm` (client)
@@ -386,11 +386,14 @@ Since 0.4.0. A confirm for something that can't be undone: a `<form>` whose subm
 
 Since 0.5.0. How much of a length limit a text uses: "1,234 / 60,000 characters" in `c3`, then bold rose with ": 1,500 over the limit" once past it (at the limit is not over). You count, so any rule works (a string's length, a BBCode counter). Every native `<p>` prop except `children`.
 
+With `live` (since 0.7.0) an `<output>` live region inside it announces "1,500 over the limit" when the count goes over and nothing while under, so typing isn't read out number by number.
+
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `count` | `number` | required | How many are used. |
 | `limit` | `number` | required | The most allowed. |
 | `unit` | `string` | `"characters"` | What is counted. |
+| `live` | `boolean` | `false` | Announce the over-limit text to screen readers (since 0.7.0). |
 
 #### `VisibilitySelect` (client)
 
@@ -420,7 +423,7 @@ Since 0.5.0. Who can see something: private, unlisted or public, each with a lin
 
 #### `ReportDisclosure` (client)
 
-Since 0.5.0. "Report this": a `Disclosure` holding a reason `Textarea` (required) and a submit button. `onSubmit` gets the trimmed reason and says how it went: `{ ok: true, message? }` replaces the form with a `role="status"` line (your message, like "You already reported it.", or `sentMessage`); `{ ok: false, message }` shows the message as the field's error and keeps what was typed for a retry. A throw reads as `failedMessage`. One send at a time. Type: `ReportResult`.
+Since 0.5.0. "Report this": a `Disclosure` holding a reason `Textarea` (required) and a submit button. `onSubmit` gets the trimmed reason and says how it went: `{ ok: true, message? }` replaces the form with a `role="status"` line (your message, like "You already reported it.", or `sentMessage`), which takes focus, since the button that had it is gone (since 0.7.0; the line is mounted empty from the start, so it is announced); `{ ok: false, message }` shows the message as the field's error and keeps what was typed for a retry. A throw reads as `failedMessage`. One send at a time. Type: `ReportResult`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -433,7 +436,7 @@ Since 0.5.0. "Report this": a `Disclosure` holding a reason `Textarea` (required
 | `failedMessage` | `ReactNode` | `"Couldn't send the report. Try again."` | Said when `onSubmit` throws. |
 | `minLength`, `maxLength` | `number` | `3`, none | The reason's length limits. |
 | `rows` | `number` | `3` | The field's height. |
-| `className` | `string` | none | Classes for the wrapper (or the status line once sent). |
+| `className` | `string` | none | Classes for the wrapper around the disclosure and the status line. |
 
 ```tsx
 <ReportDisclosure
@@ -448,7 +451,7 @@ Since 0.5.0. "Report this": a `Disclosure` holding a reason `Textarea` (required
 
 #### `fieldClasses`
 
-`fieldClasses(className?: string): string` returns the field look (`b6` background, `b3` border, `h1` border on focus, rose border when `aria-invalid`, and an `h1` border and ring when an invalid field has focus). Use it on a bare control that labels itself:
+`fieldClasses(className?: string): string` returns the field look (`b6` background, `b3` border, `h1` border plus the theme's 2px `h1` outline on focus, rose border when `aria-invalid`, and the `h1` border back when an invalid field has focus; before 0.7.0 the outline was hidden and only the border changed). Use it on a bare control that labels itself:
 
 ```tsx
 <select aria-label="Move to" className={fieldClasses("w-auto")}>...</select>
@@ -750,7 +753,7 @@ The `<ul>` of links `SiteHeader` uses, for building your own header. Put it insi
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `links` | `readonly SiteLinkItem[]` | required | The entries. |
+| `links` | `readonly SiteLinkItem[]` | required | The entries. An entry without an `href` renders as dimmed text with its `note` (no `aria-disabled` since 0.7.0: it isn't a control). |
 | `align` | `"start" \| "center"` | `"start"` | As `navAlign` on `SiteHeader`. |
 
 #### `SiteFooter`
@@ -759,7 +762,9 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub ico
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `columns` | `readonly SiteFooterColumn[]` | `[]` | Each column is a `<nav>` named by its title, which shows above the list. Up to four columns side by side from `sm` up. |
+| `columns` | `readonly SiteFooterColumn[]` | `[]` | The columns sit in one `<nav>` (`navLabel`); each is a `<section>` headed by its title. Up to four columns side by side from `sm` up. Before 0.7.0 each column was its own `<nav>`. |
+| `navLabel` | `string` | `"Footer"` | The nav landmark's name. Keep it different from `SiteHeader`'s `navLabel`, so the two landmarks tell apart (since 0.7.0). |
+| `headingLevel` | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | `2` | The column titles' heading level (since 0.7.0). |
 | `tools` | `HaruhimeToolsOptions` | none | Adds a "haruhime tools" column: the other live haruhime.moe tools as "name: blurb" links, then "All tools" on www. Options: `current` (the tool this footer is on, left out), `title` (`"haruhime tools"`), `allLabel` (`"All tools"`, `false` drops it), `allHref` (`"https://www.haruhime.moe"`), `position` (where among `columns`, default `1`, clamped). Since 0.6.0. |
 | `extra` | `ReactNode` | none | Shown above the fine print, e.g. a "clear local data" button. |
 | `finePrint` | `ReactNode` | none | One line of small print, in a `<p>`. |
@@ -813,7 +818,7 @@ Since 0.4.0. Display pieces for beatmaps and mod pools. They take plain values (
 
 #### `StarRating`
 
-A star-rating pill colored on osu!'s difficulty spectrum: "★ 5.23" on the rating's color, dark text up to 6.5 and pale yellow above. The spectrum is osu!'s own, the same at every `--hue`, so the pill sets its colors inline. Screen readers hear "5.23 stars" and the `label` after it. Every native `<span>` prop except `children`; a `style` you pass merges over the colors.
+A star-rating pill colored on osu!'s difficulty spectrum: "★ 5.23" on the rating's color, dark text up to 6.5 and osu!'s pale yellow above, except where neither clears 4.5:1 on the pill (the violet band around 6.5 to 7 stars), which gets white (since 0.7.0). The spectrum is osu!'s own, the same at every `--hue`, so the pill sets its colors inline. Screen readers hear "5.23 stars" and the `label` after it. Every native `<span>` prop except `children`; a `style` you pass merges over the colors.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -823,7 +828,7 @@ A star-rating pill colored on osu!'s difficulty spectrum: "★ 5.23" on the rati
 
 #### `BeatmapStats`
 
-A beatmap's CS, AR, OD, HP, BPM and length as a compact `<dl>`, in that order. Stats you leave out (or that aren't finite) don't show. CS, AR, OD, HP and BPM are `<abbr>`s titled with their full names. Every native `<dl>` prop except `children`. Type: `BeatmapStatKey`.
+A beatmap's CS, AR, OD, HP, BPM and length as a compact `<dl>`, in that order. Stats you leave out (or that aren't finite) don't show. CS, AR, OD, HP and BPM are `<abbr>`s titled with their full names; screen readers get the full name instead of the letters (since 0.7.0). Every native `<dl>` prop except `children`. Type: `BeatmapStatKey`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -865,7 +870,7 @@ Since 0.4.0. `Table`, `THead`, `TBody`, `Th` and `Td` give a data table the apps
 
 | Component | Extra props | What it renders |
 | --- | --- | --- |
-| `Table` | `caption?: ReactNode`, `hideCaption?: boolean` (default `false`), `wrapperClassName?: string` | A `<div>` that scrolls sideways on phones, around the `<table>`. `className` and `ref` go on the `<table>`. The caption names the table; `hideCaption` keeps it for screen readers only, when a heading already shows. |
+| `Table` | `caption?: ReactNode`, `hideCaption?: boolean` (default `false`), `wrapperClassName?: string`, `scrollLabel?: string` (default `"Table"`) | A `<section>` that scrolls sideways on phones, around the `<table>`. It takes keyboard focus (`tabindex="0"`) so the scroll is reachable without a mouse, and is named by the caption, or by `scrollLabel` without one (since 0.7.0; a plain `<div>` before). `className` and `ref` go on the `<table>`. The caption names the table; `hideCaption` keeps it for screen readers only, when a heading already shows. |
 | `THead` | none | A `<thead>` in `c3`, `text-xs`, uppercase. |
 | `TBody` | none | A `<tbody>` whose rows get a `b4` top border. Add `[&>tr]:align-top` for rows of mixed height. |
 | `Th` | `numeric?: boolean` | A `<th>` with `scope="col"` by default. With `scope="row"` it is a row's heading, in bold `c1`. |
@@ -881,18 +886,20 @@ Since 0.4.0. `cx(...classes: ClassValue[]): string` is the class merger every co
 
 ## Accessibility
 
-- Every component is checked in the test suite with axe-core's WCAG 2.0, 2.1 and 2.2 A and AA rules (all but color contrast, which needs a real browser). Interactive ones also have keyboard tests. The tests also calculate the contrast figures under Setup (`c1` on `h2`, `h1` on `b4`, and the `--h1-l` and `--h2-l` values).
-- Focus is always visible: the theme draws an `h1` outline on `:focus-visible`. Fields show focus with an `h1` border instead (plus an `h1` ring when invalid), and `RangeSlider` thumbs with a solid `h1` ring. Those keep a transparent outline, so Windows high contrast mode (forced colors) still shows focus.
-- In forced colors mode, a pressed `Chip` takes the system highlight colors, so on and off still look different.
-- Form fields link their label, hint and error. An error sets `aria-invalid` and is announced.
-- `Chip` uses `aria-pressed`. `ChipGroup`, `RangeSlider` and `FilterRow` are fieldsets named by their label. Inside a `FilterRow`, `hideLabel` leaves the naming to the row, so each row is announced once. `RangeSlider`'s thumbs are native range inputs with `aria-valuetext`, so "10+" reads as it shows.
-- `FilterPanel`'s phone toggle carries `aria-expanded` and `aria-controls`. The result count is a live region. When "Clear filters" disappears after use, focus moves to the panel's heading instead of getting lost.
-- `CopyButton` announces "Copied." (or the failure) through an `<output>`, on every press.
-- `Pagination` moves focus to its "Page X of Y" text when the link you pressed goes away on the first or last page.
-- `Tabs` follows the ARIA tabs pattern: one tab in the Tab order, arrows, Home and End to move, `aria-controls` to its panel. `ReportDisclosure` says the outcome in a `role="status"` line and keeps a failed reason in the field.
-- `SiteHeader` marks the current page with `aria-current`. `PageShell` starts with a skip link to `<main>`.
-- `DiscordIcon` and `GitHubIcon` are hidden from screen readers by default: give the link around each one an `aria-label`, as `SiteFooter` does.
-- You supply the text, so you also supply labels: give icon-only buttons an `aria-label`, and keep `label` props meaningful.
+The target is WCAG 2.2 AA. House rules, which every component follows and your own code around them should too:
+
+- **Focus is always visible, and always the same.** The theme draws a 2px `h1` outline, offset 2px, on `:focus-visible`. Fields keep it (since 0.7.0; before, they swapped it for a 1px border change) and add an `h1` border. `RangeSlider` thumbs show a solid `h1` ring instead and keep a transparent outline, so Windows high contrast mode (forced colors) still paints one. Never `outline: none`.
+- **Targets are 24px or more** (WCAG 2.2 2.5.8): buttons are `h-9`, chips and tabs 24px tall, slider thumbs 24px (since 0.7.0).
+- **Contrast is computed, not eyeballed.** The test suite checks `c1` on `h2`, `h1` on `b4` and `b5`, and the hue overrides under Setup; `StarRating` picks its text color by contrast. Text is never dimmed with `opacity` (a `text-c4` line at 70% opacity drops under 4.5:1): use a lighter palette step instead.
+- **Color never carries meaning alone.** Accent links are underlined, a pressed `Chip` is `aria-pressed`, the current nav link is `aria-current`, `CharCounter` says "over the limit" in words, errors are text.
+- **Live regions exist before they speak.** `CopyButton`, `AsyncButton`, `CharCounter live`, `FilterPanel`'s count and `ReportDisclosure`'s outcome render their `<output>` or `role="status"` node up front, empty, and swap the text in. Field errors are `role="status"` (polite); `Notice live tone="error"` is the one `role="alert"`.
+- **Focus never falls to the body.** When the control you pressed goes away, focus moves somewhere sensible: `FilterPanel` to its heading, `Pagination` to "Page X of Y", `InlineConfirm` back to its trigger, `ReportDisclosure` to its outcome line. Pending buttons use `aria-disabled`, not `disabled`, so focus stays.
+- **Landmarks are few and named.** `PageShell` gives a skip link and `<main>`; `SiteHeader` one `<nav>` (`navLabel`, default "Main"); `SiteFooter` one `<nav>` (`navLabel`, default "Footer") with a headed `<section>` per column; `Pagination` and `LinkTabs` are labelled `<nav>`s. Give two of a kind different labels.
+- **Scrollable regions take focus.** `Table`'s wrapper is a focusable named section. Do the same for a `pre` inside `Prose`.
+- **Native first.** Fields are native inputs, selects and textareas; radios and checkboxes are native with a visible label; `RangeSlider`'s thumbs are native range inputs with `aria-valuetext` ("10+" reads as it shows); `Disclosure` and `HeaderMenu` are buttons with `aria-expanded` and `aria-controls`; `Tabs` follows the ARIA tabs pattern (one tab in the Tab order, arrows, Home and End, `aria-controls`). ARIA only where HTML has no element.
+- **Groups are named.** `ChipGroup`, `RangeSlider`, `RadioGroup` and `FilterRow` are fieldsets named by their label. Inside a `FilterRow`, `hideLabel` leaves the naming to the row, so each row is announced once.
+- **Icons are decorative; links and buttons have names.** `DiscordIcon` and `GitHubIcon` are hidden from screen readers; give the link around each one an `aria-label`, as `SiteFooter` does. Give icon-only buttons an `aria-label`, and keep `label` props meaningful. `BeatmapStats` reads "Circle size" where it shows "CS".
+- **Tested.** Every component is checked with axe-core's WCAG 2.0, 2.1 and 2.2 A and AA rules in the test suite (color contrast excepted: that needs a real browser, and the sites run a Playwright axe pass with it on). Interactive ones also have keyboard tests.
 
 ## Compatibility
 

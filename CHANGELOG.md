@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Accessibility pass (WCAG 2.2 AA). Fields keep the theme's 2px focus outline instead of hiding it behind a 1px border change. `RangeSlider` thumbs and chips are 24px, the minimum target size. The default `--h1-l` is `76%` (was `70%`), so `h1` text on `b5` clears 4.5:1 at every hue; pink gets a touch lighter at the default hue. `StarRating` picks its text color by contrast (white on the 6.5 to 7 star violet band, where gold was 3.9:1). `Table`'s scrolling wrapper is a focusable `<section>` named by the caption or `scrollLabel`. `SiteFooter` holds its columns in one `<nav>` (`navLabel`, default "Footer"), each column a `<section>` with its title as a heading (`headingLevel`, default 2), instead of a `<nav>` per column. `ReportDisclosure` keeps its status line mounted from the start and moves focus to it after a send. Field errors are `role="status"`, not `role="alert"`; radios no longer carry `aria-invalid` (the group describes the error). Text-only nav entries drop `aria-disabled`. `BeatmapStats` reads full stat names to screen readers.
+
+### Added
+
+- `CharCounter`'s `live` prop: announces only the over-limit text.
+- `Table`'s `scrollLabel`, `SiteFooter`'s `navLabel` and `headingLevel`.
+- README: an "Accessibility" section with the house rules every component follows.
+
 ## [0.6.0] - 2026-09-28
 
 ### Added
