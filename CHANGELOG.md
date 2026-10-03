@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-03
+
 ### Changed
 
 - Accessibility pass (WCAG 2.2 AA). Fields keep the theme's 2px focus outline instead of hiding it behind a 1px border change. `RangeSlider` thumbs and chips are 24px, the minimum target size. The default `--h1-l` is `76%` (was `70%`), so `h1` text on `b5` clears 4.5:1 at every hue; pink gets a touch lighter at the default hue. `StarRating` picks its text color by contrast (white on the 6.5 to 7 star violet band, where gold was 3.9:1). `Table`'s scrolling wrapper is a focusable `<section>` named by the caption or `scrollLabel`. `SiteFooter` holds its columns in one `<nav>` (`navLabel`, default "Footer"), each column a `<section>` with its title as a heading (`headingLevel`, default 2), instead of a `<nav>` per column. `ReportDisclosure` keeps its status line mounted from the start and moves focus to it after a send. Field errors are `role="status"`, not `role="alert"`; radios no longer carry `aria-invalid` (the group describes the error). Text-only nav entries drop `aria-disabled`. `BeatmapStats` reads full stat names to screen readers.
@@ -108,7 +110,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/haruhimemoe/ui/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/haruhimemoe/ui/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/haruhimemoe/ui/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/haruhimemoe/ui/compare/v0.4.0...v0.5.0
