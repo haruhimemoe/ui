@@ -903,7 +903,7 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 
 ## Compatibility
 
-| | Supported |
+| Requirement | Supported |
 | --- | --- |
 | Next.js | 16 (app router). Components use `next/link` and `next/navigation`. |
 | React | 19 |
