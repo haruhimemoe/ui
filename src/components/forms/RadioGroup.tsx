@@ -94,7 +94,8 @@ export function RadioGroup({
               aria-labelledby={`${optionId}-label`}
               aria-describedby={option.hint ? hintId(optionId) : undefined}
               onChange={() => onChange?.(option.value)}
-              className="mt-1 accent-h1"
+              // 24px, the WCAG 2.2 target size; -mt-0.5 centers it on the first text-sm line.
+              className="-mt-0.5 size-6 shrink-0 accent-h1"
             />
             <span>
               <span id={`${optionId}-label`} className="font-bold text-c1">

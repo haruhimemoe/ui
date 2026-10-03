@@ -11,7 +11,10 @@
  *       with only external and text-only links nothing hydrates beyond a bare page's Next
  *       modules; a relative href skips the client list but hydrates next/link; and NavLinks in
  *       an app's own Client Component brings tailwind-merge. Before the build, plain Node
- *       imports the installed package, the way Vitest in a consuming app does. Usage:
+ *       imports the installed package, the way Vitest in a consuming app does. After the build
+ *       it serves the app and runs axe-core in headless Chromium over / at a desktop and a
+ *       phone width with color contrast on (the jsdom tests can't check contrast), WCAG 2.2 AA
+ *       plus best practices. Usage:
  *       `node scripts/check-consumer.mjs [--keep]` (--keep leaves the app in the temp dir). Needs
  *       the npm registry and Google Fonts. The app's source lives in scripts/consumer-fixture/
  *       as real files; this script writes only the config that depends on the pins and the temp
@@ -21,7 +24,7 @@
  * @modified Sat Oct 3, 2026
  */
 
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import {
   cpSync,
   existsSync,
@@ -36,6 +39,8 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import AxeBuilder from "@axe-core/playwright";
+import { chromium } from "playwright";
 
 const keep = process.argv.includes("--keep");
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -90,6 +95,71 @@ const LIBRARY_CLASSES = [
   [".bg-b6", "the header, footer and fields"],
   [".text-c3", "labels and nav links"],
 ];
+
+/** Browser axe: the widths checked and the rules run. Contrast is on here, unlike in jsdom. */
+const AXE_VIEWPORTS = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } };
+const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
+
+/** Polls a URL until it answers, or throws after the timeout. */
+const waitForServer = async (url, timeoutMs) => {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      await fetch(url);
+      return;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
+  throw new Error(`${url} did not answer within ${timeoutMs}ms`);
+};
+
+/**
+ * Serves the built app and runs axe over / at each width. Returns one failure line per
+ * violation (with up to five targets), or none.
+ */
+const axePass = async () => {
+  const port = Number(process.env.AXE_PORT ?? 3986);
+  const origin = `http://127.0.0.1:${port}`;
+  const server = spawn(
+    path.join(dir, "node_modules", ".bin", "next"),
+    ["start", "-p", String(port)],
+    {
+      cwd: dir,
+      env,
+      stdio: ["ignore", "ignore", "inherit"],
+    },
+  );
+  const lines = [];
+  try {
+    await waitForServer(origin, 30000);
+    const browser = await chromium.launch();
+    for (const [name, viewport] of Object.entries(AXE_VIEWPORTS)) {
+      const context = await browser.newContext({ viewport, colorScheme: "dark" });
+      const page = await context.newPage();
+      // "load", not "networkidle": the page keeps a connection open, so idle never comes.
+      const response = await page.goto(`${origin}/`, { waitUntil: "load" });
+      await page.waitForTimeout(500);
+      if (response?.status() !== 200)
+        throw new Error(`/ answered ${response?.status() ?? "nothing"}`);
+      const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+      for (const violation of results.violations) {
+        const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
+        lines.push(
+          [
+            `axe ${name} /: ${violation.id} (${violation.impact}) ${violation.help}`,
+            ...targets,
+          ].join("\n"),
+        );
+      }
+      await context.close();
+    }
+    await browser.close();
+  } finally {
+    server.kill();
+  }
+  return lines;
+};
 
 // The fixture app's pages, layout and stylesheet: real files that Biome lints and
 // `bun run typecheck` checks (scripts/consumer-fixture/tsconfig.json maps the package to src/).
@@ -327,11 +397,14 @@ try {
     }
   }
 
+  console.log("consumer: axe in Chromium, contrast on");
+  failures.push(...(await axePass()));
+
   if (failures.length > 0) {
     throw new Error(`${failures.join("\n")}\n\nnext build output:\n${build}`);
   }
   console.log(
-    "consumer: ok (next build passed, library CSS generated, pages prerendered, nav as documented)",
+    "consumer: ok (next build passed, library CSS generated, pages prerendered, nav as documented, axe clean)",
   );
 } catch (error) {
   console.error(`consumer: FAILED\n${error.stdout ?? ""}${error.stderr ?? error.message}`);

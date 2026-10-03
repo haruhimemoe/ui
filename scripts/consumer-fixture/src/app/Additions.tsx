@@ -20,7 +20,7 @@ import {
 // The 0.4.0 server components, rendered straight from the Server Component page.
 export function Additions() {
   return (
-    <Card title="Additions" headingLevel={5}>
+    <Card title="Additions" headingLevel={3}>
       <p className={cx("text-c2", false)}>
         Read <TextLink href="/docs">the docs</TextLink> or{" "}
         <TextLink href="https://osu.ppy.sh" target="_blank" variant="plain">
@@ -28,7 +28,7 @@ export function Additions() {
         </TextLink>
         . <Badge tone="warning">Unranked</Badge> <Badge tone="muted">beta</Badge>
       </p>
-      <button type="button" className={linkClasses()}>
+      <button type="button" className={linkClasses({ className: "py-1" })}>
         Looks like a link
       </button>
       <LinkTabs

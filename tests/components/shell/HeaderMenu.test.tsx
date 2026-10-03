@@ -5,7 +5,7 @@
  *       panel's alignment, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -36,6 +36,7 @@ describe("HeaderMenu", () => {
     const { container } = render(<Menu />);
     const button = screen.getByRole("button", { name: "peppy" });
     expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(button).toHaveClass("min-h-6");
     expect(screen.queryByRole("link", { name: "Account" })).toBeNull();
     await user.tab();
     await user.keyboard("{Enter}");

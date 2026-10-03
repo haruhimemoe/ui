@@ -25,7 +25,13 @@ export function ClientAdditions() {
         <p>Include video</p>
       </Disclosure>
       <HeaderMenu label="peppy" items={[{ href: "/docs", label: "Account" }]} />
-      <Pagination page={page} pageCount={null} hasNext onPageChange={setPage} />
+      <Pagination
+        page={page}
+        pageCount={null}
+        hasNext
+        onPageChange={setPage}
+        aria-label="More pages"
+      />
       <ChoiceChips
         label="Status"
         options={[

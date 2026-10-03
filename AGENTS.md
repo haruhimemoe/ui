@@ -41,7 +41,9 @@
 
 ```sh
 bun run check && bun run typecheck && bun run test && bun run build
-bun run check:consumer   # packs the package into a throwaway Next.js app and runs next build
+bun run check:consumer   # packs the package into a throwaway Next.js app, runs next build, then axe in Chromium
 ```
+
+The consumer check's axe pass (`scripts/check-consumer.mjs`, Playwright + `@axe-core/playwright`, `bunx playwright install chromium` once) runs WCAG 2.2 AA and best-practice rules with color contrast on over the fixture page at 1280 and 390 wide. It sees what jsdom can't: contrast, target size, scrollable regions, duplicate landmarks. A new component goes into `scripts/consumer-fixture/` so it gets this pass too.
 
 CI runs `bun run test:coverage`, which fails under 90% coverage of `src/`.

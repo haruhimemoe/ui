@@ -4,7 +4,7 @@
  *       in the page, keyboard toggling, controlled use, classes, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -71,7 +71,7 @@ describe("Disclosure", () => {
       </Disclosure>,
     );
     const button = screen.getByRole("button", { name: "S" });
-    expect(button).toHaveClass("text-c1");
+    expect(button).toHaveClass("text-c1", "min-h-6");
     expect(button).not.toHaveClass("text-c2");
     expect(button.parentElement).toHaveClass("mt-2", "flex-col");
     expect(screen.getByText("P")).toHaveClass("pl-4");

@@ -26,7 +26,7 @@ describe("RadioGroup", () => {
     const priv = screen.getByRole("radio", { name: "Private" });
     expect(priv).toBeChecked();
     expect(priv).toHaveAccessibleDescription("Only you and your editors.");
-    expect(priv).toHaveClass("accent-h1");
+    expect(priv).toHaveClass("accent-h1", "size-6");
     expect(screen.getByText("Who can see this pool")).toHaveClass("font-bold", "text-c3");
   });
 

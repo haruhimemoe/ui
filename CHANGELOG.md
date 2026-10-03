@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- `Checkbox` and `RadioGroup` boxes are 24px (WCAG 2.2 target size; they were the browser's 13px), centered on the first line of their label. `Disclosure` and `HeaderMenu` buttons are at least 24px tall.
+- The consumer check runs axe-core in headless Chromium over the fixture page with color contrast and target-size checks on, at 1280 and 390 wide, after `next build`. CI installs Chromium for it.
+
 ## [0.7.0] - 2026-10-03
 
 ### Changed

@@ -5,7 +5,7 @@
  *       so its form fields keep their values. Uncontrolled by default, or controlled with `open`.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 "use client";
@@ -63,7 +63,7 @@ export function Disclosure({
         aria-controls={panelId}
         onClick={toggle}
         className={cx(
-          "inline-flex items-center gap-1 self-start font-bold text-c2 text-sm transition-colors hover:text-c1",
+          "inline-flex min-h-6 items-center gap-1 self-start font-bold text-c2 text-sm transition-colors hover:text-c1",
           buttonClassName,
         )}
       >

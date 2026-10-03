@@ -255,7 +255,7 @@ Later sections keep their heading margin, which spaces them apart.
 
 #### `Disclosure` (client)
 
-Since 0.4.0. A button that shows and hides a panel below it, with `aria-expanded` and `aria-controls` and a ▾ / ▴ arrow. The closed panel stays in the page, hidden, so fields inside keep their values. Every native `<div>` prop except `children`, for the wrapper.
+Since 0.4.0. A button (at least 24px tall) that shows and hides a panel below it, with `aria-expanded` and `aria-controls` and a ▾ / ▴ arrow. The closed panel stays in the page, hidden, so fields inside keep their values. Every native `<div>` prop except `children`, for the wrapper.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -345,11 +345,11 @@ Every native `<select>` prop, plus the field props. Pass `<option>` elements as 
 
 #### `Checkbox`
 
-Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChange`, `name`, `disabled`...), plus the field props. The label is bold `text-c1` and the hint follows it inline after a dot. Clicking anywhere on the row toggles it. The label alone is the accessible name; the hint is the description. An `aria-labelledby` you pass is added after the label (since 0.4.0; 0.3.0 dropped it).
+Every native `<input>` prop except `type` (`checked`, `defaultChecked`, `onChange`, `name`, `disabled`...), plus the field props. The box is 24px (since 0.8.0; it was the browser's 13px), the label is bold `text-c1` and the hint follows it inline after a dot. Clicking anywhere on the row toggles it. The label alone is the accessible name; the hint is the description. An `aria-labelledby` you pass is added after the label (since 0.4.0; 0.3.0 dropped it).
 
 #### `RadioGroup` (client)
 
-Since 0.4.0. A native radio group on the `Checkbox` look: a `<fieldset>` named by its `<legend>`, one radio per option with a bold label and an inline hint, then the group's hint and error. Each option's label is its accessible name and its hint its description. Arrow keys move and pick, as native radios do. Every native `<fieldset>` prop except `onChange`, `children` and `defaultValue`; `disabled` turns off every radio. Types: `RadioOption`.
+Since 0.4.0. A native radio group on the `Checkbox` look: a `<fieldset>` named by its `<legend>`, one 24px radio per option with a bold label and an inline hint, then the group's hint and error. Each option's label is its accessible name and its hint its description. Arrow keys move and pick, as native radios do. Every native `<fieldset>` prop except `onChange`, `children` and `defaultValue`; `disabled` turns off every radio. Types: `RadioOption`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -788,7 +788,7 @@ Since 0.4.0. A row of link tabs (Pools / Maps, All / Hidden): a named `<nav>` wi
 
 #### `HeaderMenu` (client)
 
-Since 0.4.0. The header's account menu: a button (an avatar and a name, say) that shows a small panel of links and extra controls such as a sign-out button. It is a disclosure, not an ARIA menu: the button has `aria-expanded` and `aria-controls`, and Tab moves through the panel. Escape closes it and puts focus back on the button; a click outside it, a click on one of its links, or focus leaving it closes it too. Every native `<div>` prop except `children`, for the wrapper. Type: `HeaderMenuItem`.
+Since 0.4.0. The header's account menu: a button (an avatar and a name, say; at least 24px tall) that shows a small panel of links and extra controls such as a sign-out button. It is a disclosure, not an ARIA menu: the button has `aria-expanded` and `aria-controls`, and Tab moves through the panel. Escape closes it and puts focus back on the button; a click outside it, a click on one of its links, or focus leaving it closes it too. Every native `<div>` prop except `children`, for the wrapper. Type: `HeaderMenuItem`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -889,7 +889,7 @@ Since 0.4.0. `cx(...classes: ClassValue[]): string` is the class merger every co
 The target is WCAG 2.2 AA. House rules, which every component follows and your own code around them should too:
 
 - **Focus is always visible, and always the same.** The theme draws a 2px `h1` outline, offset 2px, on `:focus-visible`. Fields keep it (since 0.7.0; before, they swapped it for a 1px border change) and add an `h1` border. `RangeSlider` thumbs show a solid `h1` ring instead and keep a transparent outline, so Windows high contrast mode (forced colors) still paints one. Never `outline: none`.
-- **Targets are 24px or more** (WCAG 2.2 2.5.8): buttons are `h-9`, chips and tabs 24px tall, slider thumbs 24px (since 0.7.0).
+- **Targets are 24px or more** (WCAG 2.2 2.5.8): buttons are `h-9`, chips and tabs 24px tall, slider thumbs 24px (since 0.7.0), checkboxes and radios 24px and the `Disclosure` and `HeaderMenu` buttons at least 24px tall (since 0.8.0).
 - **Contrast is computed, not eyeballed.** The test suite checks `c1` on `h2`, `h1` on `b4` and `b5`, and the hue overrides under Setup; `StarRating` picks its text color by contrast. Text is never dimmed with `opacity` (a `text-c4` line at 70% opacity drops under 4.5:1): use a lighter palette step instead.
 - **Color never carries meaning alone.** Accent links are underlined, a pressed `Chip` is `aria-pressed`, the current nav link is `aria-current`, `CharCounter` says "over the limit" in words, errors are text.
 - **Live regions exist before they speak.** `CopyButton`, `AsyncButton`, `CharCounter live`, `FilterPanel`'s count and `ReportDisclosure`'s outcome render their `<output>` or `role="status"` node up front, empty, and swap the text in. Field errors are `role="status"` (polite); `Notice live tone="error"` is the one `role="alert"`.
@@ -899,7 +899,7 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 - **Native first.** Fields are native inputs, selects and textareas; radios and checkboxes are native with a visible label; `RangeSlider`'s thumbs are native range inputs with `aria-valuetext` ("10+" reads as it shows); `Disclosure` and `HeaderMenu` are buttons with `aria-expanded` and `aria-controls`; `Tabs` follows the ARIA tabs pattern (one tab in the Tab order, arrows, Home and End, `aria-controls`). ARIA only where HTML has no element.
 - **Groups are named.** `ChipGroup`, `RangeSlider`, `RadioGroup` and `FilterRow` are fieldsets named by their label. Inside a `FilterRow`, `hideLabel` leaves the naming to the row, so each row is announced once.
 - **Icons are decorative; links and buttons have names.** `DiscordIcon` and `GitHubIcon` are hidden from screen readers; give the link around each one an `aria-label`, as `SiteFooter` does. Give icon-only buttons an `aria-label`, and keep `label` props meaningful. `BeatmapStats` reads "Circle size" where it shows "CS".
-- **Tested.** Every component is checked with axe-core's WCAG 2.0, 2.1 and 2.2 A and AA rules in the test suite (color contrast excepted: that needs a real browser, and the sites run a Playwright axe pass with it on). Interactive ones also have keyboard tests.
+- **Tested.** Every component is checked with axe-core's WCAG 2.0, 2.1 and 2.2 A and AA rules in the test suite (color contrast excepted: that needs a real browser). The consumer check then renders every component in a real Next.js app and runs axe in headless Chromium with contrast and target-size checks on, at a desktop and a phone width; the sites run the same pass over their pages. Interactive ones also have keyboard tests.
 
 ## Compatibility
 

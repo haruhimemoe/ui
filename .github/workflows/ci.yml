@@ -44,7 +44,10 @@ jobs:
       - name: Build and pack (dry run)
         run: bun run build && npm pack --dry-run
 
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
       # Installs the packed tarball into a throwaway Next.js 16 + Tailwind 4 app, renders every
-      # component on one page and runs `next build`.
+      # component on one page, runs `next build`, then axe in Chromium with contrast on.
       - name: Consumer check
         run: bun run check:consumer

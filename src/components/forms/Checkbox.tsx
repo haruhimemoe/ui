@@ -6,7 +6,7 @@
  *       hint and error.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -44,7 +44,8 @@ export function Checkbox({
           {...fieldControlProps({ id, hint, error, describedBy, invalid })}
           // The label first, then the caller's own ids: a plain join, since these are ids.
           aria-labelledby={labelledBy ? `${labelId} ${labelledBy}` : labelId}
-          className={cx("mt-1 accent-h1", className)}
+          // 24px, the WCAG 2.2 target size; -mt-0.5 centers it on the first text-sm line.
+          className={cx("-mt-0.5 size-6 shrink-0 accent-h1", className)}
         />
         <span>
           <span id={labelId} className="font-bold text-c1">

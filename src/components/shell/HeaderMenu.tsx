@@ -6,7 +6,7 @@
  *       a click on a link, or focus leaving it closes it too.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 "use client";
@@ -93,7 +93,7 @@ export function HeaderMenu({
         aria-label={buttonLabel}
         onClick={() => setOpen(!open)}
         className={cx(
-          "flex items-center gap-2 font-bold text-c1 text-sm transition-colors hover:text-h1",
+          "flex min-h-6 items-center gap-2 font-bold text-c1 text-sm transition-colors hover:text-h1",
           buttonClassName,
         )}
       >

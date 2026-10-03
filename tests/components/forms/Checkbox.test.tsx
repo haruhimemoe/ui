@@ -4,7 +4,7 @@
  *       error wiring, native props, className, ref, mouse and keyboard toggling, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -51,7 +51,8 @@ describe("Checkbox", () => {
   it("keeps the packs choice look: accent box, bold label, dimmer inline hint", () => {
     render(<Checkbox id="bg" label="Include backgrounds" hint="Turn this off to drop them." />);
     const box = screen.getByRole("checkbox");
-    expect(box).toHaveClass("mt-1", "accent-h1");
+    // A 24px box (WCAG 2.2 2.5.8), centered on the first line of text-sm.
+    expect(box).toHaveClass("size-6", "-mt-0.5", "shrink-0", "accent-h1");
     expect(box.closest("label")).toHaveClass("flex", "items-start", "gap-2", "text-sm");
     expect(screen.getByText("Include backgrounds")).toHaveClass("font-bold", "text-c1");
     const hintRow = screen.getByText("Turn this off to drop them.").parentElement as HTMLElement;
