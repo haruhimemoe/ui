@@ -5,7 +5,7 @@
  *       their own "use client" directive, so this barrel is safe to import from Server Components.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 // Actions
@@ -106,6 +106,26 @@ export {
 } from "./components/osu/BeatmapStats.js";
 export { ModBadge, type ModBadgeProps } from "./components/osu/ModBadge.js";
 export { StarRating, type StarRatingProps } from "./components/osu/StarRating.js";
+
+// Palette
+export { CommandPalette } from "./components/palette/CommandPalette.js";
+export {
+  CommandPaletteButton,
+  type CommandPaletteButtonProps,
+} from "./components/palette/CommandPaletteButton.js";
+export { evaluate, formatResult } from "./components/palette/calc.js";
+export { type FuzzyMatch, fuzzyScore } from "./components/palette/fuzzy.js";
+export { openCommandPalette } from "./components/palette/paletteEvents.js";
+export { type SiteCommandsOptions, siteCommands } from "./components/palette/siteCommands.js";
+export type {
+  ArgChoice,
+  ArgSpec,
+  Command,
+  CommandPaletteProps,
+  Page,
+  PaletteContext,
+  Provider,
+} from "./components/palette/types.js";
 
 // Shell
 export {

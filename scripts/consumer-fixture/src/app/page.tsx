@@ -33,6 +33,7 @@ import { Additions } from "./Additions";
 import { ClientAdditions } from "./ClientAdditions";
 import { ClientAdditions05 } from "./ClientAdditions05";
 import { Filters } from "./Filters";
+import { Palette08 } from "./Palette08";
 
 const LINKS: SiteLinkItem[] = [
   { label: "Home", href: "/" },
@@ -128,6 +129,7 @@ export default function Page() {
         <GitHubIcon />
         <HaruhimeWordmark />
         <HaruhimeWordmarkLink />
+        <Palette08 />
       </Card>
       <Additions />
       <ClientAdditions />

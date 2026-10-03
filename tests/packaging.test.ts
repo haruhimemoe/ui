@@ -147,6 +147,8 @@ describe("shipped source", () => {
       "filters/ChipGroup",
       "filters/ChoiceChips",
       "forms/RadioGroup",
+      // useId only, which the regex above doesn't match; still a client file.
+      "palette/PaletteInput",
     ]) {
       const file = sources.find((s) => s.name === `src/components/${name}.tsx`);
       expect(firstStatement(file?.text ?? ""), name).toBe('"use client";');
