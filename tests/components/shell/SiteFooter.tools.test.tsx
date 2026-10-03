@@ -4,7 +4,7 @@
  *       tools" last) and SiteFooter's `tools` prop placing it among the columns.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -22,7 +22,10 @@ const COLUMNS: SiteFooterColumn[] = [
 ];
 
 const navTitles = () =>
-  screen.getAllByRole("navigation").map((nav) => nav.getAttribute("aria-label"));
+  screen
+    .getAllByRole("region")
+    .map((column) => column.getAttribute("aria-labelledby"))
+    .map((id) => document.getElementById(id ?? "")?.textContent);
 
 describe("haruhimeToolsColumn", () => {
   it("lists every live tool on https and then All tools on www", () => {
@@ -69,7 +72,7 @@ describe("SiteFooter tools", () => {
   it("puts the column second by default, without the current tool", async () => {
     const { container } = render(<SiteFooter columns={COLUMNS} tools={{ current: "pools" }} />);
     expect(navTitles()).toEqual(["pools", "haruhime tools", "Legal"]);
-    const nav = screen.getByRole("navigation", { name: "haruhime tools" });
+    const nav = screen.getByRole("region", { name: "haruhime tools" });
     expect(within(nav).queryByRole("link", { name: /^pools/ })).toBeNull();
     expect(within(nav).getByRole("link", { name: "bb: osu! BBCode editor" })).toHaveAttribute(
       "href",

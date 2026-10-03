@@ -5,7 +5,7 @@
  *       links, native props, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -47,13 +47,16 @@ describe("SiteFooter", () => {
     );
   });
 
-  it("renders one labelled navigation per column with its title", () => {
+  it("renders one Footer navigation holding a section per column, headed by its title", () => {
     render(<SiteFooter columns={COLUMNS} />);
+    const nav = screen.getByRole("navigation", { name: "Footer" });
+    expect(screen.getAllByRole("navigation")).toHaveLength(1);
     for (const { title } of COLUMNS) {
-      const nav = screen.getByRole("navigation", { name: title });
-      expect(within(nav).getByText(title)).toHaveClass("uppercase", "text-xs", "text-c4");
+      const column = within(nav).getByRole("region", { name: title });
+      const heading = within(column).getByRole("heading", { level: 2, name: title });
+      expect(heading).toHaveClass("uppercase", "text-xs", "text-c4");
     }
-    const about = screen.getByRole("navigation", { name: "About" });
+    const about = screen.getByRole("region", { name: "About" });
     expect(within(about).getByRole("link", { name: "Brand" })).toHaveAttribute("href", "/brand");
     expect(within(about).getByRole("link", { name: "hi@example.com" })).toHaveAttribute(
       "href",
@@ -63,7 +66,7 @@ describe("SiteFooter", () => {
 
   it("shows entries without an href as plain text with a small uppercase note", () => {
     render(<SiteFooter columns={COLUMNS} />);
-    const tools = screen.getByRole("navigation", { name: "Tools" });
+    const tools = screen.getByRole("region", { name: "Tools" });
     expect(within(tools).getAllByRole("link")).toHaveLength(1);
     expect(within(tools).getByRole("link", { name: "packs" })).toHaveAttribute(
       "href",
@@ -88,7 +91,7 @@ describe("SiteFooter", () => {
 
   it("sizes the column grid to the number of columns and skips it with none", () => {
     const { rerender } = render(<SiteFooter columns={COLUMNS} />);
-    const grid = () => screen.getByRole("navigation", { name: "Legal" }).parentElement;
+    const grid = () => screen.getByRole("region", { name: "Legal" }).parentElement;
     expect(grid()).toHaveClass("grid", "sm:grid-cols-3");
 
     rerender(<SiteFooter columns={COLUMNS.slice(1)} />);
@@ -107,6 +110,13 @@ describe("SiteFooter", () => {
 
     rerender(<SiteFooter />);
     expect(screen.queryByRole("navigation")).toBeNull();
+  });
+
+  it("takes a nav label and heading level for the columns", () => {
+    render(<SiteFooter columns={COLUMNS} navLabel="Site map" headingLevel={3} />);
+    const nav = screen.getByRole("navigation", { name: "Site map" });
+    expect(within(nav).getAllByRole("heading", { level: 3 })).toHaveLength(3);
+    expect(within(nav).queryByRole("heading", { level: 2 })).toBeNull();
   });
 
   it("renders extra above the fine print, and the wordmark and GitHub icon on the last row", () => {

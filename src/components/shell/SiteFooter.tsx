@@ -1,18 +1,19 @@
 /**
  * @file src/components/shell/SiteFooter.tsx
- * @desc Site footer: labelled link columns from data (entries without an href show as text with
+ * @desc Site footer: link columns from data under one nav landmark, each a section headed by its title (entries without an href show as text with
  *       a small note, like "soon"), an optional "haruhime tools" column linking the other tools,
  *       an optional extra slot, one line of fine print, the
  *       haruhime.moe wordmark linking the parent site, a GitHub icon link, and an optional
  *       Discord icon link beside it (white, as Discord's brand guidelines ask).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
 import { AutoLink } from "../basics/AutoLink.js";
+import type { HeadingLevel } from "../basics/cardStyles.js";
 import { DiscordIcon } from "../icons/DiscordIcon.js";
 import { GitHubIcon } from "../icons/GitHubIcon.js";
 import { HaruhimeWordmarkLink } from "../icons/HaruhimeWordmarkLink.js";
@@ -20,7 +21,7 @@ import { type HaruhimeToolsOptions, haruhimeToolsColumn } from "./haruhimeTools.
 import { LinkNote } from "./LinkNote.js";
 import { linkItemKey, type SiteLinkItem } from "./links.js";
 
-/** One footer column: a title (also the nav landmark's name) and its entries. */
+/** One footer column: a title (its heading, which names the column's section) and its entries. */
 export type SiteFooterColumn = {
   title: string;
   items: readonly SiteLinkItem[];
@@ -30,6 +31,10 @@ export type SiteFooterColumn = {
 export type SiteFooterProps = Omit<ComponentProps<"footer">, "children"> & {
   /** Link columns, left to right. Internal hrefs use `next/link`, external ones a plain `<a>`. */
   columns?: readonly SiteFooterColumn[] | undefined;
+  /** The one nav landmark around the columns. Default "Footer". Keep it unlike the header's. */
+  navLabel?: string | undefined;
+  /** The column titles' heading level. Default 2. */
+  headingLevel?: HeadingLevel | undefined;
   /**
    * Adds the "haruhime tools" column (haruhimeToolsColumn): the other haruhime.moe tools and
    * "All tools". `current` leaves this tool out; `position` places it (default 1).
@@ -71,6 +76,8 @@ const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-
  */
 export function SiteFooter({
   columns: ownColumns = [],
+  navLabel = "Footer",
+  headingLevel = 2,
   tools,
   extra,
   finePrint,
@@ -112,17 +119,27 @@ export function SiteFooter({
   // With the wordmark, the fine print gets its own line and the row holds wordmark + icon.
   // Without it, the fine print shares the row with the icon.
   const rowStart = parentLink ? <HaruhimeWordmarkLink href={parentHref} /> : fine;
+  const Heading = `h${headingLevel}` as const;
+  const columnId = (title: string) => `footer-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
   return (
     <footer className={cx("border-b4 border-t bg-b6 text-c3 text-sm", className)} {...props}>
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10">
         {columns.length > 0 ? (
-          <div className={cx("grid gap-8", GRID_COLUMNS[Math.min(columns.length, 4)])}>
+          // One nav landmark for the whole footer; each column is a section named by its
+          // heading, so heading navigation finds the columns and landmark lists stay short.
+          <nav
+            aria-label={navLabel}
+            className={cx("grid gap-8", GRID_COLUMNS[Math.min(columns.length, 4)])}
+          >
             {columns.map((column) => (
-              <nav key={column.title} aria-label={column.title}>
-                <p className="mb-3 font-bold text-c4 text-xs uppercase tracking-wide">
+              <section key={column.title} aria-labelledby={columnId(column.title)}>
+                <Heading
+                  id={columnId(column.title)}
+                  className="mb-3 font-bold text-c4 text-xs uppercase tracking-wide"
+                >
                   {column.title}
-                </p>
+                </Heading>
                 <ul className="flex flex-col gap-2">
                   {column.items.map((item) => (
                     <li key={linkItemKey(item)}>
@@ -140,9 +157,9 @@ export function SiteFooter({
                     </li>
                   ))}
                 </ul>
-              </nav>
+              </section>
             ))}
-          </div>
+          </nav>
         ) : null}
         {extra || fine || rowStart || icons ? (
           <div className="flex flex-col gap-3 border-b4 border-t pt-6">
