@@ -82,8 +82,11 @@ const choiceRows = (arg: ArgState): Row[] => {
   );
 };
 
+// A bare word ("e", "pi") is a search, not a sum, even though the calculator knows it.
+const BARE_WORD = /^[a-z]+$/i;
+
 const calcRow = (query: string): Row | null => {
-  if (isBareNumber(query)) return null;
+  if (isBareNumber(query) || BARE_WORD.test(query)) return null;
   const value = evaluate(query);
   if (value === null) return null;
   const text = formatResult(value);

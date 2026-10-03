@@ -71,6 +71,9 @@ describe("buildRows", () => {
       command: { id: "calc", title: "= 4", subtitle: "Enter to copy" },
     });
     expect(ids(base({ query: "2" }))).toEqual(["hint:No matching commands"]);
+    // A bare constant is a search for a command named like it, not a sum.
+    expect(ids(base({ query: "e" }))).toEqual(["hint:No matching commands"]);
+    expect(ids(base({ query: "2*pi" }))[0]).toBe("Calculator/calc");
     expect(ids(base({ query: "2+2", isRoot: false }))).toEqual(["hint:No matching commands"]);
     expect(ids(base({ query: "2+2", calculator: false }))).toEqual(["hint:No matching commands"]);
   });

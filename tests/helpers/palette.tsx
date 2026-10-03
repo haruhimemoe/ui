@@ -53,6 +53,8 @@ export const pressHotkey = (user: ReturnType<typeof userEvent.setup>) =>
 
 export const dialog = () => document.querySelector("dialog") as HTMLDialogElement;
 export const input = () => screen.getByRole("combobox") as HTMLInputElement;
-export const options = () => screen.getAllByRole("option");
+/** The selectable rows: hint rows are options too, but disabled. */
+export const options = () =>
+  screen.getAllByRole("option").filter((row) => row.getAttribute("aria-disabled") !== "true");
 export const activeOption = () =>
   document.getElementById(input().getAttribute("aria-activedescendant") ?? "");
