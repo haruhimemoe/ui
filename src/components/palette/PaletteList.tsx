@@ -23,7 +23,8 @@ export type PaletteListProps = {
   optionId: (index: number) => string;
   /** A provider is searching: the listbox is aria-busy. */
   busy?: boolean | undefined;
-  onActivate: (index: number) => void;
+  /** The pointer is over a row, at this position. */
+  onActivate: (index: number, x: number, y: number) => void;
   onSelect: (command: Command) => void;
 };
 
@@ -116,7 +117,7 @@ export function PaletteList({
                 ranges={row.ranges}
                 active={index === active}
                 mac={mac}
-                onHover={() => onActivate(index)}
+                onHover={(x, y) => onActivate(index, x, y)}
                 onSelect={() => onSelect(row.command)}
               />
             ))}

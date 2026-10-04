@@ -54,6 +54,7 @@ export function Palette() {
     ...siteCommands({
       pages: NAV,
       tools: "pools",
+      // The playground's "own" repo: an app passes its own, so Report a bug lands there.
       repo: "https://github.com/haruhimemoe/ui",
       account: { signedIn: false, signInHref: "/second", accountHref: "/second", signOutHref: "/" },
     }),

@@ -9,7 +9,7 @@
  * @modified Sat Oct 3, 2026
  */
 
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   activeOption,
@@ -79,6 +79,16 @@ describe("CommandPalette keyboard", () => {
     expect(activeOption()).toHaveTextContent("Go home");
     await user.hover(options()[2] as HTMLElement);
     expect(activeOption()).toHaveTextContent("Toggle thing");
+    // Chrome fires a pointermove at the same spot after the list scrolls under a still
+    // cursor: that must not yank the active row back while the keyboard moves it.
+    fireEvent.pointerMove(options()[1] as HTMLElement, { clientX: 40, clientY: 80 });
+    expect(activeOption()).toHaveTextContent("Copy page URL");
+    await user.keyboard("{ArrowDown}");
+    expect(activeOption()).toHaveTextContent("Toggle thing");
+    fireEvent.pointerMove(options()[1] as HTMLElement, { clientX: 40, clientY: 80 });
+    expect(activeOption()).toHaveTextContent("Toggle thing");
+    fireEvent.pointerMove(options()[1] as HTMLElement, { clientX: 41, clientY: 80 });
+    expect(activeOption()).toHaveTextContent("Copy page URL");
     await user.keyboard("{Tab}");
     expect(input()).toHaveFocus();
   });

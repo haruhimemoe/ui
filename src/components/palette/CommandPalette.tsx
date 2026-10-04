@@ -74,6 +74,9 @@ export function CommandPalette({
   const input = useRef<HTMLInputElement>(null);
   const opener = useRef<Element | null>(null);
   const chord = useRef<{ key: string; at: number } | null>(null);
+  // Where the pointer last was over a row. Chrome fires a pointermove at the same spot after the
+  // list scrolls under a still cursor; only a real move may take the active row from the keys.
+  const pointer = useRef<{ x: number; y: number } | null>(null);
   const { status, start, settle } = useLatestStatus<string>();
   // The copy status reads until the query changes or the palette reopens, then the count again.
   const [statusShown, setStatusShown] = useState(false);
@@ -375,7 +378,12 @@ export function CommandPalette({
             mac={mac}
             optionId={optionId}
             busy={Object.values(frame.providers).some((result) => result.state === "loading")}
-            onActivate={(index) => dispatch({ type: "active", index, count })}
+            onActivate={(index, x, y) => {
+              const last = pointer.current;
+              if (last && last.x === x && last.y === y) return;
+              pointer.current = { x, y };
+              dispatch({ type: "active", index, count });
+            }}
             onSelect={select}
           />
           <PaletteFooter

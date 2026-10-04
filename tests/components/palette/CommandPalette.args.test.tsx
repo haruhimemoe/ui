@@ -93,6 +93,8 @@ describe("CommandPalette args", () => {
     await user.keyboard("{Enter}7{Enter}");
     await user.click(screen.getByRole("option", { name: /Hard Rock/ }));
     expect(input()).toHaveAttribute("placeholder", "Note");
+    // A mouse pick keeps the keyboard in the input: the next prompt can be typed straight away.
+    expect(input()).toHaveFocus();
     expect(screen.getByText("HR", { selector: "span" })).toBeInTheDocument();
   });
 });

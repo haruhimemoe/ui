@@ -21,7 +21,8 @@ export type PaletteRowProps = {
   ranges: FuzzyMatch["ranges"];
   active: boolean;
   mac: boolean;
-  onHover: () => void;
+  /** The pointer moved over the row; gets the pointer's position, so a stale move can be told. */
+  onHover: (x: number, y: number) => void;
   onSelect: () => void;
 };
 
@@ -72,7 +73,10 @@ export function PaletteRow({
       role="option"
       aria-selected={active}
       className={active ? ACTIVE : ROW}
-      onPointerMove={onHover}
+      onPointerMove={(event) => onHover(event.clientX, event.clientY)}
+      // Keep focus in the input: a click on a row must not blur it, so the next prompt
+      // (an argument, a nested page) can be typed straight away.
+      onPointerDown={(event) => event.preventDefault()}
       onClick={onSelect}
     >
       {command.icon ? (
