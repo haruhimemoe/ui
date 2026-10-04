@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-03
+
 ### Added
 
 - `CommandPalette`: a mod+k command palette in a native `<dialog>`. Fuzzy search over commands with group headings and marked matches, nested pages (Backspace or Escape go back), async providers that search as you type (debounced, aborted when superseded), argument prompts (text, number, choice) before a command runs, a Recent group from localStorage, and a calculator row (`2*21` → `= 42`, Enter copies). Command shortcuts (`mod+shift+c`, chords like `g p`) work while the palette is closed. `openCommandPalette(page?)` opens it from anywhere; `CommandPaletteButton` is the header button with the platform hint. Built as a combobox over a listbox, with an `h1` edge on the active row, a focus cue on the input row, status errors and a polite result count.
@@ -122,7 +124,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.7.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/haruhimemoe/ui/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/haruhimemoe/ui/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/haruhimemoe/ui/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/haruhimemoe/ui/compare/v0.5.0...v0.5.1
