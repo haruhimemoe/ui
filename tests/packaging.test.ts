@@ -181,12 +181,21 @@ describe("package manifest and build", () => {
     expect(build.compilerOptions.declarationMap).not.toBe(true);
   });
 
-  it("exports the MDX components and the remark plugin as subpaths", () => {
+  it("exports the MDX components, the remark plugin and the Shiki registration as subpaths", () => {
     expect(pkg.exports["./mdx"]).toEqual({ types: "./dist/mdx.d.ts", default: "./dist/mdx.js" });
     expect(pkg.exports["./remark"]).toEqual({
       types: "./dist/remark/index.d.ts",
       default: "./dist/remark/index.js",
     });
+    expect(pkg.exports["./shiki"]).toEqual({
+      types: "./dist/shiki.d.ts",
+      default: "./dist/shiki.js",
+    });
+  });
+
+  // `import "@haruhimemoe/ui/shiki"` is a bare side-effect import: bundlers drop it otherwise.
+  it("marks the Shiki registration as a side effect", () => {
+    expect(pkg.sideEffects).toEqual(["**/*.css", "./dist/shiki.js"]);
   });
 
   it("keeps Shiki an optional peer, so apps without code blocks don't install it", () => {

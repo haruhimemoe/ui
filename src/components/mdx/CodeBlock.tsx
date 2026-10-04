@@ -1,8 +1,8 @@
 /**
  * @file src/components/mdx/CodeBlock.tsx
- * @desc A fenced code block rendered with Shiki highlighting when available (and when the
- *       language is one of the bundled set), plain text otherwise. Async so it can await the
- *       lazily-loaded highlighter from highlighter.ts. Server-safe: the only client piece is the
+ * @desc A fenced code block rendered with Shiki highlighting when the app registered it (by
+ *       importing `@haruhimemoe/ui/shiki`) and the language is one of the bundled set, plain
+ *       text otherwise. Async so it can await the lazily-loaded highlighter from highlighter.ts. Server-safe: the only client piece is the
  *       copy button (CodeCopyButton).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026

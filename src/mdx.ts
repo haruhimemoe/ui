@@ -3,8 +3,9 @@
  * @desc The `@haruhimemoe/ui/mdx` subpath: MDX element overrides and the pieces apps wire them
  *       up with. Every export here is a server component or a plain server-safe function; the
  *       only client code (CodeCopyButton) is rendered internally by CodeBlock, never exported.
- *       `CodeBlock` needs `shiki` installed to colorize code (`shiki` is an optional peer
- *       dependency); without it, code renders as plain, unstyled text.
+ *       `CodeBlock` colorizes code only when the app installs `shiki` (an optional peer
+ *       dependency) and imports `@haruhimemoe/ui/shiki` once; otherwise code renders as plain,
+ *       unstyled text.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Sat Oct 3, 2026

@@ -2,8 +2,9 @@
  * @file tests/components/mdx/CodeBlock.test.tsx
  * @desc Component tests for CodeBlock: Shiki highlighting, title and language fallbacks, line
  *       highlighting, code text edge cases (trailing newline, CRLF, empty lines, empty code),
- *       unknown languages, the no-Shiki fallback, the copy button, and accessibility. The real
- *       highlighter stays cached across tests except in the fallback describe, which resets it.
+ *       unknown languages, the no-Shiki fallbacks (nothing registered, a loader that fails), the
+ *       copy button, and accessibility. src/shiki.ts registers the real loader once, before all
+ *       tests; the fallback describe runs last and clears the registration.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Sat Oct 3, 2026
@@ -11,12 +12,16 @@
 
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { CodeBlock } from "../../../src/components/mdx/CodeBlock.js";
-import { getHighlighter, resetHighlighter } from "../../../src/components/mdx/highlighter.js";
+import { resetHighlighter, setHighlighterLoader } from "../../../src/components/mdx/highlighter.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
 let original: PropertyDescriptor | undefined;
+
+beforeAll(async () => {
+  await import("../../../src/shiki.js");
+});
 
 beforeEach(() => {
   original = Object.getOwnPropertyDescriptor(navigator, "clipboard");
@@ -129,10 +134,27 @@ describe("CodeBlock", () => {
       resetHighlighter();
     });
 
+    it("renders plain lines and says what to import when nothing is registered", async () => {
+      resetHighlighter();
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const { container } = render(await CodeBlock({ code: "const x = 1;", lang: "ts" }));
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0]?.[0]).toContain('import "@haruhimemoe/ui/shiki"');
+      expect(container.querySelector("span[style]")).toBeNull();
+      expect(screen.getByRole("group", { name: "Code: ts" })).toHaveTextContent("const x = 1;");
+    });
+
+    it("doesn't warn for a block with no language", async () => {
+      resetHighlighter();
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      render(await CodeBlock({ code: "plain" }));
+      expect(warn).not.toHaveBeenCalled();
+    });
+
     it("falls back to plain lines when Shiki fails to load", async () => {
       resetHighlighter();
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-      await getHighlighter(() => Promise.reject(new Error("x")));
+      setHighlighterLoader(() => Promise.reject(new Error("x")));
       const { container } = render(await CodeBlock({ code: "const x = 1;", lang: "ts" }));
       expect(warn).toHaveBeenCalled();
       const styled = [...container.querySelectorAll("span[style]")].some((span) =>
@@ -144,7 +166,7 @@ describe("CodeBlock", () => {
 
     it("is axe-clean in the fallback", async () => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-      await getHighlighter(() => Promise.reject(new Error("x")));
+      setHighlighterLoader(() => Promise.reject(new Error("x")));
       const { container } = render(await CodeBlock({ code: "const x = 1;", lang: "ts" }));
       expect(warn).toHaveBeenCalled();
       await expectNoAxeViolations(container);
