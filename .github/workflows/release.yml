@@ -47,6 +47,10 @@ jobs:
       - name: Coverage
         run: bun run test:coverage
 
+      # The consumer check runs axe in headless Chromium (see ci.yml).
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
       - name: Consumer check
         run: bun run check:consumer
 
