@@ -39,6 +39,15 @@ export { type TabItem, Tabs, type TabsProps } from "./components/basics/Tabs.js"
 export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
 export { tabId, tabPanelId } from "./components/basics/tabIds.js";
 
+// Content
+export { ContentLayout, type ContentLayoutProps } from "./components/content/ContentLayout.js";
+export { ContentNav, type ContentNavProps } from "./components/content/ContentNav.js";
+export type {
+  ContentNavGroup,
+  ContentNavItem,
+  ContentSearchItem,
+} from "./components/content/types.js";
+
 // Filters
 export { Chip, type ChipProps } from "./components/filters/Chip.js";
 export { ChipGroup, type ChipGroupProps, type ChipOption } from "./components/filters/ChipGroup.js";

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `ContentNav` and `ContentLayout`: a content section's side navigation and page grid, a port of bb's docs sidebar and layout. `ContentNav` (client) takes `groups` (`ContentNavGroup[]`, each an optional `heading` and `ContentNavItem[]`) and an index link, marks the current page `aria-current="page"`, shows `navTitle ?? title` (clamped to two lines, the full title on the link's `title` attribute) and an optional `badge`. `ContentLayout` (server) lays the nav in a 14rem column beside the page from `lg` up, taking `nav` as an already-rendered slot so it stays section-agnostic (docs today, a blog section later). New types: `ContentNavItem`, `ContentNavGroup`, `ContentSearchItem`.
+
 ## [0.10.0] - 2026-10-04
 
 ### Added

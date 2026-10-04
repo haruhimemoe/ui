@@ -155,6 +155,7 @@ Import every component from `@haruhimemoe/ui`, in Server and Client Components a
 
 - **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
+- **`ContentNav`** (since 0.11.0) reads the path to mark the current page, like `NavLinks`, but it always hydrates: its class strings are finished (no `cx`), so it ships no tailwind-merge to the browser. `ContentLayout` is a Server Component.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
 A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere. Its button mode (`onPageChange`) is a callback, so render that from a `"use client"` file.
@@ -716,6 +717,39 @@ schema.org structured data in a `<script type="application/ld+json">`. Every `<`
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `data` | `Record<string, unknown>` | required | The schema.org object. `@context` defaults to `https://schema.org`; set it in `data` to change it. |
+
+### Content
+
+Since 0.11.0. A content section's side navigation and page grid, a port of bb's docs sidebar and layout grid. `ui` has no next-kit or brand dependency: resolve your section's entries (a docs registry, a future blog) into these plain, structural types yourself.
+
+```ts
+type ContentNavItem = { href: string; title: string; navTitle?: string; badge?: string };
+type ContentNavGroup = { heading?: string; items: readonly ContentNavItem[] };
+```
+
+`ContentSearchItem` (`ContentNavItem & { description: string; keywords?: readonly string[] }`) is exported too, for a search over the same entries.
+
+#### `ContentNav` (client)
+
+The index link, then each group of links, the current page marked. A column from `lg` up; a "Contents" disclosure above it on phones. Finished class strings (no `cx`).
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | `string` | required | The nav landmark's accessible name, on both the column and the phone disclosure. |
+| `indexHref` | `string` | required | Where the index link (the section's overview page) points. |
+| `indexLabel` | `string` | `"Overview"` | The index link's label. |
+| `groups` | `readonly ContentNavGroup[]` | required | Each group's heading (left out when `heading` is unset) and links. |
+
+A link's label is `navTitle ?? title`, in a `line-clamp-2` span so a long title wraps to two lines instead of overflowing the 14rem column; the link's `title` attribute always holds the full `title`. The current page's link gets `aria-current="page"`. A `badge` (e.g. a count) shows beside the label, in `font-mono`.
+
+#### `ContentLayout`
+
+The grid: `nav` in a 14rem column from `lg` up, the page beside it; one column on phones. A Server Component. `nav` takes an already-rendered node (usually a `<ContentNav>`), so this stays section-agnostic. Every native `<div>` prop; `className` merges last.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `nav` | `ReactNode` | required | The section's navigation, already rendered. |
+| `children` | `ReactNode` | required | The page, inside a `min-w-0` wrapper (so a long line inside it can still shrink and wrap). |
 
 ### Shell
 

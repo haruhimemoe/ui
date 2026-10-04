@@ -5,6 +5,8 @@ import {
   Card,
   Checkbox,
   Chip,
+  ContentLayout,
+  ContentNav,
   CopyButton,
   DiscordIcon,
   FilterPanel,
@@ -137,6 +139,25 @@ export default function Page() {
       <ClientAdditions05 />
       <Filters />
       <MdxExports />
+      <ContentLayout
+        nav={
+          <ContentNav
+            label="Docs"
+            indexHref="/"
+            groups={[
+              {
+                heading: "Guides",
+                items: [
+                  { href: "/docs", title: "Getting started", navTitle: "Start" },
+                  { href: "/relative", title: "Relative links", badge: "new" },
+                ],
+              },
+            ]}
+          />
+        }
+      >
+        <p>Content layout body, from the packed tarball.</p>
+      </ContentLayout>
       <FilterPanel title="Server filters" resultCount="3 maps">
         <FilterRow label="Mode">
           <Chip pressed={false}>osu!taiko</Chip>
