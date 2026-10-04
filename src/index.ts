@@ -36,8 +36,15 @@ export { Notice, type NoticeProps, type NoticeTone } from "./components/basics/N
 export { PageHeader, type PageHeaderProps } from "./components/basics/PageHeader.js";
 export { Prose, type ProseProps } from "./components/basics/Prose.js";
 export { type TabItem, Tabs, type TabsProps } from "./components/basics/Tabs.js";
+export { Text, type TextProps } from "./components/basics/Text.js";
 export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
 export { tabId, tabPanelId } from "./components/basics/tabIds.js";
+export {
+  type TextClassOptions,
+  type TextSize,
+  type TextTone,
+  textClasses,
+} from "./components/basics/textStyles.js";
 export { useMotionAllowed } from "./components/basics/useMotionAllowed.js";
 
 // Brand

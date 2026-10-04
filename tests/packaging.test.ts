@@ -176,7 +176,8 @@ describe("shipped source", () => {
 
   it("exports the 0.12.0 additions from the barrel", async () => {
     const ui = await import("../src/index.js");
-    for (const name of ["useMotionAllowed"]) expect(ui, name).toHaveProperty(name);
+    for (const name of ["useMotionAllowed", "Text", "textClasses"])
+      expect(ui, name).toHaveProperty(name);
   });
 });
 

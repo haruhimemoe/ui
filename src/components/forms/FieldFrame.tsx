@@ -7,11 +7,12 @@
  *       aria-invalid.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
+import { textClasses } from "../basics/textStyles.js";
 import { FIELD_LABEL } from "./fieldStyles.js";
 
 /** The label, hint and error every form field takes, keyed on the control's required id. */
@@ -105,7 +106,7 @@ export const fieldControlProps = ({
  */
 export function FieldError({ id, error }: { id: string; error?: ReactNode | undefined }) {
   return error ? (
-    <div id={errorId(id)} role="status" className="text-rose-300 text-sm">
+    <div id={errorId(id)} role="status" className={textClasses({ tone: "error" })}>
       {error}
     </div>
   ) : null;

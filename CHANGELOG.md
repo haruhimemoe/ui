@@ -13,10 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - High contrast: under `prefers-contrast: more`, `c2`, `c3`, `c4` and `h1` get 8 points lighter and `h2` 4 points darker, through `--contrast-lift` (`0%` opts out).
 - The `coarse:` variant (`@media (pointer: coarse)`), for a touchscreen as the main pointer.
 - `useMotionAllowed()` (client): true when the visitor allows motion, false on the server, during hydration and under reduced motion, live. Lifted from haruhime.moe's homepage banner.
+- `Text` and `textClasses`: a line of text in six tones (`default` c2, `muted` c3, `subtle` c4, `error`, `warning` amber-300, `success`) and three sizes, for the error, warning and muted text apps wrote by hand.
 
 ### Changed
 
 - `c2`, `c3`, `c4`, `h1` and `h2` are defined through lightness variables (`--c2-l`, `--c3-l` and `--c4-l` join `--h1-l` and `--h2-l`) plus the contrast lift. The default colors are unchanged.
+- `Notice`, field errors, `CharCounter`, `AsyncButton`'s failure text and the palette's input error use Text's tones, so they get one step lighter under more contrast.
 
 ## [0.11.2] - 2026-10-04
 

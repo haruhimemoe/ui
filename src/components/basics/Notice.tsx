@@ -6,11 +6,11 @@
  *       status region that mounts with its text already inside may not be announced.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
-import { cx } from "../../utils/cx.js";
+import { type TextTone, textClasses } from "./textStyles.js";
 
 /** The notice's color, and its live role: `info` is c3, `warning` amber, `error` rose. */
 export type NoticeTone = "info" | "warning" | "error";
@@ -27,10 +27,10 @@ export type NoticeProps = ComponentProps<"p"> & {
   as?: "p" | "div" | undefined;
 };
 
-const TONES: Record<NoticeTone, string> = {
-  info: "text-c3",
-  warning: "text-amber-300",
-  error: "text-rose-300",
+const NOTICE_TONES: Record<NoticeTone, TextTone> = {
+  info: "muted",
+  warning: "warning",
+  error: "error",
 };
 
 /**
@@ -47,7 +47,7 @@ export function Notice({
   ...props
 }: NoticeProps) {
   const role = live ? (tone === "error" ? "alert" : "status") : undefined;
-  const classes = cx("text-sm", TONES[tone], className);
+  const classes = textClasses({ tone: NOTICE_TONES[tone], className });
 
   if (as === "div") {
     // Same attributes either way; only the ref's element type differs.

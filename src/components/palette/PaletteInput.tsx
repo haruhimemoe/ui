@@ -7,12 +7,13 @@
  *       always mounted, so a message that appears is announced.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
 
 import { type Ref, useId } from "react";
+import { TEXT_TONES } from "../basics/textTones.js";
 
 /** The input's state and ids. */
 export type PaletteInputProps = {
@@ -76,7 +77,7 @@ export function PaletteInput({
       <p
         id={errorId}
         role="status"
-        className={error ? "px-4 pb-2 text-rose-300 text-xs" : "sr-only"}
+        className={error ? `px-4 pb-2 text-xs ${TEXT_TONES.error}` : "sr-only"}
       >
         {error}
       </p>

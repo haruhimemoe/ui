@@ -239,6 +239,25 @@ A `status` region is only reliably announced when its content changes while it i
 
 An error notice (`role="alert"`) is announced either way.
 
+#### `Text` and `textClasses` (since 0.12.0)
+
+A line of text in a tone and a size, instead of hand-written color classes. Every native `<p>` prop.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `tone` | `"default" \| "muted" \| "subtle" \| "error" \| "warning" \| "success"` | `"default"` | `c2`, `c3`, `c4`, rose, amber or emerald. The status tones get one step lighter under more contrast. |
+| `size` | `"xs" \| "sm" \| "base"` | `"sm"` | The text size. |
+| `bold` | `boolean` | `false` | `font-bold`. |
+| `as` | `"p" \| "span" \| "div"` | `"p"` | The element. |
+
+`textClasses({ tone, size, bold, className })` returns the same classes for an element `Text` can't be (an `<output>`, a `<time>`, a class map). `Text` is styling only, not a live region: a message that appears after an action still goes in `Notice live` or a mounted `role="status"`. Error and warning text must say what is wrong in words.
+
+```tsx
+<Text tone="muted">Last updated Oct 4.</Text>
+<Text role="alert" tone="error" bold>That pack key is not valid.</Text>
+<output className={textClasses({ tone: "success" })}>Saved.</output>
+```
+
 #### `Prose`
 
 Long-form typography for MDX, docs and legal pages. A `max-w-3xl` `<div>` that styles the `h2`, `h3`, `p`, `a`, `strong`, `ul`, `ol`, `li`, `code`, `pre`, `hr` and `table` elements inside it. Every native `<div>` prop. A `pre` scrolls sideways, so give it `tabIndex={0}` (through your Markdown renderer's `components` map) so keyboard users can reach the scroll; CSS can't add that.

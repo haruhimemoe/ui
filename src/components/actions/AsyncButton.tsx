@@ -6,7 +6,7 @@
  *       A rejected action shows the failure message in rose.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -14,6 +14,7 @@
 import { type ReactNode, useRef, useState } from "react";
 import { cx } from "../../utils/cx.js";
 import { Button, type ButtonProps } from "../basics/Button.js";
+import { TEXT_TONES } from "../basics/textTones.js";
 import { StatusOutput } from "./StatusOutput.js";
 import { useLatestStatus } from "./useLatestStatus.js";
 
@@ -79,7 +80,7 @@ export function AsyncButton({
       </Button>
       <StatusOutput run={status?.run ?? null}>
         {status?.result.failed ? (
-          <span className="text-rose-300">{status.result.message}</span>
+          <span className={TEXT_TONES.error}>{status.result.message}</span>
         ) : (
           status?.result.message
         )}

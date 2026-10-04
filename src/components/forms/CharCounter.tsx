@@ -5,11 +5,12 @@
  *       length), so it fits any rule. Server-safe. Moved from bb.haruhime.moe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
 import { cx } from "../../utils/cx.js";
+import { textClasses } from "../basics/textStyles.js";
 
 /** Every native `<p>` prop except children, plus the count, the limit and the unit. */
 export type CharCounterProps = Omit<ComponentProps<"p">, "children"> & {
@@ -43,11 +44,11 @@ export function CharCounter({
   const shown = `${format(count)} / ${format(limit)} ${unit}${over > 0 ? `: ${overText}` : ""}`;
   return (
     <p
-      className={cx(
-        "text-sm tabular-nums",
-        over > 0 ? "font-bold text-rose-300" : "text-c3",
-        className,
-      )}
+      className={textClasses({
+        tone: over > 0 ? "error" : "muted",
+        bold: over > 0,
+        className: cx("tabular-nums", className),
+      })}
       {...props}
     >
       {live ? (
