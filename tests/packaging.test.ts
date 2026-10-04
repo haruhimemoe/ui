@@ -93,6 +93,7 @@ describe("shipped source", () => {
       "src/components/actions/useLatestStatus.ts",
       "src/components/basics/Disclosure.tsx",
       "src/components/basics/Tabs.tsx",
+      "src/components/basics/useMotionAllowed.ts",
       "src/components/brand/BrandSwatch.tsx",
       "src/components/content/ContentNav.tsx",
       "src/components/content/ContentSearch.tsx",
@@ -171,6 +172,11 @@ describe("shipped source", () => {
       const file = sources.find((s) => s.name === `src/components/${name}.tsx`);
       expect(firstStatement(file?.text ?? ""), name).toBe('"use client";');
     }
+  });
+
+  it("exports the 0.12.0 additions from the barrel", async () => {
+    const ui = await import("../src/index.js");
+    for (const name of ["useMotionAllowed"]) expect(ui, name).toHaveProperty(name);
   });
 });
 

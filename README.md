@@ -318,6 +318,21 @@ The panels are yours. `tabId(prefix, tab)` and `tabPanelId(prefix, tab)` (server
 <div role="tabpanel" id={tabPanelId("ed", tab)} aria-labelledby={tabId("ed", tab)}>...</div>
 ```
 
+#### `useMotionAllowed` (client, since 0.12.0)
+
+`useMotionAllowed()` is `true` when the visitor allows motion. It is `false` on the server, during hydration, without `matchMedia`, and while the visitor asks for reduced motion, and it follows the setting live. Use it for motion JavaScript drives (an autoplay video, a canvas, `element.animate()`). CSS transitions and animations already stop through the theme, so components don't need it for those.
+
+```tsx
+"use client";
+
+import { useMotionAllowed } from "@haruhimemoe/ui";
+
+export function Hero() {
+  const motion = useMotionAllowed();
+  return motion ? <video autoPlay loop muted playsInline src="/loop.webm" /> : null;
+}
+```
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.

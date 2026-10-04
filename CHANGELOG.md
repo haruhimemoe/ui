@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - One reduced-motion rule: under `prefers-reduced-motion: reduce` every animation and transition finishes in 0.01ms and smooth scrolling turns off, in the kit and in the app's own markup. `data-motion="essential"` keeps an element's motion.
 - High contrast: under `prefers-contrast: more`, `c2`, `c3`, `c4` and `h1` get 8 points lighter and `h2` 4 points darker, through `--contrast-lift` (`0%` opts out).
 - The `coarse:` variant (`@media (pointer: coarse)`), for a touchscreen as the main pointer.
+- `useMotionAllowed()` (client): true when the visitor allows motion, false on the server, during hydration and under reduced motion, live. Lifted from haruhime.moe's homepage banner.
 
 ### Changed
 

@@ -38,6 +38,7 @@ export { Prose, type ProseProps } from "./components/basics/Prose.js";
 export { type TabItem, Tabs, type TabsProps } from "./components/basics/Tabs.js";
 export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
 export { tabId, tabPanelId } from "./components/basics/tabIds.js";
+export { useMotionAllowed } from "./components/basics/useMotionAllowed.js";
 
 // Brand
 export {
