@@ -2,15 +2,16 @@
  * @file scripts/axe-playground.mjs
  * @desc Builds the playground (the Next app in playground/ that imports src/ directly), serves it,
  *       and runs axe-core in headless Chromium over the command palette's states on / at a desktop
- *       and a phone width, color contrast on: closed, open, a nested page, an argument prompt and
- *       no results. Then it runs the same pass over /mdx (the MDX components: callouts, Shiki code
- *       blocks, a wide table) at both widths. The jsdom tests can't see contrast or scrollable
- *       regions, and the consumer check only sees closed pages. Prints one line per violation (with
- *       up to five targets) and exits 1 on any. Usage: `bun run play:axe` (CI runs it after the
- *       consumer check; Chromium is installed for that).
+ *       and a phone width, on a touch phone (rows measured at 44px) and under more contrast, color
+ *       contrast on: closed, open, a nested page, an argument prompt and no results. Then it runs
+ *       the same pass over /mdx (the MDX components: callouts, Shiki code blocks, a wide table) at
+ *       both widths. The jsdom tests can't see contrast or scrollable regions, and the consumer
+ *       check only sees closed pages. Prints one line per violation (with up to five targets) and
+ *       exits 1 on any. Usage: `bun run play:axe` (CI runs it after the consumer check; Chromium is
+ *       installed for that).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -25,7 +26,15 @@ const port = Number(process.env.AXE_PORT ?? 3985);
 const origin = `http://127.0.0.1:${port}`;
 const env = { ...process.env, NEXT_TELEMETRY_DISABLED: "1" };
 
-const VIEWPORTS = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } };
+/** The contexts every state runs in: two widths, a touch phone and more contrast. */
+const CONTEXTS = {
+  desktop: { viewport: { width: 1280, height: 900 } },
+  phone: { viewport: { width: 390, height: 844 } },
+  coarse: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
+  contrast: { viewport: { width: 1280, height: 900 }, contrast: "more" },
+};
+/** The media query each extra context must match, so a pass means it was really checked. */
+const MEDIA = { coarse: "(pointer: coarse)", contrast: "(prefers-contrast: more)" };
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
 
 /**
@@ -85,13 +94,17 @@ const failures = [];
 try {
   await waitForServer(origin, 30000);
   const browser = await chromium.launch();
-  for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
-    const context = await browser.newContext({ viewport, colorScheme: "dark" });
+  for (const [viewportName, options] of Object.entries(CONTEXTS)) {
+    const context = await browser.newContext({ ...options, colorScheme: "dark" });
     const page = await context.newPage();
     const response = await page.goto(`${origin}/`, { waitUntil: "load" });
     if (response?.status() !== 200)
       throw new Error(`/ answered ${response?.status() ?? "nothing"}`);
     await page.waitForTimeout(500);
+    const query = MEDIA[viewportName];
+    if (query && !(await page.evaluate((q) => matchMedia(q).matches, query))) {
+      throw new Error(`${viewportName}: the browser doesn't match ${query}`);
+    }
     const mod = (await page.evaluate(() => /mac/i.test(navigator.platform))) ? "Meta" : "Control";
     for (const state of STATES) {
       for (const key of state.keys) await page.keyboard.press(key.replace("mod", mod));
@@ -120,6 +133,17 @@ try {
       console.log(
         `${viewportName} ${state.name}: ${results.violations.length ? `${results.violations.length} violations` : "ok"}`,
       );
+      // On a touchscreen every palette row must be a 44px target.
+      if (viewportName === "coarse" && state.name === "open") {
+        const heights = await page
+          .locator("[role=option]")
+          .evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height));
+        if (heights.length === 0) failures.push("coarse open: no [role=option] rows to measure");
+        for (const height of heights) {
+          if (Math.round(height) < 44)
+            failures.push(`coarse open: a palette row is ${height}px, under 44px`);
+        }
+      }
     }
     // The MDX components: callouts, highlighted code and a wide table in its scroll region.
     const mdx = await page.goto(`${origin}/mdx`, { waitUntil: "load" });
