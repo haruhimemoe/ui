@@ -2,10 +2,11 @@
  * @file tests/theme.test.ts
  * @desc Unit tests for theme.css: the h1 and h2 lightness can be overridden, the values the
  *       README gives for other hues meet WCAG AA contrast (4.5:1) where the defaults do not, and
- *       c1 stays white at every hue.
+ *       c1 stays white at every hue. Also covers the contrast lift, the motion tokens, the
+ *       reduced-motion rule and the coarse variant.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { readFileSync } from "node:fs";
@@ -35,10 +36,19 @@ const b5 = (hue: number) => luminance(hue, 10, 15);
 const h1 = (hue: number, l = 76) => luminance(hue, 100, l);
 const h2 = (hue: number, l = 45) => luminance(hue, 50, l);
 
+const LIFT = 8;
+
 describe("theme.css", () => {
-  it("lets an app set the h1 and h2 lightness", () => {
-    expect(theme).toContain("--color-h1: hsl(var(--hue) 100% var(--h1-l, 76%));");
-    expect(theme).toContain("--color-h2: hsl(var(--hue) 50% var(--h2-l, 45%));");
+  it("defines the content steps and highlights through lightness variables plus the lift", () => {
+    for (const line of [
+      "--color-c2: hsl(var(--hue) 40% calc(var(--c2-l, 90%) + var(--contrast-lift)));",
+      "--color-c3: hsl(var(--hue) 40% calc(var(--c3-l, 80%) + var(--contrast-lift)));",
+      "--color-c4: hsl(var(--hue) 40% calc(var(--c4-l, 70%) + var(--contrast-lift)));",
+      "--color-h1: hsl(var(--hue) 100% calc(var(--h1-l, 76%) + var(--contrast-lift)));",
+      "--color-h2: hsl(var(--hue) 50% calc(var(--h2-l, 45%) - var(--contrast-lift) / 2));",
+    ]) {
+      expect(theme).toContain(line);
+    }
   });
 
   it("keeps c1 white at every hue, so SiteFooter's Discord logo stays white", () => {
@@ -71,6 +81,87 @@ describe("theme.css", () => {
       expect(contrast(c1(hue), h2(hue, 31))).toBeGreaterThanOrEqual(4.5);
       expect(contrast(h1(hue, 77), b4(hue))).toBeGreaterThanOrEqual(4.5);
     }
+  });
+});
+
+describe("high contrast", () => {
+  it("lifts by 0% by default and 8% under prefers-contrast: more", () => {
+    expect(theme).toMatch(/:root \{\s*--hue: 333;\s*--contrast-lift: 0%;/);
+    expect(theme).toMatch(
+      /@media \(prefers-contrast: more\) \{\s*:root \{\s*--contrast-lift: 8%;\s*\}/,
+    );
+  });
+
+  const b6 = (hue: number) => luminance(hue, 10, 10);
+  const c3 = (hue: number, lift = 0) => luminance(hue, 40, Math.min(100, 80 + lift));
+  const c4 = (hue: number, lift = 0) => luminance(hue, 40, Math.min(100, 70 + lift));
+
+  it("gives c3 and c4 on b4, b5, b6 and h1 on b4, b5 more contrast at every hue", () => {
+    for (let hue = 0; hue < 360; hue++) {
+      for (const bg of [b4(hue), b5(hue), b6(hue)]) {
+        expect(contrast(c3(hue, LIFT), bg), `c3 hue ${hue}`).toBeGreaterThan(contrast(c3(hue), bg));
+        expect(contrast(c4(hue, LIFT), bg), `c4 hue ${hue}`).toBeGreaterThan(contrast(c4(hue), bg));
+      }
+      for (const bg of [b4(hue), b5(hue)]) {
+        expect(contrast(h1(hue, 76 + LIFT), bg), `h1 hue ${hue}`).toBeGreaterThan(
+          contrast(h1(hue), bg),
+        );
+      }
+    }
+  });
+
+  it("keeps white on h2 at 4.5:1 or more with the lift, at the README overrides and bb's", () => {
+    for (const [hue, l] of [
+      [333, 45],
+      [200, 42],
+      [150, 35],
+      [265, 45],
+    ] as const) {
+      const lifted = contrast(c1(hue), h2(hue, l - LIFT / 2));
+      expect(lifted, `hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+      expect(lifted, `hue ${hue}`).toBeGreaterThan(contrast(c1(hue), h2(hue, l)));
+    }
+  });
+});
+
+describe("motion and touch", () => {
+  it("defines the duration and easing tokens, defaulting transitions to the short standard one", () => {
+    for (const line of [
+      "--transition-duration-short: 150ms;",
+      "--transition-duration-medium: 250ms;",
+      "--transition-duration-long: 400ms;",
+      "--ease-standard: cubic-bezier(0.4, 0, 0.2, 1);",
+      "--ease-enter: cubic-bezier(0, 0, 0.2, 1);",
+      "--ease-exit: cubic-bezier(0.4, 0, 1, 1);",
+      "--default-transition-duration: var(--transition-duration-short);",
+      "--default-transition-timing-function: var(--ease-standard);",
+    ]) {
+      expect(theme).toContain(line);
+    }
+    expect(theme).toMatch(/@theme \{[^}]*--transition-duration-short/);
+  });
+
+  it("collapses motion under prefers-reduced-motion, except data-motion=essential", () => {
+    const base = theme.indexOf("@layer base");
+    const rule = theme.indexOf("@media (prefers-reduced-motion: reduce)");
+    expect(rule).toBeGreaterThan(base);
+    const block = theme.slice(rule);
+    const where = ':where(*:not([data-motion="essential"], [data-motion="essential"] *))';
+    for (const selector of [`${where},`, `${where}::before,`, `${where}::after {`]) {
+      expect(block).toContain(selector);
+    }
+    for (const line of [
+      "animation-duration: 0.01ms !important;",
+      "animation-iteration-count: 1 !important;",
+      "transition-duration: 0.01ms !important;",
+      "scroll-behavior: auto !important;",
+    ]) {
+      expect(block).toContain(line);
+    }
+  });
+
+  it("adds the coarse variant for a touchscreen as the main pointer", () => {
+    expect(theme).toContain("@custom-variant coarse (@media (pointer: coarse));");
   });
 });
 

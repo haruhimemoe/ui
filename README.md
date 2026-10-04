@@ -77,12 +77,18 @@ const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: 
 }
 ```
 
-At some hues the defaults drop below 4.5:1 contrast, so check yours. Two variables fix it:
+At some hues the defaults drop below 4.5:1 contrast, so check yours. Two variables fix it (and `--c2-l`, `--c3-l`, `--c4-l` set the content steps' lightness, default `90%`, `80%`, `70%`):
 
 - `--h2-l` sets the lightness of `h2` (default `45%`). White text on `h2` (primary buttons, the skip link) is under 4.5:1 for hues from about 23 to 205. Use `42%` at hue 200, `35%` at hue 150, or `31%` for any hue.
 - `--h1-l` sets the lightness of `h1` (default `76%` since 0.7.0, `70%` before). At `76%`, `h1` text on `b5` (links in cards and prose) is at or above 4.5:1 at every hue. On `b4` ("Clear filters" in a filter panel) it dips under for hues from about 238 to 248. Use `77%` there.
 
 The theme is dark only (`color-scheme: dark`).
+
+**5. Motion, contrast and touch (since 0.12.0).** The theme follows three browser settings. There is no in-app toggle.
+
+- **Reduced motion.** When the visitor asks for reduced motion (`prefers-reduced-motion: reduce`), every animation and transition finishes in 0.01ms and smooth scrolling turns off, in the kit and in your own markup. Put `data-motion="essential"` on an element whose movement is the message (a progress indicator): it and its children keep their motion. Tokens: `duration-short` (150ms: hovers, presses, color changes, and the default for every `transition-*`), `duration-medium` (250ms: panels, dialogs), `duration-long` (400ms: large surfaces), with `ease-standard` (the default), `ease-enter` and `ease-exit`. For motion JavaScript drives (an autoplay video, a canvas), read `useMotionAllowed()`.
+- **More contrast.** Under `prefers-contrast: more`, `c2`, `c3`, `c4` and `h1` get 8 points lighter and `h2` 4 points darker. Cards, chips, secondary and ghost buttons, neutral badges and the tabs track get a `c4` edge; fields, code blocks and menus swap their `b3` border for `c4`. The lift adds to your `--h1-l` and `--h2-l`. Set `--contrast-lift: 0%` on `:root` to opt out.
+- **Touch.** `coarse:` is a variant for a touchscreen as the main pointer (`@media (pointer: coarse)`, the same query as Tailwind's `pointer-coarse:`). Buttons at `md`, chips, checkbox and radio rows, tabs, menu items, palette rows and fields grow to 44px there, and fields use 16px text so iOS Safari doesn't zoom in. Undo it for one control with a class like `coarse:h-9`. A touchscreen laptop driven by its trackpad keeps the dense layout.
 
 ## Example
 
@@ -1285,6 +1291,8 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 - **Focus is always visible, and always the same.** The theme draws a 2px `h1` outline, offset 2px, on `:focus-visible`. Fields keep it (since 0.7.0; before, they swapped it for a 1px border change) and add an `h1` border. `RangeSlider` thumbs show a solid `h1` ring instead and keep a transparent outline, so Windows high contrast mode (forced colors) still paints one. Never `outline: none`.
 - **Targets are 24px or more** (WCAG 2.2 2.5.8): buttons are `h-9`, chips and tabs 24px tall, slider thumbs 24px (since 0.7.0), checkboxes and radios 24px and the `Disclosure` and `HeaderMenu` buttons at least 24px tall (since 0.8.0).
 - **Contrast is computed, not eyeballed.** The test suite checks `c1` on `h2`, `h1` on `b4` and `b5`, and the hue overrides under Setup; `StarRating` picks its text color by contrast. Text is never dimmed with `opacity` (a `text-c4` line at 70% opacity drops under 4.5:1): use a lighter palette step instead.
+- **Motion follows the browser.** Under `prefers-reduced-motion: reduce` every transition and animation finishes in 0.01ms (since 0.12.0); `data-motion="essential"` is the one way out. `useMotionAllowed` covers motion JavaScript drives.
+- **High contrast.** Under `prefers-contrast: more` the text steps lighten, `h2` darkens and shapes that rely on a background shade get a `c4` edge (since 0.12.0). Forced colors (Windows high contrast) keep a 1px border on buttons, cards, chips and badges.
 - **Color never carries meaning alone.** Accent links are underlined, a pressed `Chip` is `aria-pressed`, the current nav link is `aria-current`, `CharCounter` says "over the limit" in words, errors are text.
 - **Live regions exist before they speak.** `CopyButton`, `AsyncButton`, `CharCounter live`, `FilterPanel`'s count and `ReportDisclosure`'s outcome render their `<output>` or `role="status"` node up front, empty, and swap the text in. Field errors are `role="status"` (polite); `Notice live tone="error"` is the one `role="alert"`.
 - **Focus never falls to the body.** When the control you pressed goes away, focus moves somewhere sensible: `FilterPanel` to its heading, `Pagination` to "Page X of Y", `InlineConfirm` back to its trigger, `ReportDisclosure` to its outcome line. Pending buttons use `aria-disabled`, not `disabled`, so focus stays.

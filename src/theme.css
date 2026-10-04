@@ -13,9 +13,13 @@
  *       (h2 lightness, default 45%) or --h1-l (h1 lightness, default 76%, which clears 4.5:1 on
  *       b5 at every hue) moved to keep text at 4.5:1; the README lists values. Load Nunito with next/font as the --font-nunito variable;
  *       without it the sans stack falls back to the system font.
+ *
+ *       It also follows three browser settings: prefers-reduced-motion (one global rule,
+ *       data-motion="essential" opts out), prefers-contrast: more (--contrast-lift) and a coarse
+ *       pointer (the coarse: variant).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 /* This file ships as dist/theme.css, so './' is the package's compiled components. */
@@ -23,8 +27,20 @@
 
 :root {
   --hue: 333;
+  --contrast-lift: 0%;
   color-scheme: dark;
 }
+
+/* More contrast: c2, c3, c4 and h1 get lighter and h2 darker by the lift. An app opts out with
+   --contrast-lift: 0%; the lift adds to its own --h1-l and --h2-l. */
+@media (prefers-contrast: more) {
+  :root {
+    --contrast-lift: 8%;
+  }
+}
+
+/* A touchscreen as the main pointer. The same query as Tailwind's pointer-coarse:, shorter. */
+@custom-variant coarse (@media (pointer: coarse));
 
 @theme inline {
   --color-b1: hsl(var(--hue) 10% 40%);
@@ -35,14 +51,28 @@
   --color-b6: hsl(var(--hue) 10% 10%);
 
   --color-c1: hsl(var(--hue) 40% 100%);
-  --color-c2: hsl(var(--hue) 40% 90%);
-  --color-c3: hsl(var(--hue) 40% 80%);
-  --color-c4: hsl(var(--hue) 40% 70%);
+  --color-c2: hsl(var(--hue) 40% calc(var(--c2-l, 90%) + var(--contrast-lift)));
+  --color-c3: hsl(var(--hue) 40% calc(var(--c3-l, 80%) + var(--contrast-lift)));
+  --color-c4: hsl(var(--hue) 40% calc(var(--c4-l, 70%) + var(--contrast-lift)));
 
-  --color-h1: hsl(var(--hue) 100% var(--h1-l, 76%));
-  --color-h2: hsl(var(--hue) 50% var(--h2-l, 45%));
+  --color-h1: hsl(var(--hue) 100% calc(var(--h1-l, 76%) + var(--contrast-lift)));
+  --color-h2: hsl(var(--hue) 50% calc(var(--h2-l, 45%) - var(--contrast-lift) / 2));
 
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Motion tokens. A plain @theme, not inline, so utilities read the variables and one change
+   reaches every user: duration-short (hovers, presses, color changes), duration-medium (panels,
+   dialogs), duration-long (large surfaces); ease-standard, ease-enter, ease-exit. */
+@theme {
+  --transition-duration-short: 150ms;
+  --transition-duration-medium: 250ms;
+  --transition-duration-long: 400ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --default-transition-duration: var(--transition-duration-short);
+  --default-transition-timing-function: var(--ease-standard);
 }
 
 /* CodeBlock reads these as Shiki's CSS-variables theme. Every token keeps 4.5:1 against both b6
@@ -68,5 +98,21 @@
     outline: 2px solid var(--color-h1);
     outline-offset: 2px;
     border-radius: 4px;
+  }
+
+  /* The one reduced-motion rule for the family: the browser setting, no in-app toggle. 0.01ms, not
+     0, so transitionend and animationend still fire. !important in the base layer beats every
+     normal declaration in later layers, so an app's own duration-* or animate-* can't escape it.
+     data-motion="essential" keeps motion that carries meaning. Pseudo-elements can't sit inside
+     :where() or :not(), so each gets its own selector. */
+  @media (prefers-reduced-motion: reduce) {
+    :where(*:not([data-motion="essential"], [data-motion="essential"] *)),
+    :where(*:not([data-motion="essential"], [data-motion="essential"] *))::before,
+    :where(*:not([data-motion="essential"], [data-motion="essential"] *))::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

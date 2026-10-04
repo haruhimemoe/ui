@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Motion tokens in `theme.css`: `duration-short` (150ms), `duration-medium` (250ms), `duration-long` (400ms), `ease-standard`, `ease-enter` and `ease-exit`. Every `transition-*` now reads `duration-short` and `ease-standard`, the values it had.
+- One reduced-motion rule: under `prefers-reduced-motion: reduce` every animation and transition finishes in 0.01ms and smooth scrolling turns off, in the kit and in the app's own markup. `data-motion="essential"` keeps an element's motion.
+- High contrast: under `prefers-contrast: more`, `c2`, `c3`, `c4` and `h1` get 8 points lighter and `h2` 4 points darker, through `--contrast-lift` (`0%` opts out).
+- The `coarse:` variant (`@media (pointer: coarse)`), for a touchscreen as the main pointer.
+
+### Changed
+
+- `c2`, `c3`, `c4`, `h1` and `h2` are defined through lightness variables (`--c2-l`, `--c3-l` and `--c4-l` join `--h1-l` and `--h2-l`) plus the contrast lift. The default colors are unchanged.
+
 ## [0.11.2] - 2026-10-04
 
 ### Fixed
