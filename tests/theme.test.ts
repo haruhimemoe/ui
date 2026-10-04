@@ -5,7 +5,7 @@
  *       c1 stays white at every hue.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Fri Sep 25, 2026
+ * @modified Sat Oct 3, 2026
  */
 
 import { readFileSync } from "node:fs";
@@ -70,6 +70,86 @@ describe("theme.css", () => {
     for (let hue = 0; hue < 360; hue++) {
       expect(contrast(c1(hue), h2(hue, 31))).toBeGreaterThanOrEqual(4.5);
       expect(contrast(h1(hue, 77), b4(hue))).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});
+
+describe("Shiki tokens", () => {
+  const b6 = (hue: number) => luminance(hue, 10, 10);
+  const c2 = (hue: number) => luminance(hue, 40, 90);
+  const c3 = (hue: number) => luminance(hue, 40, 80);
+  const c4 = (hue: number) => luminance(hue, 40, 70);
+  // The keyword and link tokens get their own hue-derived value (not var(--color-h1)): var's
+  // default lightness (76%) fails 4.5:1 against b4 at some hues.
+  const keywordLink = (hue: number) => luminance(hue, 100, 78);
+  const hsl = (hue: number, offset: number, s: number, l: number) =>
+    luminance((hue + offset + 360) % 360, s, l);
+
+  const lines = [
+    "  --shiki-foreground: var(--color-c2);",
+    "  --shiki-background: var(--color-b6);",
+    "  --shiki-token-keyword: hsl(var(--hue) 100% 78%);",
+    "  --shiki-token-string: hsl(calc(var(--hue) + 150) 55% 75%);",
+    "  --shiki-token-string-expression: hsl(calc(var(--hue) + 150) 55% 75%);",
+    "  --shiki-token-constant: hsl(calc(var(--hue) + 40) 55% 74%);",
+    "  --shiki-token-function: hsl(calc(var(--hue) + 200) 55% 75%);",
+    "  --shiki-token-parameter: hsl(calc(var(--hue) + 60) 55% 75%);",
+    "  --shiki-token-comment: var(--color-c4);",
+    "  --shiki-token-punctuation: var(--color-c3);",
+    "  --shiki-token-link: hsl(var(--hue) 100% 78%);",
+  ];
+
+  it("contains every --shiki-* line verbatim", () => {
+    for (const line of lines) expect(theme).toContain(line);
+  });
+
+  it("meets 4.5:1 against b6 at a sample of hues", () => {
+    for (const hue of [0, 150, 200, 240, 333]) {
+      expect(contrast(c2(hue), b6(hue)), `foreground hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(c4(hue), b6(hue)), `comment hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(c3(hue), b6(hue)), `punctuation hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(keywordLink(hue), b6(hue)), `keyword/link hue ${hue}`).toBeGreaterThanOrEqual(
+        4.5,
+      );
+      expect(contrast(hsl(hue, 150, 55, 75), b6(hue)), `string hue ${hue}`).toBeGreaterThanOrEqual(
+        4.5,
+      );
+      expect(contrast(hsl(hue, 40, 55, 74), b6(hue)), `constant hue ${hue}`).toBeGreaterThanOrEqual(
+        4.5,
+      );
+      expect(
+        contrast(hsl(hue, 200, 55, 75), b6(hue)),
+        `function hue ${hue}`,
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrast(hsl(hue, 60, 55, 75), b6(hue)),
+        `parameter hue ${hue}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("meets 4.5:1 against b6 and b4 (the highlighted-line tint) at every hue", () => {
+    for (let hue = 0; hue < 360; hue++) {
+      for (const bg of [b6(hue), b4(hue)]) {
+        expect(contrast(c2(hue), bg), `foreground hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(c4(hue), bg), `comment hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(c3(hue), bg), `punctuation hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(keywordLink(hue), bg), `keyword/link hue ${hue}`).toBeGreaterThanOrEqual(
+          4.5,
+        );
+        expect(contrast(hsl(hue, 150, 55, 75), bg), `string hue ${hue}`).toBeGreaterThanOrEqual(
+          4.5,
+        );
+        expect(contrast(hsl(hue, 40, 55, 74), bg), `constant hue ${hue}`).toBeGreaterThanOrEqual(
+          4.5,
+        );
+        expect(contrast(hsl(hue, 200, 55, 75), bg), `function hue ${hue}`).toBeGreaterThanOrEqual(
+          4.5,
+        );
+        expect(contrast(hsl(hue, 60, 55, 75), bg), `parameter hue ${hue}`).toBeGreaterThanOrEqual(
+          4.5,
+        );
+      }
     }
   });
 });

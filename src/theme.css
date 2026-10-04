@@ -45,6 +45,24 @@
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* CodeBlock reads these as Shiki's CSS-variables theme. Every token keeps 4.5:1 against both b6
+   (the block's background) and b4 (the highlighted-line tint) at every integer --hue. The keyword
+   and link tokens get their own hue-derived value instead of var(--color-h1): that variable's
+   default lightness (76%) falls to 4.33:1 against b4 at hue 240. */
+:root {
+  --shiki-foreground: var(--color-c2);
+  --shiki-background: var(--color-b6);
+  --shiki-token-keyword: hsl(var(--hue) 100% 78%);
+  --shiki-token-string: hsl(calc(var(--hue) + 150) 55% 75%);
+  --shiki-token-string-expression: hsl(calc(var(--hue) + 150) 55% 75%);
+  --shiki-token-constant: hsl(calc(var(--hue) + 40) 55% 74%);
+  --shiki-token-function: hsl(calc(var(--hue) + 200) 55% 75%);
+  --shiki-token-parameter: hsl(calc(var(--hue) + 60) 55% 75%);
+  --shiki-token-comment: var(--color-c4);
+  --shiki-token-punctuation: var(--color-c3);
+  --shiki-token-link: hsl(var(--hue) 100% 78%);
+}
+
 @layer base {
   :focus-visible {
     outline: 2px solid var(--color-h1);
