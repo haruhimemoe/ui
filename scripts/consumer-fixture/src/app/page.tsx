@@ -1,4 +1,6 @@
 import {
+  BrandPage,
+  BrandSwatch,
   Button,
   ButtonLink,
   buttonClasses,
@@ -188,6 +190,20 @@ export default function Page() {
         <p>From ContentPage&apos;s Prose wrapper.</p>
       </ContentPage>
       <CopyMarkdownButton href="/docs/guide.md" label="Copy raw markdown" />
+      <BrandPage
+        name="pools"
+        mark="po"
+        tagline="From the packed tarball."
+        url="https://pools.haruhime.moe"
+        writing="Write pools in lowercase."
+        dos={["Link to the site"]}
+        donts={["Recolor the icon"]}
+        palette={{ h1: "#ff66ab", b6: "#1a1d22" }}
+        assets={[{ label: "Palette (JSON)", href: "/brand/pools-palette.json", dark: true }]}
+        contact="haruhime@haruhime.moe"
+        familyHref="https://haruhime.moe/brand"
+      />
+      <BrandSwatch token="h2" hex="#66ccff" />
       <FilterPanel title="Server filters" resultCount="3 maps">
         <FilterRow label="Mode">
           <Chip pressed={false}>osu!taiko</Chip>

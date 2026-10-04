@@ -5,7 +5,7 @@
  *       their own "use client" directive, so this barrel is safe to import from Server Components.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 // Actions
@@ -39,6 +39,14 @@ export { type TabItem, Tabs, type TabsProps } from "./components/basics/Tabs.js"
 export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
 export { tabId, tabPanelId } from "./components/basics/tabIds.js";
 
+// Brand
+export {
+  BrandPage,
+  type BrandPageAsset,
+  type BrandPageFont,
+  type BrandPageProps,
+} from "./components/brand/BrandPage.js";
+export { BrandSwatch, type BrandSwatchProps } from "./components/brand/BrandSwatch.js";
 // Content
 export { ContentIndex, type ContentIndexProps } from "./components/content/ContentIndex.js";
 export { ContentLayout, type ContentLayoutProps } from "./components/content/ContentLayout.js";

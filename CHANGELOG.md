@@ -6,11 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-04
+
 ### Added
 
 - `ContentNav` and `ContentLayout`: a content section's side navigation and page grid, a port of bb's docs sidebar and layout. `ContentNav` (client) takes `groups` (`ContentNavGroup[]`, each an optional `heading` and `ContentNavItem[]`) and an index link, marks the current page `aria-current="page"`, shows `navTitle ?? title` (clamped to two lines, the full title on the link's `title` attribute) and an optional `badge`. `ContentLayout` (server) lays the nav in a 14rem column beside the page from `lg` up, taking `nav` as an already-rendered slot so it stays section-agnostic (docs today, a blog section later). New types: `ContentNavItem`, `ContentNavGroup`, `ContentSearchItem`.
 - `searchContent`, `ContentSearch` and `ContentIndex`: a content section's search, a port of bb's docs search. `searchContent(items, query)` is pure: a blank query returns everything, otherwise every typed word must appear in an item's `title`, `navTitle`, `description`, `badge` or `keywords`, title-prefix matches first. `ContentSearch` (client) is a `TextInput` plus a polite live-region count ("12 pages.", "1 match.", "3 matches.", the unfiltered noun set by `countNoun`, default `["page", "pages"]`) over `ContentIndex`. `ContentIndex` (server) is the bare card grid, for a section with too few entries to search (`/legal`, a handful of guides).
 - `ContentPage` and `CopyMarkdownButton`: a content section's page. `ContentPage` (server) is `PageHeader` (`title`, `description` as its `lead`), a meta row with `lastUpdated` (a `<time dateTime>`) and, when `markdownHref` is set, `CopyMarkdownButton`, plus `actions`; optional `jsonLd` (one `Record<string, unknown>`, passed to `JsonLd`); then the body in `Prose`. `CopyMarkdownButton` (client) fetches `href` and copies the response body to the clipboard, reporting the result like `CopyButton`; any failure (the fetch, the response, or the clipboard) shows the same message and it never throws. Finished class strings (no `cx`), so `ContentPage` ships no tailwind-merge for it.
+- `BrandPage` and `BrandSwatch`: a product's `/brand` page, `<BrandPage {...brandPageData("pools")} />` with `@haruhimemoe/brand`'s data (typed structurally; ui doesn't depend on brand). Sections: Name, Logo (each file previewed on a dark or light tile, with a `download` link), Colors (`BrandSwatch`, click to copy the hex), Type (`fonts`, default Nunito), Do's and don'ts, osu!, Family (only with `familyHref`), Contact (`mailto:`), plus `slots.afterLogo`, `slots.afterColors` and `slots.end`. `BrandSwatch` (client) has finished class strings, so `BrandPage` ships no tailwind-merge. New types: `BrandPageProps`, `BrandPageAsset`, `BrandPageFont`, `BrandSwatchProps`.
 
 ## [0.10.0] - 2026-10-04
 
@@ -150,7 +153,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.10.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/haruhimemoe/ui/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/haruhimemoe/ui/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/haruhimemoe/ui/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/haruhimemoe/ui/compare/v0.7.0...v0.8.0

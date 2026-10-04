@@ -2,11 +2,11 @@
 
 # @haruhimemoe/ui
 
-React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, links, badges, form fields and confirms, filter controls (toggle and choice chips, a two-thumb range slider, a filter panel), tables, osu! beatmap display pieces and player cards, a command palette (mod+k, with the defaults every tool shares) and the site header, footer, tabs, account menu and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
+React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, links, badges, form fields and confirms, filter controls (toggle and choice chips, a two-thumb range slider, a filter panel), tables, osu! beatmap display pieces and player cards, a command palette (mod+k, with the defaults every tool shares), content section tooling (nav, search, index and page), brand pages and the site header, footer, tabs, account menu and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
 
 See every component in its states at [haruhime.moe/ui](https://www.haruhime.moe/ui). The page names the version it runs.
 
-This README describes version 0.9.0. Anything marked "since 0.9.0" is not in 0.8.0, anything marked "since 0.8.0" is not in 0.7.0, anything marked "since 0.7.0" is not in 0.6.0, anything marked "since 0.6.0" is not in 0.5.0, anything marked "since 0.5.0" is not in 0.4.0, anything marked "since 0.4.0" is not in 0.3.0, anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
+This README describes version 0.11.0. Anything marked "since 0.11.0" is not in 0.10.0, anything marked "since 0.10.0" is not in 0.9.0, anything marked "since 0.9.0" is not in 0.8.0, anything marked "since 0.8.0" is not in 0.7.0, anything marked "since 0.7.0" is not in 0.6.0, anything marked "since 0.6.0" is not in 0.5.0, anything marked "since 0.5.0" is not in 0.4.0, anything marked "since 0.4.0" is not in 0.3.0, anything marked "since 0.3.0" is not in 0.2.0, and anything marked "since 0.2.0" is not in 0.1.0. [CHANGELOG.md](./CHANGELOG.md) lists what changed in each version.
 
 ## Requirements
 
@@ -155,7 +155,7 @@ Import every component from `@haruhimemoe/ui`, in Server and Client Components a
 
 - **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
-- **`ContentNav`** (since 0.11.0) reads the path to mark the current page, like `NavLinks`, but it always hydrates: its class strings are finished (no `cx`), so it ships no tailwind-merge to the browser. `CopyMarkdownButton` (since 0.11.0) is the same: finished classes, no tailwind-merge, even though `ContentPage` (a Server Component) renders it. `ContentLayout` and `ContentPage` are Server Components.
+- **`ContentNav`** (since 0.11.0) reads the path to mark the current page, like `NavLinks`, but it always hydrates: its class strings are finished (no `cx`), so it ships no tailwind-merge to the browser. `CopyMarkdownButton` (since 0.11.0) is the same: finished classes, no tailwind-merge, even though `ContentPage` (a Server Component) renders it. `ContentLayout` and `ContentPage` are Server Components. `BrandSwatch` (since 0.11.0) is the same again: `BrandPage` is a Server Component and only its swatches hydrate, with no tailwind-merge.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
 A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere. Its button mode (`onPageChange`) is a callback, so render that from a `"use client"` file.
@@ -799,6 +799,47 @@ Since 0.11.0. A button that fetches `href` and copies the response body to the c
 | `label` | `ReactNode` | `"Copy as Markdown"` | The button's text. |
 | `copiedLabel` | `ReactNode` | `"Copied"` | Shown after a copy works. |
 | `failedLabel` | `ReactNode` | `"Couldn't copy"` | Shown when the fetch, the response, or the clipboard fails. |
+
+### Brand
+
+#### `BrandPage`
+
+Since 0.11.0. A product's `/brand` page body. Pass it `@haruhimemoe/brand`'s data as is:
+
+```tsx
+import { brandPageData } from "@haruhimemoe/brand/products";
+import { BrandPage } from "@haruhimemoe/ui";
+
+<BrandPage {...brandPageData("pools")} />;
+```
+
+The props are typed structurally, so ui doesn't depend on brand. Sections, in order, each a `Card` with an `<h2>`: Name (name, tagline, how to write it, the site), Logo (each file previewed on a dark `b6` or light tile by `dark`, with a `download` link; non-image files get the link only), `slots.afterLogo`, Colors (a `BrandSwatch` per palette token), `slots.afterColors`, Type, Do's and don'ts, osu! ("Not affiliated with osu! or ppy. osu! is a trademark of ppy Pty Ltd."), Family ("Part of the haruhime.moe family.", linking `familyHref`; hidden when it's null, as on haruhime.moe itself), Contact (a `mailto:` link), `slots.end`. The headings and the osu! and family lines are the same on every haruhime brand page. A Server Component.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `name` | `string` | required | The name as the wordmark reads it. |
+| `mark` | `string` | required | The icon's letters (part of the data shape; not shown). |
+| `tagline` | `string` | required | The product's one-line description. |
+| `url` | `string` | required | The product's site, linked under Name. |
+| `writing` | `string` | required | How to write the name in running text. |
+| `dos`, `donts` | `readonly string[]` | required | The two lists. |
+| `palette` | `Record<string, string>` | required | Token to `"#rrggbb"`, one swatch each. |
+| `assets` | `readonly BrandPageAsset[]` | required | `{ label, href, dark }`: `dark: false` is an on-light variant, shown on a light tile. |
+| `contact` | `string` | required | The contact address. |
+| `familyHref` | `string \| null` | required | The family brand page, or null to hide the Family section. |
+| `fonts` | `readonly BrandPageFont[]` | Nunito, "Wordmarks and headings" | `{ name, usage }` under Type. |
+| `slots` | `{ afterLogo?, afterColors?, end?: ReactNode }` | none | Extra sections, for haruhime.moe's own page. |
+
+#### `BrandSwatch` (client)
+
+Since 0.11.0. One palette token: a button showing the color, the token and its hex. Clicking copies the hex and reports the result in an `<output>` beside it, like `CopyButton`. The color is set inline from the data (`style={{ backgroundColor }}`), so it doesn't follow `--hue`. Finished class strings, no tailwind-merge.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `token` | `string` | required | The token's name. |
+| `hex` | `string` | required | The color, shown and copied. |
+| `copiedLabel` | `ReactNode` | `"Copied"` | Shown after a copy works. |
+| `failedLabel` | `ReactNode` | `"Couldn't copy"` | Shown when the clipboard refuses. |
 
 ### Shell
 

@@ -24,7 +24,7 @@
  *       the pins and the temp dir, then runs the build and the assertions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -342,6 +342,8 @@ try {
       [/<caption id="[^"]+" class="sr-only">Slots<\/caption>/, "Table with a hidden caption"],
       [/<th[^>]*scope="row"[^>]*>NM1<\/th>/, "Th as a row header"],
       [/>Delete pack<\/button>/, "InlineConfirm (client)"],
+      [/<a[^>]*href="mailto:haruhime@haruhime\.moe"/, "BrandPage"],
+      [/<span class="font-mono text-c3 text-sm">#ff66ab<\/span>/, "BrandSwatch (client)"],
       [/>Refresh pages<\/button>/, "AsyncButton (client)"],
       [/<button[^>]*aria-expanded="false"[^>]*>Download options/, "Disclosure (client)"],
       [/aria-live="polite"[^>]*>Page 2<\/span>/, "Pagination buttons (client)"],
