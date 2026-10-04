@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- `Prose` styles only a direct-child `pre` (`[&>pre]` instead of `[&_pre]`), so `CodeBlock` nested deeper (as `mdxComponents`' `pre` override renders it) keeps its own look. `Prose` also styles `blockquote`.
+- `Prose` styles a `pre` at any depth, excluding `CodeBlock`'s own (`role="group"`), so a plain `pre` nested inside `li` or `blockquote` keeps its fence look while `CodeBlock` (as `mdxComponents`' `pre` override renders it) keeps its own. `Prose` also styles `blockquote`.
 - `CodeBlock` accepts every native `<div>` prop (`id`, `data-*`, `aria-*`, …) except `code`, `lang`, `title` and `highlight`, spread onto its wrapper.
 
 ## [0.8.0] - 2026-10-03

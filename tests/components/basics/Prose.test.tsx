@@ -36,7 +36,7 @@ describe("Prose", () => {
       "leading-relaxed",
       "[&_a]:text-h1",
       "[&_h2]:text-2xl",
-      "[&>pre]:bg-b6",
+      "[&_pre:not([role=group])]:bg-b6",
       "[&_th]:text-left",
     );
     expect(screen.getByText("Hello").parentElement).toBe(prose);
@@ -87,18 +87,35 @@ describe("Prose", () => {
     expect(ref.current?.className.endsWith(" mx-auto")).toBe(true);
   });
 
-  it("styles a direct-child pre, not a nested one, and leaves pre code alone", () => {
+  it("styles a nested pre (e.g. inside li or blockquote), leaving pre code alone", () => {
     render(
       <Prose data-testid="prose">
-        <pre>
+        <blockquote>
+          <pre>
+            <code>x</code>
+          </pre>
+        </blockquote>
+      </Prose>,
+    );
+    const prose = screen.getByTestId("prose");
+    expect(prose.className).toContain("[&_pre:not([role=group])]:bg-b6");
+    expect(prose.className).toContain("[&_pre_code]:bg-transparent");
+  });
+
+  it("leaves a CodeBlock-rendered pre (role=group) untouched", () => {
+    render(
+      <Prose data-testid="prose">
+        {/* biome-ignore lint/a11y/useSemanticElements: mirrors CodeBlock's own pre exactly */}
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: mirrors CodeBlock's own pre */}
+        <pre role="group" tabIndex={0} data-testid="code-pre">
           <code>x</code>
         </pre>
       </Prose>,
     );
     const prose = screen.getByTestId("prose");
-    expect(prose.className).toContain("[&>pre]:bg-b6");
-    expect(prose.className).not.toContain("[&_pre]:bg-b6");
-    expect(prose.className).toContain("[&_pre_code]:bg-transparent");
+    expect(prose.className).toContain("[&_pre:not([role=group])]:bg-b6");
+    // The selector excludes role=group, so this pre never matches the Prose fence rule.
+    expect(screen.getByTestId("code-pre")).toBeInTheDocument();
   });
 
   it("styles blockquotes", () => {
