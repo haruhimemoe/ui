@@ -141,6 +141,16 @@ describe("shipped source", () => {
     expect(loadsOf("src/components/actions/PaginationStatus.tsx")).not.toContain("tailwind-merge");
   });
 
+  // Shiki is optional: a static import would break the build of an app that doesn't install it.
+  it("loads shiki only through dynamic import()", () => {
+    const staticImports = sources.flatMap(({ name, text }) =>
+      [...text.matchAll(/^(?:import|export)\s(?!type\s)[\s\S]*?from "(shiki[^"]*)";/gm)].map(
+        (match) => `${name}: ${match[1]}`,
+      ),
+    );
+    expect(staticImports).toEqual([]);
+  });
+
   it('keeps "use client" on the components that define their own event handlers', () => {
     for (const name of [
       "filters/Chip",
@@ -167,6 +177,21 @@ describe("package manifest and build", () => {
   it("emits no declaration maps, since src is not published", () => {
     expect(pkg.files).not.toContain("src");
     expect(build.compilerOptions.declarationMap).not.toBe(true);
+  });
+
+  it("exports the MDX components and the remark plugin as subpaths", () => {
+    expect(pkg.exports["./mdx"]).toEqual({ types: "./dist/mdx.d.ts", default: "./dist/mdx.js" });
+    expect(pkg.exports["./remark"]).toEqual({
+      types: "./dist/remark/index.d.ts",
+      default: "./dist/remark/index.js",
+    });
+  });
+
+  it("keeps Shiki an optional peer, so apps without code blocks don't install it", () => {
+    expect(pkg.dependencies).toEqual({ "tailwind-merge": "3.7.0" });
+    expect(pkg.peerDependencies.shiki).toBe(">=4.5.0 <5");
+    expect(pkg.peerDependenciesMeta?.shiki?.optional).toBe(true);
+    expect(pkg.devDependencies.shiki).toBe("4.5.0");
   });
 });
 
