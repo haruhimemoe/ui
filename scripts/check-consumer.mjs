@@ -1,24 +1,27 @@
 /**
  * @file scripts/check-consumer.mjs
- * @desc Builds and packs the package, installs the tarball into a throwaway Next.js 16 + Tailwind
- *       4 app (app router, Nunito from next/font, the two CSS imports) at this repo's pinned
- *       versions, renders one static page with every exported component, and runs `next build`.
- *       It then checks that the build passed, that the emitted CSS holds classes only the library
- *       uses (so the theme's @source line works), and that the page prerendered with client
- *       components inside, including a data-only FilterPanel straight from the Server Component
- *       page, and a NavLinks with no internal link that renders on the server alone. Header-only
- *       pages check what the README says about the nav: the client list loads no tailwind-merge;
- *       with only external and text-only links nothing hydrates beyond a bare page's Next
- *       modules; a relative href skips the client list but hydrates next/link; and NavLinks in
- *       an app's own Client Component brings tailwind-merge. Before the build, plain Node
- *       imports the installed package, the way Vitest in a consuming app does. After the build
- *       it serves the app and runs axe-core in headless Chromium over / at a desktop and a
- *       phone width with color contrast on (the jsdom tests can't check contrast), WCAG 2.2 AA
- *       plus best practices. Usage:
- *       `node scripts/check-consumer.mjs [--keep]` (--keep leaves the app in the temp dir). Needs
- *       the npm registry and Google Fonts. The app's source lives in scripts/consumer-fixture/
- *       as real files; this script writes only the config that depends on the pins and the temp
- *       dir, then runs the build and the assertions.
+ * @desc Builds and packs the package, installs the tarball into a throwaway Next.js 16 + Tailwind 4
+ *       app (app router, Nunito from next/font, the two CSS imports) at this repo's pinned
+ *       versions, renders one static page with every exported component, and runs `next build`. It
+ *       then checks that the build passed, that the emitted CSS holds classes only the library uses
+ *       (so the theme's @source line works), and that the page prerendered with client components
+ *       inside, including a data-only FilterPanel straight from the Server Component page, and a
+ *       NavLinks with no internal link that renders on the server alone. Header-only pages check
+ *       what the README says about the nav: the client list loads no tailwind-merge; with only
+ *       external and text-only links nothing hydrates beyond a bare page's Next modules; a relative
+ *       href skips the client list but hydrates next/link; and NavLinks in an app's own Client
+ *       Component brings tailwind-merge. An MDX page (@next/mdx, remark-gfm and the package's
+ *       remark plugin) checks callouts, Shiki highlighting, heading ids and the table's scroll
+ *       region. Before the build, plain Node imports the installed package and its ./mdx, ./remark
+ *       and ./shiki entry points, the way Vitest in a consuming app does. After the build it serves
+ *       the app and runs axe-core in headless Chromium over / and /mdx at a desktop and a phone
+ *       width with color contrast on (the jsdom tests can't check contrast), WCAG 2.2 AA plus best
+ *       practices. Last, it removes shiki (an optional peer) and the fixture's `import
+ *       "@haruhimemoe/ui/shiki"` lines and builds again: /mdx must still prerender, with plain
+ *       code. Usage: `node scripts/check-consumer.mjs [--keep]` (--keep leaves the app in the temp
+ *       dir). Needs the npm registry and Google Fonts. The app's source lives in
+ *       scripts/consumer-fixture/ as real files; this script writes only the config that depends on
+ *       the pins and the temp dir, then runs the build and the assertions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Sat Oct 3, 2026
@@ -114,8 +117,11 @@ const waitForServer = async (url, timeoutMs) => {
   throw new Error(`${url} did not answer within ${timeoutMs}ms`);
 };
 
+/** The routes the browser axe pass checks. */
+const AXE_ROUTES = ["/", "/mdx"];
+
 /**
- * Serves the built app and runs axe over / at each width. Returns one failure line per
+ * Serves the built app and runs axe over each route at each width. Returns one failure line per
  * violation (with up to five targets), or none.
  */
 const axePass = async () => {
@@ -134,25 +140,27 @@ const axePass = async () => {
   try {
     await waitForServer(origin, 30000);
     const browser = await chromium.launch();
-    for (const [name, viewport] of Object.entries(AXE_VIEWPORTS)) {
-      const context = await browser.newContext({ viewport, colorScheme: "dark" });
-      const page = await context.newPage();
-      // "load", not "networkidle": the page keeps a connection open, so idle never comes.
-      const response = await page.goto(`${origin}/`, { waitUntil: "load" });
-      await page.waitForTimeout(500);
-      if (response?.status() !== 200)
-        throw new Error(`/ answered ${response?.status() ?? "nothing"}`);
-      const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
-      for (const violation of results.violations) {
-        const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
-        lines.push(
-          [
-            `axe ${name} /: ${violation.id} (${violation.impact}) ${violation.help}`,
-            ...targets,
-          ].join("\n"),
-        );
+    for (const route of AXE_ROUTES) {
+      for (const [name, viewport] of Object.entries(AXE_VIEWPORTS)) {
+        const context = await browser.newContext({ viewport, colorScheme: "dark" });
+        const page = await context.newPage();
+        // "load", not "networkidle": the page keeps a connection open, so idle never comes.
+        const response = await page.goto(`${origin}${route}`, { waitUntil: "load" });
+        await page.waitForTimeout(500);
+        if (response?.status() !== 200)
+          throw new Error(`${route} answered ${response?.status() ?? "nothing"}`);
+        const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+        for (const violation of results.violations) {
+          const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
+          lines.push(
+            [
+              `axe ${name} ${route}: ${violation.id} (${violation.impact}) ${violation.help}`,
+              ...targets,
+            ].join("\n"),
+          );
+        }
+        await context.close();
       }
-      await context.close();
     }
     await browser.close();
   } finally {
@@ -164,6 +172,8 @@ const axePass = async () => {
 // The fixture app's pages, layout and stylesheet: real files that Biome lints and
 // `bun run typecheck` checks (scripts/consumer-fixture/tsconfig.json maps the package to src/).
 const FIXTURE = path.join(root, "scripts", "consumer-fixture", "src");
+/** The fixture files that register Shiki: the no-Shiki build strips the import from these. */
+const SHIKI_IMPORTERS = ["src/mdx-components.tsx", "src/app/MdxExports.tsx"];
 
 try {
   console.log("consumer: building and packing");
@@ -182,12 +192,18 @@ try {
           next: pin("next"),
           react: pin("react"),
           "react-dom": pin("react-dom"),
+          shiki: pin("shiki"),
         },
         devDependencies: {
+          "@mdx-js/loader": pin("@mdx-js/loader"),
+          "@mdx-js/react": pin("@mdx-js/react"),
+          "@next/mdx": pin("@next/mdx"),
           "@tailwindcss/postcss": pin("@tailwindcss/postcss"),
           "@types/node": pin("@types/node"),
           "@types/react": pin("@types/react"),
+          "@types/mdx": pin("@types/mdx"),
           "@types/react-dom": pin("@types/react-dom"),
+          "remark-gfm": pin("remark-gfm"),
           tailwindcss: pin("tailwindcss"),
           typescript: pin("typescript"),
         },
@@ -224,7 +240,23 @@ try {
       2,
     )}\n`,
   );
-  write("next.config.mjs", `export default { turbopack: { root: ${JSON.stringify(dir)} } };\n`);
+  // @next/mdx has no GFM: without remark-gfm the fixture's pipe table stays a paragraph.
+  // Turbopack takes MDX plugins only as module names, so the library's is a default export.
+  write(
+    "next.config.mjs",
+    [
+      'import createMDX from "@next/mdx";',
+      "const withMDX = createMDX({",
+      "  extension: /\\.mdx?$/,",
+      '  options: { remarkPlugins: ["remark-gfm", "@haruhimemoe/ui/remark"] },',
+      "});",
+      "export default withMDX({",
+      '  pageExtensions: ["ts", "tsx", "md", "mdx"],',
+      `  turbopack: { root: ${JSON.stringify(dir)} },`,
+      "});",
+      "",
+    ].join("\n"),
+  );
   write("postcss.config.mjs", `export default { plugins: { "@tailwindcss/postcss": {} } };\n`);
   cpSync(FIXTURE, path.join(dir, "src"), { recursive: true });
 
@@ -233,19 +265,33 @@ try {
 
   // Node's ESM resolver, as Vitest uses for node_modules: every import in dist must resolve.
   console.log("consumer: importing the package in plain Node");
-  const exported = JSON.parse(
+  const imported = JSON.parse(
     run("node", [
       "--input-type=module",
       "-e",
-      'const ui = await import("@haruhimemoe/ui"); console.log(JSON.stringify(Object.keys(ui)));',
+      [
+        'const ui = await import("@haruhimemoe/ui");',
+        'const mdx = await import("@haruhimemoe/ui/mdx");',
+        'const remark = await import("@haruhimemoe/ui/remark");',
+        'await import("@haruhimemoe/ui/shiki");',
+        "console.log(JSON.stringify({ ui: Object.keys(ui), mdx: Object.keys(mdx),",
+        "  remark: typeof remark.default }));",
+      ].join(" "),
     ]),
   );
-  if (!(exported.length > 20)) throw new Error(`Node imported only ${exported.length} exports`);
+  const exported = [...imported.ui, ...imported.mdx];
+  if (!(imported.ui.length > 20))
+    throw new Error(`Node imported only ${imported.ui.length} exports`);
+  if (imported.mdx.length < 5) throw new Error(`Node imported only ${imported.mdx} from ./mdx`);
+  if (imported.remark !== "function") {
+    throw new Error(`./remark's default export is a ${imported.remark}, not a plugin function`);
+  }
   // Every runtime export has to appear in the fixture, so a new component gets built here too.
   const fixtureText = readdirSync(FIXTURE, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".tsx"))
     .map((entry) => readFileSync(path.join(entry.parentPath, entry.name), "utf8"))
     .join("\n");
+  // Both entry points count: src/index.ts's and src/mdx.ts's runtime exports.
   const unused = exported.filter((name) => !new RegExp(`\\b${name}\\b`).test(fixtureText));
   if (unused.length > 0) {
     throw new Error(`scripts/consumer-fixture renders no ${unused.join(", ")}: add them`);
@@ -397,14 +443,74 @@ try {
     }
   }
 
+  // The MDX page: @next/mdx with remark-gfm and the library's remark plugin, built by Turbopack.
+  const mdx = readRoute("mdx");
+  if (!mdx) {
+    failures.push("/mdx did not prerender (.next/server/app/mdx.html is missing)");
+  } else {
+    const html = mdx.html;
+    const notes = html.match(/role="note"/g)?.length ?? 0;
+    if (notes !== 3) {
+      failures.push(`/mdx has ${notes} role="note", not 3 (two > [!…] callouts and a <Callout>)`);
+    }
+    const marked = html.match(/data-highlighted=""/g)?.length ?? 0;
+    if (marked !== 1) failures.push(`/mdx has ${marked} data-highlighted lines, not 1 ({2})`);
+    if (!html.includes("var(--shiki-token-")) {
+      failures.push("/mdx has no var(--shiki-token-: Shiki didn't highlight the ts fence");
+    }
+    if (!html.includes('aria-label="Code: pool.ts"')) {
+      failures.push('/mdx is missing aria-label="Code: pool.ts" (the fence title)');
+    }
+    for (const id of ["usage", "usage-1"]) {
+      if (!html.includes(`id="${id}"`)) failures.push(`/mdx is missing id="${id}" (heading ids)`);
+    }
+    const brainfuck = /aria-label="Code: brainfuck"[^>]*>([\s\S]*?)<\/pre>/.exec(html);
+    if (!brainfuck) {
+      failures.push('/mdx is missing aria-label="Code: brainfuck" (an unknown language)');
+    } else if (brainfuck[1]?.includes("--shiki-token")) {
+      failures.push("/mdx colors the brainfuck block, which Shiki doesn't load");
+    }
+    if (!/<div(?=[^>]*role="group")(?=[^>]*aria-label="Table")[^>]*>\s*<table/.test(html)) {
+      failures.push('/mdx is missing the table\'s role="group" aria-label="Table" scroll region');
+    }
+  }
+
   console.log("consumer: axe in Chromium, contrast on");
   failures.push(...(await axePass()));
+
+  // An app without Shiki (an optional peer) must still build, with plain code blocks.
+  if (failures.length === 0) {
+    console.log("consumer: next build without shiki");
+    run("bun", ["remove", "shiki"]);
+    // An app without Shiki doesn't register it either: drop the side-effect import.
+    for (const file of SHIKI_IMPORTERS) {
+      const text = readFileSync(path.join(dir, file), "utf8");
+      const stripped = text.replace(/^import "@haruhimemoe\/ui\/shiki";\n/m, "");
+      if (stripped === text) throw new Error(`${file} has no @haruhimemoe/ui/shiki import`);
+      writeFileSync(path.join(dir, file), stripped);
+    }
+    if (existsSync(path.join(dir, "node_modules", "shiki"))) {
+      throw new Error("node_modules/shiki is still there after bun remove shiki");
+    }
+    const plainBuild = run(path.join(dir, "node_modules", ".bin", "next"), ["build"]);
+    const plain = readRoute("mdx");
+    if (!plain) {
+      failures.push(`/mdx did not prerender without shiki\n${plainBuild}`);
+    } else {
+      if (!plain.html.includes('aria-label="Code: pool.ts"')) {
+        failures.push('/mdx without shiki is missing aria-label="Code: pool.ts"');
+      }
+      if (plain.html.includes("var(--shiki-token-")) {
+        failures.push("/mdx without shiki still has var(--shiki-token-: shiki wasn't removed");
+      }
+    }
+  }
 
   if (failures.length > 0) {
     throw new Error(`${failures.join("\n")}\n\nnext build output:\n${build}`);
   }
   console.log(
-    "consumer: ok (next build passed, library CSS generated, pages prerendered, nav as documented, axe clean)",
+    "consumer: ok (next build passed, library CSS generated, pages prerendered, nav as documented, MDX page built, axe clean, built without shiki)",
   );
 } catch (error) {
   console.error(`consumer: FAILED\n${error.stdout ?? ""}${error.stderr ?? error.message}`);

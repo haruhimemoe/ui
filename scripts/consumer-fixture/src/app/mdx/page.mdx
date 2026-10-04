@@ -1,0 +1,36 @@
+{/**
+ * @file scripts/consumer-fixture/src/app/mdx/page.mdx
+ * @desc Every MDX feature the library handles: a titled code fence with a highlighted line, an
+ *       unknown language, duplicate headings, GitHub-style callouts, a Callout and a wide table.
+ * @author David @dvhsh (https://dvh.sh)
+ * @created Sat Oct 3, 2026
+ * @modified Sat Oct 3, 2026
+ */}
+
+import { Callout } from "@haruhimemoe/ui/mdx";
+
+## Usage
+
+```ts title="pool.ts" {2}
+const pool = await getPool(1);
+const maps = pool.maps.filter((map) => map.mods.includes("HD"));
+console.log(maps.length);
+```
+
+```brainfuck
+++[>+<-]
+```
+
+## Usage
+
+> [!NOTE]
+> Built pools stay private until you share them.
+
+> [!WARNING]
+> Deleting a pool can't be undone.
+
+<Callout type="tip">Tips render too.</Callout>
+
+| Mod | Multiplier | Notes on a long column that makes the table wide enough to scroll on a phone |
+| --- | --- | --- |
+| HD | 1.06 | Hidden_mod_long_unbroken_token_that_forces_horizontal_scroll_on_a_phone_width |

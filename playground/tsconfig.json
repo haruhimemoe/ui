@@ -5,7 +5,12 @@
     "allowJs": true,
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "paths": { "@haruhimemoe/ui": ["../src/index.ts"], "@/*": ["./*"] }
+    "paths": {
+      "@haruhimemoe/ui": ["../src/index.ts"],
+      "@haruhimemoe/ui/mdx": ["../src/mdx.ts"],
+      "@haruhimemoe/ui/shiki": ["../src/shiki.ts"],
+      "@/*": ["./*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules", ".next"]

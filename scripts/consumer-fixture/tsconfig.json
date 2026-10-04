@@ -1,7 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "paths": { "@haruhimemoe/ui": ["../../src/index.ts"] }
+    "paths": {
+      "@haruhimemoe/ui": ["../../src/index.ts"],
+      "@haruhimemoe/ui/mdx": ["../../src/mdx.ts"],
+      "@haruhimemoe/ui/remark": ["../../src/remark/index.ts"],
+      "@haruhimemoe/ui/shiki": ["../../src/shiki.ts"]
+    }
   },
   "include": ["src", "env.d.ts"]
 }

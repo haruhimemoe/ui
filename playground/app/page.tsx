@@ -20,6 +20,7 @@ export default function Page() {
           links={[
             { label: "Home", href: "/" },
             { label: "Second", href: "/second" },
+            { label: "MDX", href: "/mdx" },
           ]}
           actions={<CommandPaletteButton>Search</CommandPaletteButton>}
         />

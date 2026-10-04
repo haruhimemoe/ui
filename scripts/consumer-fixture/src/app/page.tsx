@@ -33,6 +33,7 @@ import { Additions } from "./Additions";
 import { ClientAdditions } from "./ClientAdditions";
 import { ClientAdditions05 } from "./ClientAdditions05";
 import { Filters } from "./Filters";
+import { MdxExports } from "./MdxExports";
 import { Palette08 } from "./Palette08";
 
 const LINKS: SiteLinkItem[] = [
@@ -135,6 +136,7 @@ export default function Page() {
       <ClientAdditions />
       <ClientAdditions05 />
       <Filters />
+      <MdxExports />
       <FilterPanel title="Server filters" resultCount="3 maps">
         <FilterRow label="Mode">
           <Chip pressed={false}>osu!taiko</Chip>

@@ -1,12 +1,13 @@
 /**
  * @file scripts/axe-playground.mjs
- * @desc Builds the playground (the Next app in playground/ that imports src/ directly), serves
- *       it, and runs axe-core in headless Chromium over the command palette's states on / at a
- *       desktop and a phone width, color contrast on: closed, open, a nested page, an argument
- *       prompt and no results. The jsdom tests can't see contrast or scrollable regions, and the
- *       consumer check only sees the closed page. Prints one line per violation (with up to five
- *       targets) and exits 1 on any. Usage: `bun run play:axe` (CI runs it after the consumer
- *       check; Chromium is installed for that).
+ * @desc Builds the playground (the Next app in playground/ that imports src/ directly), serves it,
+ *       and runs axe-core in headless Chromium over the command palette's states on / at a desktop
+ *       and a phone width, color contrast on: closed, open, a nested page, an argument prompt and
+ *       no results. Then it runs the same pass over /mdx (the MDX components: callouts, Shiki code
+ *       blocks, a wide table) at both widths. The jsdom tests can't see contrast or scrollable
+ *       regions, and the consumer check only sees closed pages. Prints one line per violation (with
+ *       up to five targets) and exits 1 on any. Usage: `bun run play:axe` (CI runs it after the
+ *       consumer check; Chromium is installed for that).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Sat Oct 3, 2026
@@ -120,6 +121,27 @@ try {
         `${viewportName} ${state.name}: ${results.violations.length ? `${results.violations.length} violations` : "ok"}`,
       );
     }
+    // The MDX components: callouts, highlighted code and a wide table in its scroll region.
+    const mdx = await page.goto(`${origin}/mdx`, { waitUntil: "load" });
+    if (mdx?.status() !== 200) throw new Error(`/mdx answered ${mdx?.status() ?? "nothing"}`);
+    await page.waitForTimeout(500);
+    if ((await page.locator("[role=note]").count()) === 0) {
+      throw new Error(`${viewportName} /mdx: no [role=note], the callouts didn't render`);
+    }
+    if (shots) await page.screenshot({ path: path.join(shots, `${viewportName}-mdx.png`) });
+    const mdxResults = await new AxeBuilder({ page }).withTags(TAGS).analyze();
+    for (const violation of mdxResults.violations) {
+      const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
+      failures.push(
+        [
+          `${viewportName} /mdx: ${violation.id} (${violation.impact}) ${violation.help}`,
+          ...targets,
+        ].join("\n"),
+      );
+    }
+    console.log(
+      `${viewportName} /mdx: ${mdxResults.violations.length ? `${mdxResults.violations.length} violations` : "ok"}`,
+    );
     await context.close();
   }
   await browser.close();
