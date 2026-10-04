@@ -43,7 +43,12 @@ export { tabId, tabPanelId } from "./components/basics/tabIds.js";
 export { ContentIndex, type ContentIndexProps } from "./components/content/ContentIndex.js";
 export { ContentLayout, type ContentLayoutProps } from "./components/content/ContentLayout.js";
 export { ContentNav, type ContentNavProps } from "./components/content/ContentNav.js";
+export { ContentPage, type ContentPageProps } from "./components/content/ContentPage.js";
 export { ContentSearch, type ContentSearchProps } from "./components/content/ContentSearch.js";
+export {
+  CopyMarkdownButton,
+  type CopyMarkdownButtonProps,
+} from "./components/content/CopyMarkdownButton.js";
 export { searchContent } from "./components/content/searchContent.js";
 export type {
   ContentNavGroup,

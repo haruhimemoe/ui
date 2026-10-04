@@ -155,7 +155,7 @@ Import every component from `@haruhimemoe/ui`, in Server and Client Components a
 
 - **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
-- **`ContentNav`** (since 0.11.0) reads the path to mark the current page, like `NavLinks`, but it always hydrates: its class strings are finished (no `cx`), so it ships no tailwind-merge to the browser. `ContentLayout` is a Server Component.
+- **`ContentNav`** (since 0.11.0) reads the path to mark the current page, like `NavLinks`, but it always hydrates: its class strings are finished (no `cx`), so it ships no tailwind-merge to the browser. `CopyMarkdownButton` (since 0.11.0) is the same: finished classes, no tailwind-merge, even though `ContentPage` (a Server Component) renders it. `ContentLayout` and `ContentPage` are Server Components.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
 A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere. Its button mode (`onPageChange`) is a callback, so render that from a `"use client"` file.
@@ -773,6 +773,32 @@ The same card grid as `ContentSearch` (one link per item: title, badge, descript
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `items` | `readonly ContentSearchItem[]` | required | The entries to list. |
+
+#### `ContentPage`
+
+Since 0.11.0. A content section's page: `PageHeader` (the title and the description as its lead), a meta row with when the page was last updated and a "Copy as Markdown" button, then the body in `Prose`. Optional JSON-LD. A Server Component.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `title` | `ReactNode` | required | The page's `<h1>`, passed to `PageHeader`. |
+| `description` | `ReactNode` | none | Passed to `PageHeader` as `lead`. |
+| `lastUpdated` | `string` | none | A `<time dateTime>`-ready string (an ISO date, say), shown next to `lastUpdatedLabel`. |
+| `lastUpdatedLabel` | `ReactNode` | `"Last updated"` | The label before the time. |
+| `markdownHref` | `string` | none | The page's raw Markdown source. When set, shows a `CopyMarkdownButton` for it. |
+| `jsonLd` | `Record<string, unknown>` | none | One schema.org object, passed to `JsonLd`. Use `ld.graph(...)` yourself for several nodes. |
+| `actions` | `ReactNode` | none | Extra buttons or links, shown alongside the time and the copy button. |
+| `children` | `ReactNode` | required | The page body, rendered inside `Prose`. |
+
+#### `CopyMarkdownButton` (client)
+
+Since 0.11.0. A button that fetches `href` and copies the response body to the clipboard, reporting the result in an `<output>` beside it, like `CopyButton`. Any failure (the fetch rejects, the response isn't ok, or the clipboard refuses) shows the same failure message; it never throws. Its own client file with finished class strings (no `cx`): `ContentPage` is a Server Component, and this keeps tailwind-merge out of the browser bundle it ships.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `href` | `string` | required | Fetched on click; the response's text is copied. |
+| `label` | `ReactNode` | `"Copy as Markdown"` | The button's text. |
+| `copiedLabel` | `ReactNode` | `"Copied"` | Shown after a copy works. |
+| `failedLabel` | `ReactNode` | `"Couldn't copy"` | Shown when the fetch, the response, or the clipboard fails. |
 
 ### Shell
 

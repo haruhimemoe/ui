@@ -95,6 +95,7 @@ describe("shipped source", () => {
       "src/components/basics/Tabs.tsx",
       "src/components/content/ContentNav.tsx",
       "src/components/content/ContentSearch.tsx",
+      "src/components/content/CopyMarkdownButton.tsx",
       "src/components/filters/FilterPanel.tsx",
       "src/components/filters/RangeBox.tsx",
       "src/components/filters/RangeSlider.tsx",
@@ -135,6 +136,7 @@ describe("shipped source", () => {
     expect(rendered).toEqual([
       "src/components/actions/PaginationButton.tsx",
       "src/components/actions/PaginationStatus.tsx",
+      "src/components/content/CopyMarkdownButton.tsx",
       "src/components/mdx/CodeCopyButton.tsx",
       "src/components/shell/NavListClient.tsx",
     ]);

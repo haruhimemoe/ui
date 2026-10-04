@@ -8,8 +8,10 @@ import {
   ContentIndex,
   ContentLayout,
   ContentNav,
+  ContentPage,
   ContentSearch,
   CopyButton,
+  CopyMarkdownButton,
   DiscordIcon,
   FilterPanel,
   FilterRow,
@@ -174,6 +176,18 @@ export default function Page() {
           "",
         )}
       />
+      <ContentPage
+        title="Content page"
+        description="Everything a doc page needs, from the packed tarball."
+        lastUpdated="2026-10-04"
+        markdownHref="/docs/guide.md"
+        jsonLd={{ "@type": "TechArticle", name: "Content page" }}
+        actions={<ButtonLink href="/docs">Edit on GitHub</ButtonLink>}
+      >
+        <h2>Body</h2>
+        <p>From ContentPage&apos;s Prose wrapper.</p>
+      </ContentPage>
+      <CopyMarkdownButton href="/docs/guide.md" label="Copy raw markdown" />
       <FilterPanel title="Server filters" resultCount="3 maps">
         <FilterRow label="Mode">
           <Chip pressed={false}>osu!taiko</Chip>
