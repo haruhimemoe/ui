@@ -36,7 +36,7 @@ describe("Prose", () => {
       "leading-relaxed",
       "[&_a]:text-h1",
       "[&_h2]:text-2xl",
-      "[&_pre]:bg-b6",
+      "[&>pre]:bg-b6",
       "[&_th]:text-left",
     );
     expect(screen.getByText("Hello").parentElement).toBe(prose);
@@ -85,6 +85,29 @@ describe("Prose", () => {
     expect(ref.current).toHaveAttribute("id", "content");
     expect(ref.current).toHaveAttribute("lang", "en");
     expect(ref.current?.className.endsWith(" mx-auto")).toBe(true);
+  });
+
+  it("styles a direct-child pre, not a nested one, and leaves pre code alone", () => {
+    render(
+      <Prose data-testid="prose">
+        <pre>
+          <code>x</code>
+        </pre>
+      </Prose>,
+    );
+    const prose = screen.getByTestId("prose");
+    expect(prose.className).toContain("[&>pre]:bg-b6");
+    expect(prose.className).not.toContain("[&_pre]:bg-b6");
+    expect(prose.className).toContain("[&_pre_code]:bg-transparent");
+  });
+
+  it("styles blockquotes", () => {
+    render(
+      <Prose data-testid="prose">
+        <blockquote>Text</blockquote>
+      </Prose>,
+    );
+    expect(screen.getByTestId("prose")).toHaveClass("[&_blockquote]:border-l-2");
   });
 
   it("has no axe violations around typical Markdown output", async () => {
