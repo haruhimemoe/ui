@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The `coarse:` variant (`@media (pointer: coarse)`), for a touchscreen as the main pointer.
 - `useMotionAllowed()` (client): true when the visitor allows motion, false on the server, during hydration and under reduced motion, live. Lifted from haruhime.moe's homepage banner.
 - `Text` and `textClasses`: a line of text in six tones (`default` c2, `muted` c3, `subtle` c4, `error`, `warning` amber-300, `success`) and three sizes, for the error, warning and muted text apps wrote by hand.
+- `download` on `ButtonLink` and `TextLink` renders a plain `<a download>` (no prefetch, no client routing), for any value but `false`.
 
 ### Changed
 
@@ -22,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Button no longer stretches** in a flex column or a grid cell: `buttonClasses()` adds `w-fit` (Button, ButtonLink, AsyncButton, CopyButton, Pagination). Pass `className="w-full"` where a full-width button is wanted. `self-start` on buttons is now a no-op.
 - Buttons at `md` are 44px tall on touch screens (`coarse:h-11`). Secondary and ghost buttons get a `c4` edge under more contrast; every button keeps a 1px border in forced colors, and a disabled one uses the system's GrayText there.
 - `CopyMarkdownButton` follows Button's classes again (a test now pins its copy).
+- `BrandPage`'s file links are `TextLink download`.
 
 ## [0.11.2] - 2026-10-04
 

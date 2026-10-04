@@ -195,6 +195,13 @@ A link that looks like `Button`. Every `next/link` prop (`href`, `prefetch`, `re
 - A string `href` with a scheme (`https:`, `mailto:`) or starting with `//` renders a plain `<a>`, and `next/link`'s own props are dropped. The href is read the way the browser reads it: leading spaces don't count and a backslash counts as a slash, so `/\host` and `\\host` are off-site too (since 0.4.0).
 - That plain `<a>` with `target="_blank"` and no `rel` gets `rel="noreferrer"`. A `rel` you pass always wins. Internal links get only the `rel` you pass.
 
+Since 0.12.0, `download` (any value but `false`) renders a plain `<a download>`: no prefetch of an API route or a large file, no client routing. An external href also renders a plain `<a>`, with `rel="noreferrer"` in a new tab.
+
+```tsx
+<ButtonLink href="/api/me/export" download variant="secondary">Download my data</ButtonLink>
+<ButtonLink href="https://osu.ppy.sh" target="_blank">osu!</ButtonLink>
+```
+
 #### `buttonClasses`
 
 `buttonClasses({ variant?, size?, className? }): string` returns the `Button` classes, for elements the components don't cover. Types: `ButtonVariant`, `ButtonSize`, `ButtonClassOptions`.
@@ -308,9 +315,11 @@ Since 0.4.0. A text link: `next/link` inside the app, a plain `<a>` off-site (wi
 <TextLink href={`/packs/${pack.id}`} variant="plain">{pack.name}</TextLink>
 ```
 
+`download` works the same way (since 0.12.0): `<TextLink href="/brand/haruhime-palette.json" download>Download palette (JSON)</TextLink>`.
+
 #### `linkClasses`
 
-Since 0.4.0. `linkClasses({ variant?, className? }): string` returns the `TextLink` classes, for an element that should look like one (a `<button>` that reads as a link, say). Type: `LinkClassOptions`.
+Since 0.4.0. `linkClasses({ variant?, className? }): string` returns the `TextLink` classes, for an element that should look like one (a `<button>` that reads as a link, say). Type: `LinkClassOptions`. Downloads use `TextLink download` since 0.12.0.
 
 #### `Badge`
 

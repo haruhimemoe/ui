@@ -13,6 +13,7 @@
 import type { ReactNode } from "react";
 import { Card } from "../basics/Card.js";
 import { linkClasses } from "../basics/linkStyles.js";
+import { TextLink } from "../basics/TextLink.js";
 import { BrandSwatch } from "./BrandSwatch.js";
 
 /** One downloadable brand file. */
@@ -102,9 +103,9 @@ export function BrandPage({
                   <img src={asset.href} alt="" className="max-h-full max-w-full" />
                 </div>
               ) : null}
-              <a className={LINK} href={asset.href} download>
+              <TextLink href={asset.href} download>
                 {asset.label}
-              </a>
+              </TextLink>
             </li>
           ))}
         </ul>
