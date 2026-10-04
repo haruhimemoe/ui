@@ -78,6 +78,39 @@ describe("MdxLink", () => {
     expect(link).toHaveAttribute("href", "mailto:a@b.c");
     expect(link).not.toHaveAttribute("target");
   });
+
+  it("forwards aria-* and data-* props through to next/link for an internal href", () => {
+    render(
+      <MdxLink node={{}} href="/docs" aria-describedby="x" data-foo="1">
+        Docs
+      </MdxLink>,
+    );
+    const link = screen.getByRole("link", { name: "Docs" });
+    expect(link).toHaveAttribute("aria-describedby", "x");
+    expect(link).toHaveAttribute("data-foo", "1");
+  });
+
+  it("forwards aria-* and data-* props through on an external https href", () => {
+    render(
+      <MdxLink node={{}} href="https://osu.ppy.sh" aria-describedby="x" data-foo="1">
+        osu!
+      </MdxLink>,
+    );
+    const link = screen.getByRole("link", { name: "osu!" });
+    expect(link).toHaveAttribute("aria-describedby", "x");
+    expect(link).toHaveAttribute("data-foo", "1");
+  });
+
+  it("forwards aria-* and data-* props through on a same-page hash href", () => {
+    render(
+      <MdxLink node={{}} href="#usage" aria-describedby="x" data-foo="1">
+        Usage
+      </MdxLink>,
+    );
+    const link = screen.getByRole("link", { name: "Usage" });
+    expect(link).toHaveAttribute("aria-describedby", "x");
+    expect(link).toHaveAttribute("data-foo", "1");
+  });
 });
 
 describe("MdxH2", () => {
