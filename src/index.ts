@@ -105,6 +105,11 @@ export {
   type BeatmapStatsProps,
 } from "./components/osu/BeatmapStats.js";
 export { ModBadge, type ModBadgeProps } from "./components/osu/ModBadge.js";
+export {
+  PlayerCard,
+  type PlayerCardProps,
+  type PlayerTeam,
+} from "./components/osu/PlayerCard.js";
 export { StarRating, type StarRatingProps } from "./components/osu/StarRating.js";
 
 // Palette

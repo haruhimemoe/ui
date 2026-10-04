@@ -1,7 +1,7 @@
 {
   "name": "@haruhimemoe/ui",
   "version": "0.9.0",
-  "description": "React components for the haruhime.moe osu! tools on Next.js: the osu!-web-style palette as a Tailwind theme, buttons, cards, form fields and confirms, filter controls, tables, osu! beatmap display pieces, a command palette and the site header and footer.",
+  "description": "React components for the haruhime.moe osu! tools on Next.js: the osu!-web-style palette as a Tailwind theme, buttons, cards, form fields and confirms, filter controls, tables, osu! beatmap display pieces and player cards, a command palette and the site header and footer.",
   "keywords": [
     "osu",
     "osu!",

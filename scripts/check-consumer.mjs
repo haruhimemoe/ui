@@ -359,6 +359,7 @@ try {
         "BeatmapStats",
       ],
       [/<span[^>]*class="[^"]*bg-amber-300[^"]*"[^>]*>HD2<\/span>/, "ModBadge"],
+      [/<a\b[^>]*href="https:\/\/osu\.ppy\.sh\/users\/2"[^>]*>peppy<\/a>/, "PlayerCard"],
       [/<button[^>]*aria-expanded="false"[^>]*>peppy<\/button>/, "HeaderMenu (client)"],
       [
         /<a\b(?=[^>]*href="https:\/\/discord\.gg\/example")(?=[^>]*aria-label="Discord")[^>]*><svg\b[^>]*viewBox="0 0 24 24"/,

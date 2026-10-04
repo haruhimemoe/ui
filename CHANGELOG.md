@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `PlayerCard`: osu!-web's user card from plain props (cover, avatar, country and team flags, supporter heart, username linking to the profile, an optional status row). It never fetches; apps pass a snapshot.
+
 ## [0.9.0] - 2026-10-03
 
 ### Added

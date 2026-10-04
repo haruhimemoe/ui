@@ -8,6 +8,7 @@ import {
   LinkTabs,
   linkClasses,
   ModBadge,
+  PlayerCard,
   StarRating,
   Table,
   TBody,
@@ -44,6 +45,15 @@ export function Additions() {
       <StarRating value={5.23} label="with HR" />
       <BeatmapStats cs={4} ar={9.3} od={8} hp={5} bpm={180} lengthSeconds={125} />
       <ModBadge mod="HD2" />
+      <PlayerCard
+        username="peppy"
+        userId={2}
+        countryCode="AU"
+        supporter
+        statusText="osu!"
+        statusNote="formerly ppy"
+      />
+      <PlayerCard username="token" statusText="BoBERT" />
       <Table caption="Slots" hideCaption>
         <THead>
           <tr>

@@ -2,7 +2,7 @@
 
 # @haruhimemoe/ui
 
-React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, links, badges, form fields and confirms, filter controls (toggle and choice chips, a two-thumb range slider, a filter panel), tables, osu! beatmap display pieces, a command palette (mod+k, with the defaults every tool shares) and the site header, footer, tabs, account menu and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
+React components for the haruhime.moe osu! tools on Next.js. It ships the osu!-web-style palette as a Tailwind 4 theme, plus buttons, links, badges, form fields and confirms, filter controls (toggle and choice chips, a two-thumb range slider, a filter panel), tables, osu! beatmap display pieces and player cards, a command palette (mod+k, with the defaults every tool shares) and the site header, footer, tabs, account menu and page frame. Most components are Server Components. The few that need the browser carry `"use client"` in their own files, so you import everything from one place.
 
 See every component in its states at [haruhime.moe/ui](https://www.haruhime.moe/ui). The page names the version it runs.
 
@@ -814,7 +814,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 
 ### osu!
 
-Since 0.4.0. Display pieces for beatmaps and mod pools. They take plain values (no osu! API types) and are Server Components.
+Since 0.4.0. Display pieces for beatmaps, mod pools and (since 0.10.0) players. They take plain values (no osu! API types) and are Server Components.
 
 #### `StarRating`
 
@@ -844,6 +844,42 @@ A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: N
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `mod` | `string` | required | The mod or slot label. |
+
+#### `PlayerCard`
+
+Since 0.10.0. osu!-web's user card (the 120px card from the friends list and user tooltips): the profile cover under a dark overlay, the 60px avatar, the country flag, the team flag and the supporter heart, the username, and an optional status row. The whole card links to the osu! profile. Every native `<div>` prop except `children`.
+
+It never fetches. Pass a snapshot you keep yourself (from one osu! API lookup, or typed by hand), so a page of cards costs no API calls and hits no rate limits. Leave `status` out for static data: the card draws no online or offline ring unless told to. Images are plain `<img>` tags (lazy, sized), so the app needs no `images.remotePatterns` for osu!'s hosts. A cover ending in `.gif` is hidden when the visitor asks for reduced motion.
+
+```tsx
+<PlayerCard
+  username="peppy"
+  userId={2}
+  countryCode="AU"
+  coverUrl="https://assets.ppy.sh/user-profile-covers/2/….jpeg"
+  team={{ name: "mom?", flagUrl: "https://assets.ppy.sh/teams/flag/1/….png" }}
+  supporter
+  statusText="osu!"
+/>
+```
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `username` | `string` | required | The name on the card. |
+| `userId` | `number` | none | The osu! id: the avatar comes from `https://a.ppy.sh/<id>` and the card links to `https://osu.ppy.sh/users/<id>`. |
+| `href` | `string \| null` | the profile | Replaces the link; `null` draws none. Without a link the name is plain text. |
+| `avatarUrl` | `string` | from `userId` | Replaces the avatar. With neither, the name's first letter stands in. |
+| `coverUrl` | `string` | none | The cover behind the card. None leaves it plain `b4`. |
+| `countryCode` | `string` | none | ISO 3166-1 alpha-2. Draws osu!'s own flag (`osu.ppy.sh/assets/images/flags/<code points>.svg`); anything but two letters draws none. |
+| `countryName` | `string` | English name from `Intl` | The flag's alt text. |
+| `team` | `{ name, flagUrl }` | none | The team flag beside the country's, named and titled by the team. |
+| `supporter` | `boolean` | `false` | Draws the supporter heart. |
+| `supporterLabel` | `string` | `"osu! supporter"` | What screen readers hear for the heart. |
+| `status` | `"online" \| "offline"` | none | Draws the status ring (lime online, dark offline). |
+| `statusText` | `ReactNode` | `"Online"`/`"Offline"` with a status | The bottom row's main line: a status, or anything short (a role). |
+| `statusNote` | `ReactNode` | none | A small line above it ("Last seen 29 days ago", "formerly RMarc"). |
+
+The bottom row is left out when there is no status, text or note; the card keeps its 120px height so cards line up in a grid. The overlay is `b5` at 80%, enough for `c2` text at 12px to keep 4.5:1 over a white cover (axe can't check text over an image).
 
 ### MDX (server)
 
