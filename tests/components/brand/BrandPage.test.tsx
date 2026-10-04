@@ -108,15 +108,27 @@ describe("BrandPage", () => {
   });
 
   it("gives every asset a download link on a tile matching its background", () => {
-    render(<BrandPage {...props} />);
+    const { container } = render(<BrandPage {...props} />);
     const icon = screen.getByRole("link", { name: /Icon/ });
     expect(icon).toHaveAttribute("href", "/brand/pools-icon.svg");
     expect(icon).toHaveAttribute("download");
     const light = screen.getByRole("link", { name: /Wordmark, on light/ });
     expect(light).toHaveAttribute("download");
-    const tiles = screen.getAllByRole("img");
+    const tiles = container.querySelectorAll("img");
     expect(tiles[0]?.parentElement?.className).toContain("bg-b6");
     expect(tiles[1]?.parentElement?.className).toContain("bg-c1");
+  });
+
+  it("marks each asset preview decorative, since the download link already carries its name", () => {
+    const { container } = render(<BrandPage {...props} />);
+    const previews = container.querySelectorAll("img");
+    expect(previews).toHaveLength(data.assets.length);
+    for (const preview of previews) {
+      expect(preview).toHaveAttribute("alt", "");
+    }
+    // The link right next to each preview still names the file: no information is lost.
+    expect(screen.getByRole("link", { name: "Icon" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Wordmark, on light" })).toBeInTheDocument();
   });
 
   it("links the contact address with mailto:", () => {

@@ -97,8 +97,9 @@ export function BrandPage({
                 <div
                   className={`flex h-32 items-center justify-center rounded-md p-4 ${asset.dark ? "bg-b6" : "bg-c1"}`}
                 >
+                  {/* Decorative: the download link right below already carries the file's name. */}
                   {/* biome-ignore lint/performance/noImgElement: unsized SVG previews; next/image needs a size */}
-                  <img src={asset.href} alt={asset.label} className="max-h-full max-w-full" />
+                  <img src={asset.href} alt="" className="max-h-full max-w-full" />
                 </div>
               ) : null}
               <a className={LINK} href={asset.href} download>
