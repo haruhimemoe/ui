@@ -98,6 +98,7 @@ describe("shipped source", () => {
       "src/components/filters/RangeSlider.tsx",
       "src/components/forms/ReportDisclosure.tsx",
       "src/components/forms/TypeToConfirm.tsx",
+      "src/components/mdx/CodeCopyButton.tsx",
       "src/components/palette/CommandPalette.tsx",
       "src/components/palette/CommandPaletteButton.tsx",
       "src/components/palette/PaletteList.tsx",
@@ -132,6 +133,7 @@ describe("shipped source", () => {
     expect(rendered).toEqual([
       "src/components/actions/PaginationButton.tsx",
       "src/components/actions/PaginationStatus.tsx",
+      "src/components/mdx/CodeCopyButton.tsx",
       "src/components/shell/NavListClient.tsx",
     ]);
   });
