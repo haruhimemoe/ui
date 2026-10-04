@@ -16,12 +16,14 @@
  *       and ./shiki entry points, the way Vitest in a consuming app does. After the build it serves
  *       the app and runs axe-core in headless Chromium over / and /mdx at a desktop and a phone
  *       width with color contrast on (the jsdom tests can't check contrast), WCAG 2.2 AA plus best
- *       practices. Last, it removes shiki (an optional peer) and the fixture's `import
- *       "@haruhimemoe/ui/shiki"` lines and builds again: /mdx must still prerender, with plain
- *       code. Usage: `node scripts/check-consumer.mjs [--keep]` (--keep leaves the app in the temp
- *       dir). Needs the npm registry and Google Fonts. The app's source lives in
- *       scripts/consumer-fixture/ as real files; this script writes only the config that depends on
- *       the pins and the temp dir, then runs the build and the assertions.
+ *       practices. It then runs axe again on / under a coarse pointer, more contrast and reduced
+ *       motion, and the media pass in scripts/consumer-media.mjs. Last, it removes shiki (an
+ *       optional peer) and the fixture's `import "@haruhimemoe/ui/shiki"` lines and builds again:
+ *       /mdx must still prerender, with plain code. Usage: `node scripts/check-consumer.mjs
+ *       [--keep]` (--keep leaves the app in the temp dir). Needs the npm registry and Google Fonts.
+ *       The app's source lives in scripts/consumer-fixture/ as real files; this script writes only
+ *       the config that depends on the pins and the temp dir, then runs the build and the
+ *       assertions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Sun Oct 4, 2026
@@ -44,6 +46,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright";
+// biome-ignore lint/correctness/useImportExtensions: forceJsExtensions would point this at a .js file that does not exist.
+import { MEDIA_CONTEXTS, mediaPass } from "./consumer-media.mjs";
 
 const keep = process.argv.includes("--keep");
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -97,6 +101,9 @@ const LIBRARY_CLASSES = [
   [".px-2\\.5", "Chip"],
   [".bg-b6", "the header, footer and fields"],
   [".text-c3", "labels and nav links"],
+  [".coarse\\:h-11", "Button md on a coarse pointer"],
+  [".contrast-more\\:inset-ring", "the contrast edges"],
+  [".forced-colors\\:border", "the forced-colors borders"],
 ];
 
 /** Browser axe: the widths checked and the rules run. Contrast is on here, unlike in jsdom. */
@@ -162,6 +169,26 @@ const axePass = async () => {
         await context.close();
       }
     }
+    // The same axe pass on / under the media a visitor can ask for: coarse targets are measured
+    // at 44px there, and more contrast changes every text color.
+    for (const [name, options] of Object.entries(MEDIA_CONTEXTS)) {
+      const context = await browser.newContext(options);
+      const page = await context.newPage();
+      await page.goto(`${origin}/`, { waitUntil: "load" });
+      await page.waitForTimeout(500);
+      const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+      for (const violation of results.violations) {
+        const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
+        lines.push(
+          [
+            `axe ${name} /: ${violation.id} (${violation.impact}) ${violation.help}`,
+            ...targets,
+          ].join("\n"),
+        );
+      }
+      await context.close();
+    }
+    lines.push(...(await mediaPass(browser, origin)));
     await browser.close();
   } finally {
     server.kill();
@@ -308,6 +335,9 @@ try {
   }
   if (!css.includes("--hue")) failures.push("CSS is missing the theme's --hue palette");
   if (!css.includes("--h2-l")) failures.push("CSS is missing the --h2-l lightness override");
+  if (!css.includes("--contrast-lift")) failures.push("CSS is missing --contrast-lift");
+  if (!css.includes("prefers-reduced-motion"))
+    failures.push("CSS is missing the reduced-motion rule");
 
   const index = readRoute("index");
   if (!index) {
@@ -366,6 +396,27 @@ try {
       [
         /<a\b(?=[^>]*href="https:\/\/discord\.gg\/example")(?=[^>]*aria-label="Discord")[^>]*><svg\b[^>]*viewBox="0 0 24 24"/,
         "SiteFooter's Discord link with DiscordIcon",
+      ],
+      [
+        /<a\b(?=[^>]*href="\/files\/export\.json")(?=[^>]*download="")[^>]*>Download my data<\/a>/,
+        "ButtonLink download",
+      ],
+      [
+        /<a\b(?=[^>]*href="\/brand\/palette\.json")(?=[^>]*download="palette\.json")[^>]*>Download palette \(JSON\)<\/a>/,
+        "TextLink download",
+      ],
+      [
+        /<label[^>]*class="[^"]*sr-only[^"]*"[^>]*>Hidden label input<\/label>/,
+        "TextInput hideLabel",
+      ],
+      [/<span[^>]*class="[^"]*bg-fuchsia-400[^"]*"[^>]*>fuchsia<\/span>/, "ModBadge color"],
+      [
+        /<output class="text-emerald-300 contrast-more:text-emerald-200 text-sm">Saved\.<\/output>/,
+        "textClasses",
+      ],
+      [
+        /<span class="text-rose-300 contrast-more:text-rose-200 text-sm font-bold">Bold error span\.<\/span>/,
+        "Text as span",
       ],
     ];
     for (const [pattern, from] of expected) {

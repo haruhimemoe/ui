@@ -42,6 +42,7 @@ import { Additions } from "./Additions";
 import { ClientAdditions } from "./ClientAdditions";
 import { ClientAdditions05 } from "./ClientAdditions05";
 import { Filters } from "./Filters";
+import { Foundations } from "./Foundations";
 import { MdxExports } from "./MdxExports";
 import { Palette08 } from "./Palette08";
 
@@ -145,6 +146,7 @@ export default function Page() {
       <ClientAdditions />
       <ClientAdditions05 />
       <Filters />
+      <Foundations />
       <MdxExports />
       <ContentLayout
         nav={
