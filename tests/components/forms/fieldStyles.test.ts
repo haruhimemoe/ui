@@ -4,14 +4,14 @@
  *       in forced-colors mode, and extras appended last.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { describe, expect, it } from "vitest";
 import { fieldClasses } from "../../../src/components/forms/fieldStyles.js";
 
 const PACKS_FIELD =
-  "w-full rounded-md border border-b3 bg-b6 px-3 py-2 text-c1 text-sm placeholder:text-c4 focus-visible:border-h1 disabled:opacity-50 aria-invalid:border-rose-400 aria-invalid:focus-visible:border-h1";
+  "w-full rounded-md border border-b3 bg-b6 px-3 py-2 text-c1 text-sm placeholder:text-c4 focus-visible:border-h1 disabled:opacity-50 aria-invalid:border-rose-400 aria-invalid:focus-visible:border-h1 coarse:min-h-11 coarse:text-base contrast-more:border-c4";
 
 describe("fieldClasses", () => {
   it("shows focus on an invalid field: the h1 border beats the rose border", () => {
@@ -53,5 +53,11 @@ describe("fieldClasses", () => {
   it("marks invalid fields with a rose border and dims disabled ones", () => {
     expect(fieldClasses()).toContain("aria-invalid:border-rose-400");
     expect(fieldClasses()).toContain("disabled:opacity-50");
+  });
+
+  it("grows to 44px with 16px text on a coarse pointer and edges in c4 under more contrast", () => {
+    expect(fieldClasses().split(" ")).toEqual(
+      expect.arrayContaining(["coarse:min-h-11", "coarse:text-base", "contrast-more:border-c4"]),
+    );
   });
 });

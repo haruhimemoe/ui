@@ -4,7 +4,7 @@
  *       aria-describedby and aria-invalid. Server-safe: the required id names the hint and error.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -16,13 +16,14 @@ export type TextInputProps = Omit<ComponentProps<"input">, "id"> & FieldProps;
 
 /**
  * @function TextInput
- * @param props {TextInputProps} native input props, plus id, label, hint, error and
+ * @param props {TextInputProps} native input props, plus id, label, hideLabel, hint, error and
  *        wrapperClassName; `className` goes on the `<input>`
  * @returns {JSX.Element} a label, the input, and the hint and error when given
  */
 export function TextInput({
   id,
   label,
+  hideLabel,
   hint,
   error,
   wrapperClassName,
@@ -32,7 +33,14 @@ export function TextInput({
   ...props
 }: TextInputProps) {
   return (
-    <FieldFrame id={id} label={label} hint={hint} error={error} className={wrapperClassName}>
+    <FieldFrame
+      id={id}
+      label={label}
+      hideLabel={hideLabel}
+      hint={hint}
+      error={error}
+      className={wrapperClassName}
+    >
       <input
         {...props}
         {...fieldControlProps({ id, hint, error, describedBy, invalid })}

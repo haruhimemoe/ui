@@ -373,11 +373,12 @@ Shared props (type `FieldProps`), taken by `TextInput`, `Textarea`, `Select` and
 | --- | --- | --- | --- |
 | `id` | `string` | required | The control's id. The label points at it. The hint gets `<id>-hint` and the error `<id>-error`. |
 | `label` | `ReactNode` | required | The visible label. |
+| `hideLabel` | `boolean` | `false` | Since 0.12.0. Hides the label visually; it still names the control. No gap is left above the control. |
 | `hint` | `ReactNode` | none | Help text in a `<div>`, linked with `aria-describedby`. On `Checkbox` the hint sits inline inside the label, so keep it to text there. |
 | `error` | `ReactNode` | none | Error text in a `role="status"` `<div>` (`text-rose-300`; `role="alert"` before 0.7.0), so a list of errors is fine. Sets `aria-invalid` and links the text with `aria-describedby`. |
 | `wrapperClassName` | `string` | none | Classes for the wrapper around the label, control, hint and error, for layout (`min-w-48 flex-1`). |
 
-`className` goes on the control itself. Your own `aria-describedby` is kept after the hint and error ids.
+`className` goes on the control itself. Your own `aria-describedby` is kept after the hint and error ids. Fields are 44px tall with 16px text on a coarse pointer (since 0.12.0).
 
 #### `TextInput`
 
@@ -406,6 +407,7 @@ Since 0.4.0. A native radio group on the `Checkbox` look: a `<fieldset>` named b
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `label` | `ReactNode` | required | The legend. |
+| `hideLabel` | `boolean` | `false` | Since 0.12.0. Hides the legend visually; it still names the group. |
 | `options` | `readonly RadioOption[]` | required | `{ value: string; label: ReactNode; hint?: ReactNode; disabled?: boolean }` for each radio. |
 | `value` / `defaultValue` | `string` | none | The picked value, held by you (`value`, with `onChange`) or by the group (`defaultValue`). |
 | `onChange` | `(value: string) => void` | none | Gets the picked option's value. |
@@ -744,6 +746,8 @@ One labelled row: the label above the controls on phones, in a `w-28` column on 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `label` | `ReactNode` | required | The row's label. Also names the group. |
+
+Not the same as the fields' `hideLabel`: inside a `FilterRow`, a `ChipGroup`, `ChoiceChips` or `RangeSlider`'s own `hideLabel` drops its label entirely, because the row names it instead.
 
 #### `FilterPanel` (client)
 

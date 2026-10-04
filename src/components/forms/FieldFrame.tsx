@@ -25,6 +25,11 @@ export type FieldProps = {
   hint?: ReactNode | undefined;
   /** Error text under the control (a list is fine). Marks the control aria-invalid and links it. */
   error?: ReactNode | undefined;
+  /**
+   * Hide the label visually. It still names the control (screen readers, voice control). Unlike
+   * a filter group's hideLabel, the label stays: only its look goes.
+   */
+  hideLabel?: boolean | undefined;
   /** Classes for the wrapper around the label, control, hint and error (layout, width). */
   wrapperClassName?: string | undefined;
 };
@@ -119,14 +124,22 @@ type FieldFrameProps = Omit<FieldProps, "wrapperClassName"> & {
 
 /**
  * @function FieldFrame
- * @param props {FieldFrameProps} the control's id, label, hint, error, wrapper classes and the
- *        control itself as children
+ * @param props {FieldFrameProps} the control's id, label, hideLabel, hint, error, wrapper classes
+ *        and the control itself as children
  * @returns {JSX.Element} the label, control, hint and error stacked in a column
  */
-export function FieldFrame({ id, label, hint, error, className, children }: FieldFrameProps) {
+export function FieldFrame({
+  id,
+  label,
+  hideLabel,
+  hint,
+  error,
+  className,
+  children,
+}: FieldFrameProps) {
   return (
     <div className={cx("flex flex-col gap-1", className)}>
-      <label htmlFor={id} className={FIELD_LABEL}>
+      <label htmlFor={id} className={cx(FIELD_LABEL, hideLabel && "sr-only")}>
         {label}
       </label>
       {children}

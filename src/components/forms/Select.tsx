@@ -4,7 +4,7 @@
  *       through aria-describedby and aria-invalid. Options come in as children. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -16,13 +16,14 @@ export type SelectProps = Omit<ComponentProps<"select">, "id"> & FieldProps;
 
 /**
  * @function Select
- * @param props {SelectProps} native select props with `<option>` children, plus id, label, hint,
- *        error and wrapperClassName; `className` goes on the `<select>`
+ * @param props {SelectProps} native select props with `<option>` children, plus id, label,
+ *        hideLabel, hint, error and wrapperClassName; `className` goes on the `<select>`
  * @returns {JSX.Element} a label, the select, and the hint and error when given
  */
 export function Select({
   id,
   label,
+  hideLabel,
   hint,
   error,
   wrapperClassName,
@@ -32,7 +33,14 @@ export function Select({
   ...props
 }: SelectProps) {
   return (
-    <FieldFrame id={id} label={label} hint={hint} error={error} className={wrapperClassName}>
+    <FieldFrame
+      id={id}
+      label={label}
+      hideLabel={hideLabel}
+      hint={hint}
+      error={error}
+      className={wrapperClassName}
+    >
       <select
         {...props}
         {...fieldControlProps({ id, hint, error, describedBy, invalid })}

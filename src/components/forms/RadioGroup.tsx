@@ -7,7 +7,7 @@
  *       native radios do. Controlled (`value`) or uncontrolled (`defaultValue`).
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -32,6 +32,8 @@ export type RadioGroupProps = Omit<
 > & {
   /** The legend, which names the group. */
   label: ReactNode;
+  /** Hide the legend visually; it still names the group. */
+  hideLabel?: boolean | undefined;
   options: readonly RadioOption[];
   /** The radios' name, for a form (default: a generated one). */
   name?: string | undefined;
@@ -57,6 +59,7 @@ export type RadioGroupProps = Omit<
  */
 export function RadioGroup({
   label,
+  hideLabel,
   options,
   name,
   value,
@@ -76,11 +79,11 @@ export function RadioGroup({
       className={cx("flex flex-col gap-2", className)}
       {...props}
     >
-      <legend className={cx("mb-1", FIELD_LABEL)}>{label}</legend>
+      <legend className={cx("mb-1", FIELD_LABEL, hideLabel && "sr-only")}>{label}</legend>
       {options.map((option, i) => {
         const optionId = `${id}-${i}`;
         return (
-          <label key={option.value} className="flex items-start gap-2 text-sm">
+          <label key={option.value} className="flex items-start gap-2 coarse:py-2.5 text-sm">
             <input
               type="radio"
               id={optionId}

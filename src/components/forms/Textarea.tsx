@@ -4,7 +4,7 @@
  *       an optional hint and error wired through aria-describedby and aria-invalid. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -17,13 +17,14 @@ export type TextareaProps = Omit<ComponentProps<"textarea">, "id"> & FieldProps;
 
 /**
  * @function Textarea
- * @param props {TextareaProps} native textarea props, plus id, label, hint, error and
+ * @param props {TextareaProps} native textarea props, plus id, label, hideLabel, hint, error and
  *        wrapperClassName; `className` goes on the `<textarea>`
  * @returns {JSX.Element} a label, the textarea, and the hint and error when given
  */
 export function Textarea({
   id,
   label,
+  hideLabel,
   hint,
   error,
   wrapperClassName,
@@ -33,7 +34,14 @@ export function Textarea({
   ...props
 }: TextareaProps) {
   return (
-    <FieldFrame id={id} label={label} hint={hint} error={error} className={wrapperClassName}>
+    <FieldFrame
+      id={id}
+      label={label}
+      hideLabel={hideLabel}
+      hint={hint}
+      error={error}
+      className={wrapperClassName}
+    >
       <textarea
         {...props}
         {...fieldControlProps({ id, hint, error, describedBy, invalid })}

@@ -6,7 +6,7 @@
  *       hint and error.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -19,12 +19,14 @@ export type CheckboxProps = Omit<ComponentProps<"input">, "id" | "type"> & Field
 /**
  * @function Checkbox
  * @param props {CheckboxProps} native input props (`checked`, `defaultChecked`, `onChange`...),
- *        plus id, label, hint, error and wrapperClassName; `className` goes on the `<input>`
+ *        plus id, label, hideLabel, hint, error and wrapperClassName; `className` goes on the
+ *        `<input>`
  * @returns {JSX.Element} the checkbox row, and the error under it when given
  */
 export function Checkbox({
   id,
   label,
+  hideLabel,
   hint,
   error,
   wrapperClassName,
@@ -37,7 +39,7 @@ export function Checkbox({
   const labelId = `${id}-label`;
   return (
     <div className={cx("flex flex-col gap-1", wrapperClassName)}>
-      <label htmlFor={id} className="flex items-start gap-2 text-sm">
+      <label htmlFor={id} className="flex items-start gap-2 coarse:py-2.5 text-sm">
         <input
           {...props}
           type="checkbox"
@@ -48,12 +50,12 @@ export function Checkbox({
           className={cx("-mt-0.5 size-6 shrink-0 accent-h1", className)}
         />
         <span>
-          <span id={labelId} className="font-bold text-c1">
+          <span id={labelId} className={cx("font-bold text-c1", hideLabel && "sr-only")}>
             {label}
           </span>
           {hint ? (
             <span className="text-c3">
-              {" · "}
+              {hideLabel ? null : " · "}
               <span id={hintId(id)}>{hint}</span>
             </span>
           ) : null}

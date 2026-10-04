@@ -5,7 +5,7 @@
  *       that leaves the name to a surrounding FilterRow. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { type ComponentProps, type ReactNode, useId } from "react";
@@ -18,7 +18,9 @@ export type GroupFrameProps = ComponentProps<"fieldset"> & {
   label: ReactNode;
   /**
    * Leave the name to a surrounding FilterRow: no label shows, and the fieldset is not a group
-   * of its own (role none), so screen readers hear the row's name once.
+   * of its own (role none), so screen readers hear the row's name once. Unlike the fields'
+   * hideLabel (TextInput, RadioGroup...), which keeps the label for screen readers, this one
+   * drops it.
    */
   hideLabel?: boolean | undefined;
 };
