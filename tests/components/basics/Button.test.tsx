@@ -4,7 +4,7 @@
  *       disabled state, focus ring, clicks, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { render, screen } from "@testing-library/react";
