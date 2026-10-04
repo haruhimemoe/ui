@@ -6,7 +6,7 @@
  *       a click on a link, or focus leaving it closes it too.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -34,7 +34,8 @@ export type HeaderMenuProps = Omit<ComponentProps<"div">, "children"> & {
   buttonClassName?: string | undefined;
 };
 
-const ITEM = "block rounded px-3 py-2 font-bold text-c2 text-sm hover:bg-b4 hover:text-c1";
+const ITEM =
+  "block rounded px-3 py-2 font-bold text-c2 text-sm hover:bg-b4 hover:text-c1 coarse:py-3";
 
 /**
  * @function HeaderMenu
@@ -93,7 +94,7 @@ export function HeaderMenu({
         aria-label={buttonLabel}
         onClick={() => setOpen(!open)}
         className={cx(
-          "flex min-h-6 items-center gap-2 font-bold text-c1 text-sm transition-colors hover:text-h1",
+          "flex coarse:min-h-11 min-h-6 items-center gap-2 font-bold text-c1 text-sm transition-colors hover:text-h1",
           buttonClassName,
         )}
       >
@@ -103,7 +104,7 @@ export function HeaderMenu({
         id={panelId}
         hidden={!open}
         className={cx(
-          "absolute z-10 mt-2 w-44 flex-col gap-1 rounded-lg border border-b3 bg-b6 p-2",
+          "absolute z-10 mt-2 w-44 flex-col gap-1 rounded-lg border border-b3 bg-b6 p-2 contrast-more:border-c4",
           open && "flex",
           align === "end" ? "right-0" : "left-0",
         )}

@@ -7,7 +7,7 @@
  *       `aria-labelledby={tabId(idPrefix, tab)}`. Controlled. Moved from bb.haruhime.moe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -79,7 +79,10 @@ export function Tabs<T extends string>({
       role="tablist"
       aria-label={label}
       onKeyDown={move}
-      className={cx("flex gap-1 rounded-full bg-b4 p-1", className)}
+      className={cx(
+        "flex gap-1 rounded-full bg-b4 p-1 contrast-more:inset-ring contrast-more:inset-ring-c4 forced-colors:border",
+        className,
+      )}
       {...props}
     >
       {tabs.map((tab, index) => {
@@ -95,7 +98,7 @@ export function Tabs<T extends string>({
             tabIndex={index === at ? 0 : -1}
             onClick={() => onChange(tab.id)}
             className={cx(
-              "flex-1 rounded-full px-4 py-1.5 font-bold text-sm transition-colors",
+              "coarse:min-h-11 flex-1 rounded-full px-4 py-1.5 font-bold text-sm transition-colors",
               selected ? "bg-h2 text-c1 forced-colors:underline" : "text-c3 hover:text-c1",
             )}
           >

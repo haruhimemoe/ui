@@ -28,9 +28,9 @@ export type ContentNavProps = {
 };
 
 const LINK_CLASS_NAME =
-  "flex items-baseline justify-between gap-2 rounded px-2 py-1 text-sm hover:bg-b4 hover:text-c1 text-c3";
+  "flex items-baseline justify-between gap-2 rounded px-2 py-1 text-sm hover:bg-b4 hover:text-c1 text-c3 coarse:py-2.5";
 const CURRENT_CLASS_NAME =
-  "flex items-baseline justify-between gap-2 rounded px-2 py-1 text-sm hover:bg-b4 hover:text-c1 bg-b4 font-bold text-c1";
+  "flex items-baseline justify-between gap-2 rounded px-2 py-1 text-sm hover:bg-b4 hover:text-c1 bg-b4 font-bold text-c1 coarse:py-2.5";
 
 /**
  * @function ContentNav

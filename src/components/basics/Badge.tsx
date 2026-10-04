@@ -4,7 +4,7 @@
  *       so screen readers read it in place with the text around it. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -19,14 +19,15 @@ export type BadgeProps = ComponentProps<"span"> & {
   tone?: BadgeTone | undefined;
 };
 
-const BASE = "inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs";
+const BASE =
+  "inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs forced-colors:border";
 
 // The looks the apps already use: pools' tags and warnings, and its header's beta pill.
 const TONES: Record<BadgeTone, string> = {
-  neutral: "bg-b3 text-c2",
+  neutral: "bg-b3 text-c2 contrast-more:inset-ring contrast-more:inset-ring-c4",
   accent: "bg-h1 font-bold text-b6",
   warning: "bg-amber-300/20 font-bold text-amber-200",
-  muted: "border border-b3 bg-b5 font-bold text-c4 uppercase tracking-wide",
+  muted: "border border-b3 bg-b5 font-bold text-c4 uppercase tracking-wide contrast-more:border-c4",
 };
 
 /**

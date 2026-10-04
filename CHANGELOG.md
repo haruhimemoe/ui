@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `download` on `ButtonLink` and `TextLink` renders a plain `<a download>` (no prefetch, no client routing), for any value but `false`.
 - `hideLabel` on `TextInput`, `Select`, `Textarea`, `Checkbox` and `RadioGroup`: the label (legend for RadioGroup) is hidden visually but still names the control, with no gap left above it.
 - `ModBadge` `color` (`ModBadgeColor`): any of the six bucket colors, the ten @haruhimemoe/pool palette colors or `neutral`, overriding the color the mod's letters pick. A value outside the list falls back to the bucket.
+- 44px touch targets on a coarse pointer: chips and choice chips, checkbox and radio rows, Disclosure and HeaderMenu buttons and menu items, Tabs and LinkTabs, palette rows, FilterPanel's toggle, code copy buttons and ContentNav links.
+- Under more contrast, cards, chips, neutral badges and the tabs track get a `c4` edge, and code blocks, menus, the palette and its key hints a `c4` border. In forced colors, cards, chips, badges, mod badges and the tabs track keep a 1px border; an unavailable chip is GrayText.
 
 ### Changed
 

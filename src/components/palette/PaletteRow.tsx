@@ -6,7 +6,7 @@
  *       on the dialog, so this isn't focusable (aria-activedescendant names it).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ReactNode } from "react";
@@ -27,11 +27,12 @@ export type PaletteRowProps = {
 };
 
 // The active row shows its state with an h1 edge, not background alone: bg-b4 on b6 is only
-// 1.5:1. min-h-9 keeps every row a 36px target.
+// 1.5:1. min-h-9 keeps every row a 36px target, 44px on a coarse pointer.
 const ROW =
-  "flex min-h-9 cursor-default items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2";
+  "flex min-h-9 cursor-default items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2 coarse:min-h-11";
 const ACTIVE = `${ROW} border-h1 bg-b4 forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]`;
-const KBD = "rounded border border-b3 bg-b5 px-1.5 font-sans text-c3 text-xs";
+const KBD =
+  "rounded border border-b3 bg-b5 px-1.5 font-sans text-c3 text-xs contrast-more:border-c4";
 
 const highlighted = (title: string, ranges: FuzzyMatch["ranges"]): ReactNode[] => {
   const parts: ReactNode[] = [];

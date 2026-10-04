@@ -5,7 +5,7 @@
  *       button; from `sm` up they are always shown.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -89,7 +89,7 @@ export function FilterPanel({
             aria-expanded={open}
             aria-controls={bodyId}
             onClick={() => setOpen(!open)}
-            className="inline-flex size-8 items-center justify-center rounded-full text-c2 transition-colors hover:bg-b3 hover:text-c1 sm:hidden"
+            className="inline-flex coarse:size-11 size-8 items-center justify-center rounded-full text-c2 transition-colors hover:bg-b3 hover:text-c1 sm:hidden"
           >
             <span aria-hidden="true">{open ? "▴" : "▾"}</span>
           </button>

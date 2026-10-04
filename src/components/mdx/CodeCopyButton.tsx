@@ -6,7 +6,7 @@
  *       string and never imports cx, keeping tailwind-merge out of the client bundle.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -18,7 +18,7 @@ import { useLatestStatus } from "../actions/useLatestStatus.js";
 export type CodeCopyButtonProps = { code: string; label: string };
 
 const BUTTON =
-  "inline-flex min-h-6 min-w-6 items-center justify-center rounded px-2 py-0.5 text-c2 text-sm hover:bg-b4 hover:text-c1";
+  "inline-flex min-h-6 min-w-6 items-center justify-center rounded px-2 py-0.5 text-c2 text-sm hover:bg-b4 hover:text-c1 coarse:min-h-11 coarse:min-w-11";
 
 /**
  * @function CodeCopyButton

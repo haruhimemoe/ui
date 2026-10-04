@@ -5,7 +5,7 @@
  *       loads its own URL. Server-safe: the caller says which link is current.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
@@ -27,7 +27,8 @@ export type LinkTabsProps = Omit<ComponentProps<"nav">, "children"> & {
   items: readonly LinkTabItem[];
 };
 
-const TAB = "rounded-full px-3 py-1 font-bold text-sm transition-colors";
+const TAB =
+  "inline-flex items-center rounded-full px-3 py-1 font-bold text-sm transition-colors coarse:min-h-11";
 // Forced-colors mode drops the pill's background, so the current tab is underlined there.
 const CURRENT = "bg-b3 text-c1 forced-colors:underline";
 const OTHER = "text-c3 hover:text-c1";

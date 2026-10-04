@@ -8,7 +8,7 @@
  *       Mount once, inside a client component, since commands carry functions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -46,7 +46,7 @@ const CHORD_MS = 800;
 const DIALOG =
   "m-0 h-dvh max-h-none w-full max-w-none bg-transparent p-0 text-c1 backdrop:bg-b6/70 backdrop:backdrop-blur-sm sm:h-auto sm:pt-[12vh]";
 const PANEL =
-  "mx-auto flex h-full max-h-dvh w-full flex-col overflow-hidden border-b3 bg-b6 shadow-2xl sm:h-auto sm:max-h-[70vh] sm:max-w-xl sm:rounded-xl sm:border";
+  "mx-auto flex h-full max-h-dvh w-full flex-col overflow-hidden border-b3 bg-b6 shadow-2xl sm:h-auto sm:max-h-[70vh] sm:max-w-xl sm:rounded-xl sm:border contrast-more:border-c4";
 
 /**
  * @function CommandPalette

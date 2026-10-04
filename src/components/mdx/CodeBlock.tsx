@@ -6,7 +6,7 @@
  *       Server-safe: the only client piece is the copy button (CodeCopyButton).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -72,7 +72,10 @@ export async function CodeBlock({
   const name = title ?? lang;
   return (
     <div
-      className={cx("mt-3 overflow-hidden rounded-md border border-b3 bg-b6", className)}
+      className={cx(
+        "mt-3 overflow-hidden rounded-md border border-b3 bg-b6 contrast-more:border-c4",
+        className,
+      )}
       {...rest}
     >
       <div className="flex min-h-9 items-center justify-between gap-3 border-b3 border-b px-3 py-1 text-c3 text-sm">
