@@ -109,9 +109,13 @@
     :where(*:not([data-motion="essential"], [data-motion="essential"] *)),
     :where(*:not([data-motion="essential"], [data-motion="essential"] *))::before,
     :where(*:not([data-motion="essential"], [data-motion="essential"] *))::after {
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat utility and inline transitions */
       animation-duration: 0.01ms !important;
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat utility and inline transitions */
       animation-iteration-count: 1 !important;
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat utility and inline transitions */
       transition-duration: 0.01ms !important;
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat utility and inline transitions */
       scroll-behavior: auto !important;
     }
   }

@@ -2,7 +2,8 @@
  * @file scripts/consumer-fixture/src/app/Foundations.tsx
  * @desc The 0.12.0 pieces for the consumer check: Text in every tone and size, textClasses, a
  *       Button in a flex column, an essential-motion Button, download links, hidden-label fields,
- *       ModBadge in all 17 colors and the useMotionAllowed island. data-check hooks are what
+ *       a Textarea (keeps its 6rem minimum height on a coarse pointer), ModBadge in all 17
+ *       colors and the useMotionAllowed island. data-check hooks are what
  *       scripts/consumer-media.mjs measures.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
@@ -17,6 +18,7 @@ import {
   type ModBadgeColor,
   Select,
   Text,
+  Textarea,
   TextInput,
   TextLink,
   textClasses,
@@ -80,6 +82,7 @@ export function Foundations() {
       <Select id="check-select" label="Hidden label select" hideLabel defaultValue="a">
         <option value="a">A</option>
       </Select>
+      <Textarea id="check-textarea" label="Hidden label textarea" hideLabel data-check="textarea" />
       <div className="flex flex-wrap gap-2">
         {COLORS.map((color) => (
           <ModBadge key={color} mod="NM1" color={color}>

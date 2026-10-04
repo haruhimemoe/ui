@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `CopyMarkdownButton` follows Button's classes again (a test now pins its copy).
 - `BrandPage`'s file links are `TextLink download`.
 - Fields are 44px tall with 16px text on touch screens (no iOS zoom), checkbox and radio rows 44px tall, and a field's border is `c4` under more contrast.
+- `RangeSlider`'s value boxes also become 44px tall with 16px text on touch screens: they use `fieldClasses`, the same field look.
 
 ## [0.11.2] - 2026-10-04
 

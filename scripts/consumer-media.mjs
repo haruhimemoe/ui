@@ -3,11 +3,12 @@
  * @desc The consumer check's media pass: opens the built fixture at / under a coarse pointer, more
  *       contrast, reduced motion and forced colors, and measures what jsdom can't: a Button in a
  *       flex column keeps its content width, Button md and a TextInput are 44px tall with 16px
- *       input text on a coarse pointer, c4 is lighter and Card has an inset ring under more
- *       contrast, transitions take 0.01ms under reduced motion except inside
- *       data-motion="essential", a Button keeps a 1px border in forced colors, and download links
- *       are plain <a download> that the page never prefetches. Each context first checks that the
- *       browser really matches its media query, so a pass means the state was measured.
+ *       input text on a coarse pointer, a Textarea keeps at least its 96px (6rem) minimum height
+ *       on a coarse pointer instead of shrinking to the field look's 44px, c4 is lighter and Card
+ *       has an inset ring under more contrast, transitions take 0.01ms under reduced motion except
+ *       inside data-motion="essential", a Button keeps a 1px border in forced colors, and download
+ *       links are plain <a download> that the page never prefetches. Each context first checks
+ *       that the browser really matches its media query, so a pass means the state was measured.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
  * @modified Sun Oct 4, 2026
@@ -61,6 +62,7 @@ const read = (page) =>
     const box = (node) => node?.getBoundingClientRect() ?? null;
     const button = el("button");
     const input = el("input");
+    const textarea = el("textarea");
     return {
       stackWidth: box(el("stack"))?.width ?? 0,
       buttonWidth: box(button)?.width ?? 0,
@@ -70,6 +72,7 @@ const read = (page) =>
       essentialTransition: style(el("essential"))?.transitionDuration ?? "",
       inputHeight: box(input)?.height ?? 0,
       inputFont: style(input)?.fontSize ?? "",
+      textareaHeight: box(textarea)?.height ?? 0,
       c4: style(el("c4"))?.color ?? "",
       cardShadow: style(el("card"))?.boxShadow ?? "",
       motionText: el("motion")?.textContent ?? "",
@@ -127,6 +130,9 @@ export const mediaPass = async (browser, origin) => {
   }
   if (coarse.values.inputFont !== "16px")
     fail(`TextInput text is ${coarse.values.inputFont} on a coarse pointer`);
+  if (Math.round(coarse.values.textareaHeight) < 96) {
+    fail(`Textarea is ${coarse.values.textareaHeight}px on a coarse pointer, under 96px (6rem)`);
+  }
 
   const contrast = await visit(
     browser,

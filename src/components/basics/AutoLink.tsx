@@ -22,7 +22,9 @@ export type AutoLinkProps = ComponentProps<typeof Link>;
  * @param props {AutoLinkProps} next/link props
  * @returns {JSX.Element} a `next/link` for internal paths (and URL objects), or a plain `<a>` for
  *          an external string href or a download, with rel="noreferrer" when `target="_blank"`
- *          and no `rel`
+ *          and no `rel`. `download` only forces the plain `<a>` for a string `href`: a URL-object
+ *          href still renders `next/link` (next/link's own typed routes don't take `download`
+ *          either, so that pairing isn't one this component needs to special-case).
  */
 export function AutoLink({ href, target, rel, ...props }: AutoLinkProps) {
   // `download` counts when set to anything but undefined or false: "" is the attribute's own

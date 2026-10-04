@@ -250,7 +250,7 @@ An error notice (`role="alert"`) is announced either way.
 
 #### `Text` and `textClasses` (since 0.12.0)
 
-A line of text in a tone and a size, instead of hand-written color classes. Every native `<p>` prop.
+A line of text in a tone and a size, instead of hand-written color classes. Every native `<p>` prop. Types: `TextTone`, `TextSize`, `TextClassOptions`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -1018,7 +1018,7 @@ A beatmap's CS, AR, OD, HP, BPM and length as a compact `<dl>`, in that order. S
 
 #### `ModBadge`
 
-A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: NM sky, HD amber, HR rose, DT and NC violet, FM emerald, TB orange, with dark text. Anything else is a `b3` pill. Every native `<span>` prop; `children` replace the text, and `className` recolors it (`bg-pink-300` for a custom bucket). A custom bucket: `<ModBadge mod={code} color={PALETTE[entry.color].toLowerCase() as ModBadgeColor} />`.
+A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: NM sky, HD amber, HR rose, DT and NC violet, FM emerald, TB orange, with dark text. Anything else is a `b3` pill. Every native `<span>` prop; `children` replace the text. A custom bucket picks its color with `color`: `<ModBadge mod={code} color={PALETTE[entry.color].toLowerCase() as ModBadgeColor} />`. `className` still recolors it (`bg-pink-300`) when `color`'s fixed list doesn't fit.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |

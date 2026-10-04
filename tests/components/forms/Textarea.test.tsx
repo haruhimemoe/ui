@@ -4,7 +4,7 @@
  *       native props, className, ref, typing, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -31,6 +31,13 @@ describe("Textarea", () => {
       "min-h-24",
       "resize-y",
     );
+  });
+
+  it("keeps its 6rem minimum height on a coarse pointer, not the field's 44px", () => {
+    render(<Textarea id="desc" label="Description" />);
+    const className = screen.getByRole("textbox").className;
+    expect(className).toMatch(/\bcoarse:min-h-24\b/);
+    expect(className).not.toMatch(/\bcoarse:min-h-11\b/);
   });
 
   it("has no description and is not invalid without a hint or error", () => {

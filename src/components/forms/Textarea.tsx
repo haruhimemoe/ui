@@ -1,7 +1,9 @@
 /**
  * @file src/components/forms/Textarea.tsx
  * @desc Labeled textarea on the shared field look (at least 6rem tall, resizes vertically), with
- *       an optional hint and error wired through aria-describedby and aria-invalid. Server-safe.
+ *       an optional hint and error wired through aria-describedby and aria-invalid. Repeats
+ *       `coarse:min-h-24` so tailwind-merge drops the field look's `coarse:min-h-11`: a 44px
+ *       minimum would shrink the textarea on a touch screen. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Sun Oct 4, 2026
@@ -45,7 +47,7 @@ export function Textarea({
       <textarea
         {...props}
         {...fieldControlProps({ id, hint, error, describedBy, invalid })}
-        className={fieldClasses(cx("min-h-24 resize-y", className))}
+        className={fieldClasses(cx("coarse:min-h-24 min-h-24 resize-y", className))}
       />
     </FieldFrame>
   );
