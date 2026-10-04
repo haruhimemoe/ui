@@ -6,7 +6,7 @@
  *       delete and transfer forms, as one component.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -93,7 +93,7 @@ export function TypeToConfirm({
         spellCheck={false}
         onChange={(event) => setTyped(event.currentTarget.value)}
       />
-      <Button type="submit" variant={variant} className="self-start" disabled={!matches || pending}>
+      <Button type="submit" variant={variant} disabled={!matches || pending}>
         {pending && pendingLabel !== undefined ? pendingLabel : submitLabel}
       </Button>
     </form>

@@ -32,9 +32,10 @@ export type CopyMarkdownButtonProps = {
   failedLabel?: ReactNode | undefined;
 };
 
-// buttonClasses({ variant: "secondary" }) copied as a literal, so this file imports no cx.
+// buttonClasses({ variant: "secondary" }) copied as a literal, so this file imports no cx. The
+// test pins it to buttonClasses.
 const BUTTON_CLASS_NAME =
-  "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h1 disabled:cursor-not-allowed disabled:opacity-50 bg-b3 text-c1 not-disabled:hover:bg-b2 h-9 px-4 text-sm";
+  "inline-flex w-fit items-center justify-center gap-2 rounded-full font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h1 disabled:cursor-not-allowed disabled:opacity-50 forced-colors:border forced-colors:disabled:text-[GrayText] bg-b3 text-c1 not-disabled:hover:bg-b2 contrast-more:inset-ring contrast-more:inset-ring-c4 h-9 px-4 text-sm coarse:h-11";
 
 /**
  * @function CopyMarkdownButton

@@ -3,7 +3,7 @@
  * @desc Shared class builder for Button and ButtonLink (osu!-web pill buttons).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { cx } from "../../utils/cx.js";
@@ -11,7 +11,7 @@ import { cx } from "../../utils/cx.js";
 /** The pill's colors: `primary` is h2 (h1 on hover), `secondary` b3, `ghost` transparent. */
 export type ButtonVariant = "primary" | "secondary" | "ghost";
 
-/** The pill's height, padding and text size: `md` is h-9 and text-sm, `lg` h-11 and text-base. */
+/** The pill's height, padding and text size: `md` is h-9 (h-11 on a coarse pointer) and text-sm, `lg` h-11 and text-base. */
 export type ButtonSize = "md" | "lg";
 
 /** Options for {@link buttonClasses}. */
@@ -21,19 +21,24 @@ export type ButtonClassOptions = {
   className?: string | undefined;
 };
 
+// w-fit: a flex-column or grid item keeps its content width instead of stretching. The 1px
+// border shows only in forced colors, where the pill's background is dropped.
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h1 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex w-fit items-center justify-center gap-2 rounded-full font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h1 disabled:cursor-not-allowed disabled:opacity-50 forced-colors:border forced-colors:disabled:text-[GrayText]";
 
 // Hover only when not disabled. `not-disabled:` (not `enabled:`) so links, which are never
-// :disabled, keep their hover colors.
+// :disabled, keep their hover colors. Under more contrast, b3 and a transparent pill get a c4
+// edge: b3 on b5 is under 1.5:1.
 const VARIANTS: Record<ButtonVariant, string> = {
   primary: "bg-h2 text-c1 not-disabled:hover:bg-h1 not-disabled:hover:text-b6",
-  secondary: "bg-b3 text-c1 not-disabled:hover:bg-b2",
-  ghost: "bg-transparent text-c2 not-disabled:hover:bg-b4 not-disabled:hover:text-c1",
+  secondary:
+    "bg-b3 text-c1 not-disabled:hover:bg-b2 contrast-more:inset-ring contrast-more:inset-ring-c4",
+  ghost:
+    "bg-transparent text-c2 not-disabled:hover:bg-b4 not-disabled:hover:text-c1 contrast-more:inset-ring contrast-more:inset-ring-c4",
 };
 
 const SIZES: Record<ButtonSize, string> = {
-  md: "h-9 px-4 text-sm",
+  md: "h-9 px-4 text-sm coarse:h-11",
   lg: "h-11 px-6 text-base",
 };
 

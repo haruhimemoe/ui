@@ -6,7 +6,7 @@
  *       at a time; a throw reads as `failedMessage`. Moved from bb.haruhime.moe (ReportForm).
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
@@ -112,7 +112,7 @@ export function ReportDisclosure({
               required
               onChange={(event) => setReason(event.currentTarget.value)}
             />
-            <Button type="submit" variant="secondary" disabled={pending} className="self-start">
+            <Button type="submit" variant="secondary" disabled={pending}>
               {pending ? pendingLabel : submitLabel}
             </Button>
           </form>

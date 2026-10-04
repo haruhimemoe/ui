@@ -19,6 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - `c2`, `c3`, `c4`, `h1` and `h2` are defined through lightness variables (`--c2-l`, `--c3-l` and `--c4-l` join `--h1-l` and `--h2-l`) plus the contrast lift. The default colors are unchanged.
 - `Notice`, field errors, `CharCounter`, `AsyncButton`'s failure text and the palette's input error use Text's tones, so they get one step lighter under more contrast.
+- **Button no longer stretches** in a flex column or a grid cell: `buttonClasses()` adds `w-fit` (Button, ButtonLink, AsyncButton, CopyButton, Pagination). Pass `className="w-full"` where a full-width button is wanted. `self-start` on buttons is now a no-op.
+- Buttons at `md` are 44px tall on touch screens (`coarse:h-11`). Secondary and ghost buttons get a `c4` edge under more contrast; every button keeps a 1px border in forced colors, and a disabled one uses the system's GrayText there.
+- `CopyMarkdownButton` follows Button's classes again (a test now pins its copy).
 
 ## [0.11.2] - 2026-10-04
 

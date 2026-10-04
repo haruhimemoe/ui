@@ -125,4 +125,33 @@ describe("buttonClasses", () => {
     expect(classes).toContain("bg-transparent");
     expect(classes.endsWith(" mt-2")).toBe(true);
   });
+
+  it("sits at its content width; className w-full stretches it", () => {
+    expect(buttonClasses().split(" ")).toContain("w-fit");
+    const wide = buttonClasses({ className: "w-full" }).split(" ");
+    expect(wide).toContain("w-full");
+    expect(wide).not.toContain("w-fit");
+  });
+
+  it("grows to 44px on a coarse pointer at md only", () => {
+    expect(buttonClasses().split(" ")).toContain("coarse:h-11");
+    expect(buttonClasses({ size: "lg" }).split(" ")).not.toContain("coarse:h-11");
+  });
+
+  it("draws an edge under more contrast where only a background shade shows the shape", () => {
+    for (const variant of ["secondary", "ghost"] as const) {
+      expect(buttonClasses({ variant }).split(" ")).toEqual(
+        expect.arrayContaining(["contrast-more:inset-ring", "contrast-more:inset-ring-c4"]),
+      );
+    }
+    expect(buttonClasses().split(" ")).not.toContain("contrast-more:inset-ring");
+  });
+
+  it("keeps a border and a GrayText disabled state in forced colors, in every variant", () => {
+    for (const variant of ["primary", "secondary", "ghost"] as const) {
+      expect(buttonClasses({ variant }).split(" ")).toEqual(
+        expect.arrayContaining(["forced-colors:border", "forced-colors:disabled:text-[GrayText]"]),
+      );
+    }
+  });
 });

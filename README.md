@@ -186,6 +186,8 @@ A pill button. Every native `<button>` prop.
 | `size` | `"md" \| "lg"` | `"md"` | Height, padding and text size. |
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Never submits a form unless you ask for `"submit"`. |
 
+Since 0.12.0 a button sits at its content width (`w-fit`), also in a flex column or a grid cell; pass `className="w-full"` for a full-width one. At `md` it is 44px tall on a coarse pointer.
+
 #### `ButtonLink`
 
 A link that looks like `Button`. Every `next/link` prop (`href`, `prefetch`, `replace`, `scroll`, `target`, `rel`...), plus `variant` and `size` as on `Button`.

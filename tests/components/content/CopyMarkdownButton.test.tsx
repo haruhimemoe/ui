@@ -12,6 +12,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { buttonClasses } from "../../../src/components/basics/buttonStyles.js";
 import { CopyMarkdownButton } from "../../../src/components/content/CopyMarkdownButton.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
@@ -229,6 +230,11 @@ describe("CopyMarkdownButton", () => {
   it("uses the finished secondary button classes, with no cx merge needed", () => {
     render(<CopyMarkdownButton href="/docs/guide.md" />);
     expect(screen.getByRole("button")).toHaveClass("bg-b3", "text-c1", "rounded-full");
+  });
+
+  it("uses exactly Button's secondary classes, so the copy can't drift", () => {
+    render(<CopyMarkdownButton href="/docs/x.md" />);
+    expect(screen.getByRole("button").className).toBe(buttonClasses({ variant: "secondary" }));
   });
 
   it("has no axe violations before and after copying", async () => {
