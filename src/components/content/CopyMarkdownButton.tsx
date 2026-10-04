@@ -2,7 +2,9 @@
  * @file src/components/content/CopyMarkdownButton.tsx
  * @desc A button that fetches a page's raw Markdown and copies it to the clipboard, reporting the
  *       result in an `<output>` beside it (a polite live region), for a doc page's "Copy as
- *       Markdown" action. Any failure (the fetch rejects, the response isn't ok, or the clipboard
+ *       Markdown" action. Where `ClipboardItem` exists, the clipboard write starts inside the click
+ *       with the fetch as a promised Blob, since Safari rejects a write that starts after an
+ *       awaited fetch; elsewhere it fetches, then calls `writeText`. Any failure (the fetch rejects, the response isn't ok, or the clipboard
  *       refuses) announces the same failure message; the button never throws. Its own client file
  *       with finished class strings (no `cx`), so tailwind-merge stays out of the browser bundle
  *       for `ContentPage`, the Server Component that renders it. Not a wrapper around
@@ -51,10 +53,20 @@ export function CopyMarkdownButton({
   const copy = async () => {
     const run = start();
     try {
-      const response = await fetch(href);
-      if (!response.ok) throw new Error(String(response.status));
-      const text = await response.text();
-      await navigator.clipboard.writeText(text);
+      if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+        // Started synchronously in the click so Safari keeps the user activation.
+        const blob = fetch(href).then(async (response) => {
+          if (!response.ok) throw new Error(String(response.status));
+          return new Blob([await response.text()], { type: "text/plain" });
+        });
+        // If the write is refused before reading the blob, its own rejection stays handled.
+        blob.catch(() => undefined);
+        await navigator.clipboard.write([new ClipboardItem({ "text/plain": blob })]);
+      } else {
+        const response = await fetch(href);
+        if (!response.ok) throw new Error(String(response.status));
+        await navigator.clipboard.writeText(await response.text());
+      }
       settle(run, "copied");
     } catch {
       settle(run, "failed");

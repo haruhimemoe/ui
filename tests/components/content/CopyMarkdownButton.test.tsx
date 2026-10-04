@@ -1,8 +1,9 @@
 /**
  * @file tests/components/content/CopyMarkdownButton.test.tsx
- * @desc Component tests for CopyMarkdownButton: a successful fetch-then-copy, a non-ok response, a
- *       clipboard rejection and a network error, each announced in the status with no unhandled
- *       rejection; custom labels; finished classes; accessibility.
+ * @desc Component tests for CopyMarkdownButton: the ClipboardItem path (a promised Blob written
+ *       inside the click, for Safari) and the fetch-then-writeText fallback, each with success, a
+ *       non-ok response, a clipboard rejection and a network error announced in the status with
+ *       no unhandled rejection; custom labels; finished classes; accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
  * @modified Sun Oct 4, 2026
@@ -41,7 +42,115 @@ const stubClipboard = (writeText: (text: string) => Promise<void>) => {
   return spy;
 };
 
+/** A minimal ClipboardItem stand-in that keeps the promised data it was built with. */
+class FakeClipboardItem {
+  constructor(readonly items: Record<string, Promise<Blob>>) {}
+}
+
+/**
+ * Stubs ClipboardItem and a clipboard whose write awaits each item's text/plain promise, as a
+ * browser does, then hands the copied text to `onText` (which may reject, like a denied write).
+ */
+const stubClipboardItem = (onText: (text: string) => Promise<void> = () => Promise.resolve()) => {
+  vi.stubGlobal("ClipboardItem", FakeClipboardItem);
+  const writeText = vi.fn(() => Promise.resolve());
+  const write = vi.fn(async (items: FakeClipboardItem[]) => {
+    for (const item of items) {
+      const blob = await item.items["text/plain"];
+      expect(blob?.type).toBe("text/plain");
+      await onText(await (blob as Blob).text());
+    }
+  });
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { write, writeText },
+  });
+  return { write, writeText };
+};
+
+describe("CopyMarkdownButton with ClipboardItem", () => {
+  it("starts clipboard.write inside the click with a promised Blob, and says Copied", async () => {
+    const user = userEvent.setup();
+    const fetchSpy = vi.fn().mockResolvedValue({ ok: true, text: () => Promise.resolve("# Hi") });
+    vi.stubGlobal("fetch", fetchSpy);
+    const copied: string[] = [];
+    const { write, writeText } = stubClipboardItem(async (text) => {
+      copied.push(text);
+    });
+
+    render(<CopyMarkdownButton href="/docs/guide.md" />);
+    await user.click(screen.getByRole("button"));
+    expect(fetchSpy).toHaveBeenCalledWith("/docs/guide.md");
+    expect(write).toHaveBeenCalledTimes(1);
+    expect(writeText).not.toHaveBeenCalled();
+    expect(copied).toEqual(["# Hi"]);
+    expect(screen.getByRole("status")).toHaveTextContent("Copied");
+    expect(rejections).toEqual([]);
+  });
+
+  it("announces the failure on a non-ok response", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404 }));
+    const copied: string[] = [];
+    stubClipboardItem(async (text) => {
+      copied.push(text);
+    });
+
+    render(<CopyMarkdownButton href="/docs/missing.md" />);
+    await user.click(screen.getByRole("button"));
+    expect(screen.getByRole("status")).toHaveTextContent("Couldn't copy");
+    expect(copied).toEqual([]);
+    expect(rejections).toEqual([]);
+  });
+
+  it("announces the failure on a network error", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    stubClipboardItem();
+
+    render(<CopyMarkdownButton href="/docs/guide.md" />);
+    await expect(user.click(screen.getByRole("button"))).resolves.not.toThrow();
+    expect(screen.getByRole("status")).toHaveTextContent("Couldn't copy");
+    expect(rejections).toEqual([]);
+  });
+
+  it("announces the failure when the clipboard rejects the write", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, text: () => Promise.resolve("# Hi") }),
+    );
+    stubClipboardItem(() => Promise.reject(new Error("denied")));
+
+    render(<CopyMarkdownButton href="/docs/guide.md" />);
+    await user.click(screen.getByRole("button"));
+    expect(screen.getByRole("status")).toHaveTextContent("Couldn't copy");
+    expect(rejections).toEqual([]);
+  });
+});
+
 describe("CopyMarkdownButton", () => {
+  it("falls back to fetch then writeText when ClipboardItem is missing", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal("ClipboardItem", undefined);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, text: () => Promise.resolve("# Hi") }),
+    );
+    const write = vi.fn(() => Promise.resolve());
+    const writeText = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { write, writeText },
+    });
+
+    render(<CopyMarkdownButton href="/docs/guide.md" />);
+    await user.click(screen.getByRole("button"));
+    expect(write).not.toHaveBeenCalled();
+    expect(writeText).toHaveBeenCalledWith("# Hi");
+    expect(screen.getByRole("status")).toHaveTextContent("Copied");
+  });
+
   it("fetches the href, copies the body, and says so in the status", async () => {
     const user = userEvent.setup();
     const fetchSpy = vi.fn().mockResolvedValue({ ok: true, text: () => Promise.resolve("# Hi") });
