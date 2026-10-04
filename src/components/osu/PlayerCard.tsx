@@ -5,6 +5,7 @@
  *       the username (the whole card links to the profile), and an optional status row. It never
  *       fetches: the app passes a snapshot, so nothing here claims live data unless told to. The
  *       online ring's lime is osu!'s own green-light, hue-independent like StarRating's spectrum.
+ *       Keyboard focus outlines the whole card in h1 as well as the username's own ring.
  *       Plain `<img>`s, not next/image, so apps need no `images.remotePatterns` for osu!'s hosts.
  *       Server-safe.
  * @author David @dvhsh (https://dvh.sh)
@@ -67,6 +68,11 @@ function initialOf(name: string): string {
   return name.match(/[\p{L}\p{N}]/u)?.[0]?.toUpperCase() ?? "?";
 }
 
+/** Whether a status line has something to show: not null, undefined, a boolean or "". */
+function shown(node: ReactNode): boolean {
+  return node != null && typeof node !== "boolean" && node !== "";
+}
+
 /** The supporter heart: osu!'s pink-circle badge with a white heart. */
 function SupporterHeart({ label }: { label: string }) {
   return (
@@ -110,14 +116,22 @@ export function PlayerCard({
   const avatar = avatarUrl ?? (userId === undefined ? null : defaultAvatarUrl(userId));
   const code = normalizeCountryCode(countryCode);
   const flag = flagUrl(countryCode);
-  const mainLine = statusText ?? (status === "online" ? "Online" : status ? "Offline" : null);
-  const hasStatusRow = status !== undefined || mainLine !== null || statusNote != null;
+  const mainLine = shown(statusText)
+    ? statusText
+    : status === "online"
+      ? "Online"
+      : status
+        ? "Offline"
+        : null;
+  const note = shown(statusNote) ? statusNote : null;
+  const hasStatusRow = status !== undefined || mainLine !== null || note !== null;
 
   return (
     <div
       className={cx(
         "relative isolate flex h-[120px] flex-col justify-between overflow-hidden rounded-[10px] bg-b4 text-c1",
-        link && "hover:outline-2 hover:outline-c3",
+        link &&
+          "hover:outline-2 hover:outline-c3 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-h1",
         className,
       )}
       {...props}
@@ -135,7 +149,7 @@ export function PlayerCard({
           )}
         />
       ) : null}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-b5/80" />
+      {coverUrl ? <div aria-hidden="true" className="absolute inset-0 -z-10 bg-b5/80" /> : null}
 
       <div className="flex gap-2.5 p-2.5">
         {avatar ? (
@@ -176,7 +190,6 @@ export function PlayerCard({
               <img
                 src={team.flagUrl}
                 alt={team.name}
-                title={team.name}
                 width={52}
                 height={26}
                 loading="lazy"
@@ -215,9 +228,7 @@ export function PlayerCard({
             ) : null}
           </div>
           <div className="flex min-w-0 flex-col">
-            {statusNote != null ? (
-              <span className="truncate text-c2 text-xs">{statusNote}</span>
-            ) : null}
+            {note !== null ? <span className="truncate text-c2 text-xs">{note}</span> : null}
             {mainLine !== null ? <span className="truncate text-sm">{mainLine}</span> : null}
           </div>
         </div>

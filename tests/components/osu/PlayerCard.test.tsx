@@ -60,7 +60,6 @@ describe("PlayerCard", () => {
   it("draws the team flag with its name, and the supporter heart with its label", () => {
     const { rerender } = render(<PlayerCard {...FULL} />);
     const teamFlag = screen.getByRole("img", { name: "mom?" });
-    expect(teamFlag).toHaveAttribute("title", "mom?");
     expect(teamFlag).toHaveAttribute("src", FULL.team.flagUrl);
     expect(screen.getByRole("img", { name: "osu! supporter" })).toBeInTheDocument();
     rerender(<PlayerCard {...FULL} supporterLabel="supporter" />);
@@ -97,8 +96,21 @@ describe("PlayerCard", () => {
   });
 
   it("leaves the status row out when there is nothing to say", () => {
-    const { container } = render(<PlayerCard {...FULL} />);
+    const { container, rerender } = render(<PlayerCard {...FULL} />);
     expect(container.querySelector(".pb-2\\.5")).toBeNull();
+    rerender(<PlayerCard {...FULL} statusText="" statusNote={false} />);
+    expect(container.querySelector(".pb-2\\.5")).toBeNull();
+    rerender(<PlayerCard {...FULL} statusText={0} />);
+    expect(screen.getByText("0")).toBeInTheDocument();
+  });
+
+  it("draws the overlay only over a cover, and outlines a linked card on keyboard focus", () => {
+    const { container, rerender } = render(<PlayerCard {...FULL} />);
+    expect(container.querySelector(".bg-b5\\/80")).not.toBeNull();
+    expect(container.firstElementChild?.className).toContain("has-[a:focus-visible]:outline-h1");
+    rerender(<PlayerCard username="token" />);
+    expect(container.querySelector(".bg-b5\\/80")).toBeNull();
+    expect(container.firstElementChild?.className).not.toContain("outline");
   });
 
   it("hides an animated cover for reduced motion, and keeps a still one", () => {
