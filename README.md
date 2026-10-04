@@ -845,6 +845,136 @@ A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: N
 | --- | --- | --- | --- |
 | `mod` | `string` | required | The mod or slot label. |
 
+### MDX (server)
+
+Since 0.9.0. Three subpaths, so an app that never renders Markdown loads none of this: `@haruhimemoe/ui/mdx` (the React pieces: `mdxComponents`, `CodeBlock`, `Callout`), `@haruhimemoe/ui/remark` (plain functions, no React, for `@next/mdx` and `react-markdown`'s `remarkPlugins`), and `@haruhimemoe/ui/shiki` (opt-in code highlighting). The root `@haruhimemoe/ui` export is unchanged.
+
+**With `@next/mdx`:**
+
+```ts
+// next.config.ts
+import createMDX from "@next/mdx";
+
+const withMDX = createMDX({
+  extension: /\.mdx?$/,
+  // Turbopack only takes MDX plugins as module names, not imported functions.
+  options: { remarkPlugins: ["remark-gfm", "@haruhimemoe/ui/remark"] },
+});
+
+export default withMDX({ pageExtensions: ["ts", "tsx", "md", "mdx"] });
+```
+
+```tsx
+// mdx-components.tsx
+import { mdxComponents } from "@haruhimemoe/ui/mdx";
+import "@haruhimemoe/ui/shiki"; // optional: see "Code highlighting" below
+
+export function useMDXComponents(components) {
+  return { ...mdxComponents, ...components };
+}
+```
+
+`remark-gfm` isn't ui's dependency (pin it yourself); without it `@next/mdx` has no pipe tables, and a table with no GFM stays a paragraph.
+
+**With `react-markdown`:**
+
+```tsx
+import { mdxComponents } from "@haruhimemoe/ui/mdx";
+import remarkHaruhime from "@haruhimemoe/ui/remark";
+import remarkGfm from "remark-gfm";
+import Markdown from "react-markdown";
+
+<Markdown components={mdxComponents} remarkPlugins={[remarkGfm, remarkHaruhime]}>
+  {body}
+</Markdown>;
+```
+
+If you sanitize the output (`rehype-sanitize` or your own schema), allow `className` on `code` matching `/^language-/`, `dataMeta` on `code`, `dataCallout` on `blockquote`, and `id` on `h2`/`h3`: the remark plugin writes these, and `mdxComponents` reads them back.
+
+#### `mdxComponents`
+
+The element overrides apps pass to `@next/mdx`'s `useMDXComponents` or `react-markdown`'s `components`: `{ a, blockquote, h2, h3, pre, table }`. Spread it and add your own (`{ ...mdxComponents, Example: LiveExample }`).
+
+| Element | Renders |
+| --- | --- |
+| `a` | `https://` opens in a new tab (`rel="noopener noreferrer"`); a same-page `#hash` is a plain anchor; everything else goes through `AutoLink` (`next/link`, or a plain `<a>` off-site). |
+| `h2`, `h3` | The heading with its id (from the remark plugin, or a `slugify` of its own text) and, beside it, a `#` anchor link (`aria-label="Link to section: …"`, always visible in `c4`, turning `h1` on hover, never only on hover). |
+| `pre` | Reads its single `code` child (text, `language-x` class, the fence's meta) and renders `CodeBlock`. Anything else (a `pre` with no single `code` child) renders as a plain, focusable `<pre>`. |
+| `table` | The table wrapped in a focusable, named scroll region: `<div role="group" tabIndex={0} aria-label="…">`, labelled by the table's `<caption>` text, or `"Table"` without one. |
+| `blockquote` | A blockquote the remark plugin marked `data-callout` renders as `Callout` of that type; any other blockquote renders plainly. |
+
+#### `CodeBlock`
+
+An async Server Component: a header bar (the fence's `title`, or the language name, or `"Code"`) with a copy button, over a `<pre role="group" tabIndex={0}>` of lines. Every native `<div>` prop goes on the wrapper except `code`, `lang`, `title` and `highlight`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `code` | `string` | required | The text. Any line endings (`\r\n`, a trailing newline) are normalized; a lone trailing newline doesn't add a phantom last line. |
+| `lang` | `string` | none | A Shiki language id or alias (`ts`, `tsx`, `js`, `json`, `bash`/`sh`/`shell`, `css`, `html`, `md`/`markdown`, `diff`, `yaml`/`yml`). Unknown languages render plain. |
+| `title` | `string` | none | Shown in the header instead of the language; also names the `<pre>` and the copy button ("Copy x.ts"). |
+| `highlight` | `readonly number[]` | `[]` | 1-based line numbers to mark: an `h1` left border and a `b4` tint (`forced-colors:border-[Highlight]` keeps the mark visible under Windows high contrast). |
+
+In MDX, pass these through the fence's meta string instead of writing `CodeBlock` by hand: ` ```ts title="pool.ts" {2,4-5}`. `parseCodeMeta` reads `title="…"` or `title='…'` and `{1,3-5}` ranges (anything else is ignored, and it never throws); the language comes from the fence's own tag.
+
+#### Code highlighting
+
+`shiki` is an optional peer dependency: apps that never render code don't install it, and ui's only runtime dependency stays `tailwind-merge`. An app that renders code:
+
+```sh
+bun add shiki
+```
+
+```ts
+// in the module that renders code: mdx-components.tsx, or next to your react-markdown call
+import "@haruhimemoe/ui/shiki";
+```
+
+That import is a side effect: it registers a Shiki core highlighter (`shiki/core` with the no-WASM JS regex engine, loaded through dynamic `import()`, built once per process) under `@haruhimemoe/ui/mdx`'s `CodeBlock`. It isn't "once anywhere": registration lives in the module graph that imported it, so a route that renders `CodeBlock` without this import in its own graph may or may not highlight depending on load order. Put it in `mdx-components.tsx` (reaches every MDX page) or directly beside your `react-markdown` renderer. `package.json`'s `sideEffects` lists `./dist/shiki.js`, so bundlers don't drop the bare import; Turbopack resolves even a dynamic `import("shiki/core")` at build time, which is why highlighting is a separate subpath instead of code `CodeBlock` imports unconditionally.
+
+Without the import, `CodeBlock` renders plain, unstyled lines, and in development it logs one `console.warn` per process ("code blocks aren't highlighted…"). A highlighter that fails to load (a missing package, a broken build) falls back the same way, warned once.
+
+Tokens render as `<span style={{ color: "var(--shiki-token-…)" }}>`, no injected Shiki HTML, through `--shiki-*` custom properties in `theme.css` (see "Setup" above for loading it). They follow `--hue` like the rest of the palette: `--shiki-foreground` and `--shiki-background` are `c2`/`b6`; `--shiki-token-keyword`, `-string`, `-string-expression`, `-constant`, `-function`, `-parameter`, `-punctuation` and `-link` are hue-offset HSL values, each at or above 4.5:1 against both `b6` (the block's background) and `b4` (a highlighted line's tint) at every integer hue; `-comment` uses `c4`. `keyword` and `link` get their own hue-derived lightness instead of reusing `h1`: `h1`'s default (76%) drops to 4.33:1 against `b4` at hue 240, and a `--h1-l` override written for other text shouldn't silently recolor code too.
+
+#### `Callout`
+
+A labelled aside: a left-border panel (`role="note"`) with an icon and a bold label, usable directly in MDX or rendered by `mdxComponents`' `blockquote` override.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `type` | `"note" \| "tip" \| "warning"` | `"note"` | The border color, icon and default label (`h1` / `c2` / `h2` border; "Note" / "Tip" / "Warning"). The type is in the text, never color alone. |
+| `title` | `ReactNode` | the type's label | Replaces the default label. |
+| `children` | `ReactNode` | required | The body. |
+
+GitHub-style callout syntax works through the remark plugin: a blockquote whose first paragraph starts with `[!NOTE]`, `[!TIP]`, `[!WARNING]` (case-insensitive; GitHub's `[!IMPORTANT]` maps to `tip`, `[!CAUTION]` to `warning`) becomes a `Callout` of that type, the marker stripped:
+
+```md
+> [!NOTE]
+> Packs are deleted after 90 days of no edits.
+```
+
+Or write `<Callout type="tip">` directly in an `.mdx` file.
+
+#### `@haruhimemoe/ui/remark`
+
+Plain functions (no React), for `remarkPlugins`. Default export `remarkHaruhime(options?)` runs all three transforms below in order and is what Turbopack needs by module name: `remarkPlugins: ["@haruhimemoe/ui/remark"]`. Named exports `remarkCodeMeta`, `remarkCallouts` and `remarkHeadingIds` run one each, for `react-markdown`'s array form or a custom pipeline.
+
+| Option (all default `true`) | Turns off |
+| --- | --- |
+| `codeMeta` | Copying a fenced code block's meta string onto `data-meta`, which `CodeBlock`'s fence syntax (`title=`, `{…}`) reads. |
+| `callouts` | The `[!NOTE]` / `[!TIP]` / `[!WARNING]` blockquote markers. |
+| `headingIds` | Slugged, deduplicated ids on `h2`/`h3` (a heading that already has one keeps it). |
+
+`slugify(text)` and `createSlugger()` are also exported: lowercase, Unicode-aware (letters, marks, digits and underscores from any script survive; everything else but whitespace and hyphens is dropped), spaces to hyphens, repeats suffixed `-1`, `-2` like GitHub's own heading anchors. `@haruhimemoe/ui/mdx` re-exports `slugify` for apps that build their own heading links.
+
+#### Accessibility
+
+- The `<pre>` `CodeBlock` renders and the `<div>` `mdxComponents`' `table` wraps a table in are both `role="group"` with `tabIndex={0}` and an `aria-label` (`pre` may not be named on its own): keyboard users can reach a sideways scroll that a mouse would otherwise require. Do the same for any `pre` you render yourself inside `Prose`.
+- Heading anchor links are always visible (`c4`, turning `h1` on hover), never hover-only, and at least 24px; their `aria-label` ("Link to section: …") keeps the heading's own accessible name as its own text.
+- `CodeCopyButton` reports "Copied" or "Copy failed" through a live region mounted before use, like `CopyButton`.
+- `Callout` is `role="note"` with the type in text, not color alone; highlighted code lines keep a `forced-colors` border so Windows high contrast mode still shows them.
+
+`Prose` (in "Basics" above) styles a direct-child `pre` with its own fence look, so `CodeBlock` (which isn't a direct child; `mdxComponents`' `pre` override renders it) is untouched when both are in play. `Prose` also styles `blockquote`.
+
 ### Palette (client)
 
 Since 0.8.0. A command palette: press Ctrl K (⌘K on a Mac) anywhere on the page and a dialog opens with a search box over everything the app can do. It is one component for every haruhime tool: `CommandPalette` is the engine, `siteCommands` the defaults every site shares, and each app plugs in its own commands, pages and search providers through the same `Command` and `Provider` types. No new dependency.

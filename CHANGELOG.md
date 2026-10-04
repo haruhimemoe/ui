@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `@haruhimemoe/ui/mdx`: `mdxComponents` (the `a`/`h2`/`h3`/`pre`/`table`/`blockquote` element overrides for `@next/mdx` and `react-markdown`), `CodeBlock` (a fenced code block, Shiki-highlighted when registered), `Callout` (a note/tip/warning aside, also reached through a GitHub-style `> [!NOTE]` blockquote), `parseCodeMeta` and `slugify`.
+- `@haruhimemoe/ui/remark`: `remarkHaruhime` (default export, for Turbopack's module-name-only `remarkPlugins`) plus the named `remarkCodeMeta`, `remarkCallouts` and `remarkHeadingIds`, and `createSlugger`.
+- `@haruhimemoe/ui/shiki`: an opt-in side-effect import (`shiki` is now an optional peer dependency) that registers Shiki's core highlighter for `CodeBlock`. An app that skips it, or doesn't install `shiki`, gets plain code blocks instead of a build failure.
+- `theme.css`: `--shiki-foreground`, `--shiki-background` and the `--shiki-token-*` variables Shiki's CSS-variables theme reads, derived from `--hue` like the rest of the palette.
+
+### Changed
+
+- `Prose` styles only a direct-child `pre` (`[&>pre]` instead of `[&_pre]`), so `CodeBlock` nested deeper (as `mdxComponents`' `pre` override renders it) keeps its own look. `Prose` also styles `blockquote`.
+
 ## [0.8.0] - 2026-10-03
 
 ### Added
