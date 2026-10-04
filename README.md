@@ -889,7 +889,9 @@ import Markdown from "react-markdown";
 </Markdown>;
 ```
 
-If you sanitize the output (`rehype-sanitize` or your own schema), allow `className` on `code` matching `/^language-/`, `dataMeta` on `code`, `dataCallout` on `blockquote`, and `id` on `h2`/`h3`: the remark plugin writes these, and `mdxComponents` reads them back.
+`mdxComponents` must render in a Server Component: `CodeBlock` (its `pre` override hands off to) is async, and a client component can't render an async one. A client-side renderer, like a live editor preview, can't use `pre` from this map; pass your own synchronous override for that case.
+
+If you sanitize the output (`rehype-sanitize` or your own schema), allow `className` on `code` matching `/^language-/`, `dataMeta` on `code`, `dataCallout` on `blockquote`, and `id` on `h2`/`h3`: the remark plugin writes these, and `mdxComponents` reads them back. rehype-sanitize's default `clobberPrefix` renames those heading ids to `user-content-…`; pass `clobberPrefix: ""` (what haruhime.moe uses) to keep the plain id, or live with the prefix and update any hand-written anchor links to match.
 
 #### `mdxComponents`
 
@@ -929,11 +931,11 @@ bun add shiki
 import "@haruhimemoe/ui/shiki";
 ```
 
-That import is a side effect: it registers a Shiki core highlighter (`shiki/core` with the no-WASM JS regex engine, loaded through dynamic `import()`, built once per process) under `@haruhimemoe/ui/mdx`'s `CodeBlock`. It isn't "once anywhere": registration lives in the module graph that imported it, so a route that renders `CodeBlock` without this import in its own graph may or may not highlight depending on load order. Put it in `mdx-components.tsx` (reaches every MDX page) or directly beside your `react-markdown` renderer. `package.json`'s `sideEffects` lists `./dist/shiki.js`, so bundlers don't drop the bare import; Turbopack resolves even a dynamic `import("shiki/core")` at build time, which is why highlighting is a separate subpath instead of code `CodeBlock` imports unconditionally.
+That import is a side effect: it registers a Shiki core highlighter (`shiki/core` with the no-WASM JS regex engine, loaded through dynamic `import()`) under `@haruhimemoe/ui/mdx`'s `CodeBlock`. The registration lives on `globalThis` for the whole process, not per module graph, but it only exists once the import has actually run: put it in the module that renders code (`mdx-components.tsx`, which reaches every MDX page, or directly beside your `react-markdown` renderer) so it runs before `CodeBlock` does. `package.json`'s `sideEffects` lists `./dist/shiki.js`, so bundlers don't drop the bare import; Turbopack resolves even a dynamic `import("shiki/core")` at build time, which is why highlighting is a separate subpath instead of `CodeBlock` importing it unconditionally.
 
 Without the import, `CodeBlock` renders plain, unstyled lines, and in development it logs one `console.warn` per process ("code blocks aren't highlighted…"). A highlighter that fails to load (a missing package, a broken build) falls back the same way, warned once.
 
-Tokens render as `<span style={{ color: "var(--shiki-token-…)" }}>`, no injected Shiki HTML, through `--shiki-*` custom properties in `theme.css` (see "Setup" above for loading it). They follow `--hue` like the rest of the palette: `--shiki-foreground` and `--shiki-background` are `c2`/`b6`; `--shiki-token-keyword`, `-string`, `-string-expression`, `-constant`, `-function`, `-parameter`, `-punctuation` and `-link` are hue-offset HSL values, each at or above 4.5:1 against both `b6` (the block's background) and `b4` (a highlighted line's tint) at every integer hue; `-comment` uses `c4`. `keyword` and `link` get their own hue-derived lightness instead of reusing `h1`: `h1`'s default (76%) drops to 4.33:1 against `b4` at hue 240, and a `--h1-l` override written for other text shouldn't silently recolor code too.
+Tokens render as `<span style={{ color: "var(--shiki-token-…)" }}>`, no injected Shiki HTML, through `--shiki-*` custom properties in `theme.css` (see "Setup" above for loading it). They follow `--hue` like the rest of the palette: `--shiki-foreground` and `--shiki-background` are `c2`/`b6`; `-punctuation` is `c3` and `-comment` is `c4`, the palette tokens as-is; `-keyword` and `-link` are `hsl(var(--hue) 100% 78%)`, the palette's own hue with no offset; `-string`, `-string-expression`, `-constant`, `-function` and `-parameter` are each `calc(var(--hue) + N)`, a hue-offset HSL value. Every one stays at or above 4.5:1 against both `b6` (the block's background) and `b4` (a highlighted line's tint) at every integer hue. `keyword` and `link` get their own fixed lightness instead of reusing `h1`: `h1`'s default (76%) drops to 4.33:1 against `b4` at hue 240, and a `--h1-l` override written for other text shouldn't silently recolor code too.
 
 #### `Callout`
 
