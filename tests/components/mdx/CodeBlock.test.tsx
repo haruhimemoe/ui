@@ -129,6 +129,22 @@ describe("CodeBlock", () => {
     await expectNoAxeViolations(container);
   });
 
+  it("keeps newlines between lines so the pre's textContent matches the normalized code", async () => {
+    const { container } = render(await CodeBlock({ code: "a\n\nb\nc", lang: "ts" }));
+    const pre = container.querySelector("pre");
+    expect(pre?.textContent).toBe("a\n\nb\nc");
+  });
+
+  it("passes id, data-* and className through to the wrapper div", async () => {
+    const { container } = render(
+      await CodeBlock({ code: "a", id: "snippet", "data-foo": "1", className: "x" } as never),
+    );
+    const wrapper = container.firstElementChild;
+    expect(wrapper).toHaveAttribute("id", "snippet");
+    expect(wrapper).toHaveAttribute("data-foo", "1");
+    expect(wrapper?.className).toContain("x");
+  });
+
   describe("without Shiki", () => {
     afterEach(() => {
       resetHighlighter();
