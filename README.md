@@ -1018,11 +1018,12 @@ A beatmap's CS, AR, OD, HP, BPM and length as a compact `<dl>`, in that order. S
 
 #### `ModBadge`
 
-A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: NM sky, HD amber, HR rose, DT and NC violet, FM emerald, TB orange, with dark text. Anything else is a `b3` pill. Every native `<span>` prop; `children` replace the text, and `className` recolors it (`bg-pink-300` for a custom bucket).
+A mod pool slot's pill (`NM1`, `HD2`, `TB`), colored by the first two letters: NM sky, HD amber, HR rose, DT and NC violet, FM emerald, TB orange, with dark text. Anything else is a `b3` pill. Every native `<span>` prop; `children` replace the text, and `className` recolors it (`bg-pink-300` for a custom bucket). A custom bucket: `<ModBadge mod={code} color={PALETTE[entry.color].toLowerCase() as ModBadgeColor} />`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `mod` | `string` | required | The mod or slot label. |
+| `color` | `ModBadgeColor` | from `mod` | Since 0.12.0. Overrides the bucket color: `sky`, `amber`, `rose`, `violet`, `emerald`, `orange` (the buckets), `green`, `teal`, `pink`, `lime`, `cyan`, `fuchsia`, `yellow`, `red`, `indigo`, `stone` (@haruhimemoe/pool's PALETTE, lowercased), or `neutral`. |
 
 #### `PlayerCard`
 

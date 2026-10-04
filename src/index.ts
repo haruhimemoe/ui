@@ -137,7 +137,11 @@ export {
   BeatmapStats,
   type BeatmapStatsProps,
 } from "./components/osu/BeatmapStats.js";
-export { ModBadge, type ModBadgeProps } from "./components/osu/ModBadge.js";
+export {
+  ModBadge,
+  type ModBadgeColor,
+  type ModBadgeProps,
+} from "./components/osu/ModBadge.js";
 export {
   PlayerCard,
   type PlayerCardProps,

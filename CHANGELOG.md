@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `Text` and `textClasses`: a line of text in six tones (`default` c2, `muted` c3, `subtle` c4, `error`, `warning` amber-300, `success`) and three sizes, for the error, warning and muted text apps wrote by hand.
 - `download` on `ButtonLink` and `TextLink` renders a plain `<a download>` (no prefetch, no client routing), for any value but `false`.
 - `hideLabel` on `TextInput`, `Select`, `Textarea`, `Checkbox` and `RadioGroup`: the label (legend for RadioGroup) is hidden visually but still names the control, with no gap left above it.
+- `ModBadge` `color` (`ModBadgeColor`): any of the six bucket colors, the ten @haruhimemoe/pool palette colors or `neutral`, overriding the color the mod's letters pick. A value outside the list falls back to the bucket.
 
 ### Changed
 
