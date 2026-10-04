@@ -29,4 +29,9 @@ describe("createSlugger", () => {
     const slug = createSlugger();
     expect([slug("Usage"), slug("Usage"), slug("Usage")]).toEqual(["usage", "usage-1", "usage-2"]);
   });
+
+  it("skips a suffix already taken by a literal heading, like github-slugger", () => {
+    const slug = createSlugger();
+    expect([slug("Foo"), slug("Foo"), slug("Foo 1")]).toEqual(["foo", "foo-1", "foo-1-1"]);
+  });
 });

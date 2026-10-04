@@ -1,7 +1,7 @@
 /**
  * @file src/remark/slugify.ts
  * @desc GitHub-style heading slugs: lowercase, drop punctuation (keeping letters, marks, digits
- *       and underscores from any script), turn each run of whitespace into one hyphen, and
+ *       and underscores from any script), turn each whitespace character into a hyphen, and
  *       suffix repeats `-1`, `-2` the way GitHub's own heading anchors do.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
@@ -23,15 +23,21 @@ export const slugify = (text: string): string =>
 
 /**
  * @function createSlugger
- * @returns {(text: string) => string} a function that slugs `text` and, on a repeat base slug,
- *          appends `-1`, `-2`, … like GitHub's heading anchors
+ * @returns {(text: string) => string} a function that slugs `text` and, on a repeat (the slug
+ *          itself, or a literal heading that already claimed the suffixed form), appends `-1`,
+ *          `-2`, … until it finds an unused candidate, like GitHub's heading anchors
  */
 export const createSlugger = (): ((text: string) => string) => {
-  const seen = new Map<string, number>();
+  const occurrences = new Map<string, number>();
   return (text) => {
     const base = slugify(text);
-    const count = seen.get(base) ?? 0;
-    seen.set(base, count + 1);
-    return count === 0 ? base : `${base}-${count}`;
+    let candidate = base;
+    while (occurrences.has(candidate)) {
+      const count = (occurrences.get(base) ?? 0) + 1;
+      occurrences.set(base, count);
+      candidate = `${base}-${count}`;
+    }
+    occurrences.set(candidate, 0);
+    return candidate;
   };
 };

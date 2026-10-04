@@ -111,6 +111,13 @@ describe("MdxLink", () => {
     expect(link).toHaveAttribute("aria-describedby", "x");
     expect(link).toHaveAttribute("data-foo", "1");
   });
+
+  it("renders a plain anchor with no href attribute when href is undefined", () => {
+    render(<MdxLink node={{}}>Named anchor</MdxLink>);
+    const anchor = screen.getByText("Named anchor");
+    expect(anchor.tagName).toBe("A");
+    expect(anchor).not.toHaveAttribute("href");
+  });
 });
 
 describe("MdxH2", () => {
@@ -200,6 +207,21 @@ describe("MdxPre", () => {
     expect(pre).not.toHaveAttribute("node");
   });
 
+  it("still detects a fence when an app overrides the code component", () => {
+    function CustomCode(props: { className?: string; children?: unknown }) {
+      return createElement("code", props);
+    }
+    const custom = createElement(CustomCode, { className: "language-ts" }, "const a = 1;\n");
+    const element = MdxPre({ node: {}, children: custom });
+    expect(element.type).toBe(CodeBlock);
+    expect(element.props).toEqual({
+      code: "const a = 1;\n",
+      lang: "ts",
+      title: undefined,
+      highlight: [],
+    });
+  });
+
   it('reads the code fence meta from props["data-meta"]', () => {
     const code = createElement("code", { "data-meta": "{2-3}" }, "a\nb\nc\n");
     const element = MdxPre({ node: {}, children: code });
@@ -249,6 +271,18 @@ describe("MdxBlockquote", () => {
     );
     const note = screen.getByRole("note");
     expect(note).toHaveTextContent("Tip");
+  });
+
+  it("forwards className, id and other props to the rendered Callout", () => {
+    render(
+      <MdxBlockquote node={{}} data-callout="note" className="x" id="cb" data-foo="1">
+        Text
+      </MdxBlockquote>,
+    );
+    const note = screen.getByRole("note");
+    expect(note).toHaveClass("x");
+    expect(note).toHaveAttribute("id", "cb");
+    expect(note).toHaveAttribute("data-foo", "1");
   });
 
   it("renders a plain blockquote with no data-callout attribute when none is given", () => {

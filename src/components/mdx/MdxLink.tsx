@@ -6,8 +6,10 @@
  *       doesn't treat `#usage` as external and would otherwise send it through next/link, which
  *       has no reason to handle a same-page jump; everything else (internal paths, `mailto:` and
  *       other schemes) goes through AutoLink, which already picks `next/link` or a plain `<a>` by
- *       href and spreads every other prop onto whichever element it renders. Drops the `node`
- *       prop react-markdown passes to every component, so it never reaches the DOM.
+ *       href and spreads every other prop onto whichever element it renders. No `href` at all (a
+ *       README `<a name>`/`<a id>` anchor via rehype-raw) renders a plain `<a>` with no `href`
+ *       attribute, not a focusable empty link. Drops the `node` prop react-markdown passes to
+ *       every component, so it never reaches the DOM.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Sat Oct 3, 2026
@@ -26,7 +28,10 @@ export type MdxLinkProps = ComponentProps<"a"> & { node?: unknown };
  *          for a same-page hash, or an AutoLink (next/link or a plain anchor, by href) otherwise,
  *          every other prop forwarded in full
  */
-export function MdxLink({ node: _node, href = "", children, ...props }: MdxLinkProps) {
+export function MdxLink({ node: _node, href, children, ...props }: MdxLinkProps) {
+  if (href === undefined) {
+    return <a {...props}>{children}</a>;
+  }
   if (/^https?:\/\//i.test(href)) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" {...props}>

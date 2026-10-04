@@ -1,9 +1,12 @@
 /**
  * @file src/components/mdx/MdxPre.tsx
  * @desc react-markdown/MDX's `pre` override: a fenced code block (a `<pre>` wrapping a single
- *       `<code>` with a `language-*` class) is handed to CodeBlock with its parsed meta; anything
- *       else renders as a plain, focusable `<pre>`. Drops the `node` prop react-markdown passes
- *       to every component.
+ *       child with a `language-*` class, a `data-meta` prop, or the literal `code` element type)
+ *       is handed to CodeBlock with its parsed meta; detecting the fence by the child's props
+ *       rather than only `child.type === "code"` means an app that overrides the `code` component
+ *       (through `mdxComponents`' own map or MDX's `useMDXComponents`) still gets highlighting.
+ *       Anything else renders as a plain, focusable `<pre>`. Drops the `node` prop react-markdown
+ *       passes to every component.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Sat Oct 3, 2026
@@ -27,7 +30,12 @@ type CodeProps = { className?: string; children?: ReactNode; "data-meta"?: strin
  */
 export function MdxPre({ node: _node, children, ...props }: MdxPreProps) {
   const [child] = Children.toArray(children);
-  if (!isValidElement<CodeProps>(child) || child.type !== "code") {
+  const isFence =
+    isValidElement<CodeProps>(child) &&
+    (child.type === "code" ||
+      /(?:^|\s)language-/.test(child.props.className ?? "") ||
+      child.props["data-meta"] !== undefined);
+  if (!isFence || !isValidElement<CodeProps>(child)) {
     return (
       <pre
         // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard focus
