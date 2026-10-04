@@ -5,8 +5,10 @@ import {
   Card,
   Checkbox,
   Chip,
+  ContentIndex,
   ContentLayout,
   ContentNav,
+  ContentSearch,
   CopyButton,
   DiscordIcon,
   FilterPanel,
@@ -27,6 +29,7 @@ import {
   type SiteFooterColumn,
   SiteHeader,
   type SiteLinkItem,
+  searchContent,
   Textarea,
   TextInput,
 } from "@haruhimemoe/ui";
@@ -158,6 +161,19 @@ export default function Page() {
       >
         <p>Content layout body, from the packed tarball.</p>
       </ContentLayout>
+      <ContentSearch
+        label="Search the docs"
+        items={[
+          { href: "/docs", title: "Getting started", description: "From the packed tarball." },
+          { href: "/relative", title: "Relative links", badge: "new", description: "Links." },
+        ]}
+      />
+      <ContentIndex
+        items={searchContent(
+          [{ href: "/legal/terms", title: "Terms", description: "From the packed tarball." }],
+          "",
+        )}
+      />
       <FilterPanel title="Server filters" resultCount="3 maps">
         <FilterRow label="Mode">
           <Chip pressed={false}>osu!taiko</Chip>

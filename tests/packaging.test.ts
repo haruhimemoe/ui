@@ -94,6 +94,7 @@ describe("shipped source", () => {
       "src/components/basics/Disclosure.tsx",
       "src/components/basics/Tabs.tsx",
       "src/components/content/ContentNav.tsx",
+      "src/components/content/ContentSearch.tsx",
       "src/components/filters/FilterPanel.tsx",
       "src/components/filters/RangeBox.tsx",
       "src/components/filters/RangeSlider.tsx",

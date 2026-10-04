@@ -720,14 +720,14 @@ schema.org structured data in a `<script type="application/ld+json">`. Every `<`
 
 ### Content
 
-Since 0.11.0. A content section's side navigation and page grid, a port of bb's docs sidebar and layout grid. `ui` has no next-kit or brand dependency: resolve your section's entries (a docs registry, a future blog) into these plain, structural types yourself.
+Since 0.11.0. A content section's side navigation, page grid and search, ports of bb's docs sidebar, layout grid and search. `ui` has no next-kit or brand dependency: resolve your section's entries (a docs registry, a future blog) into these plain, structural types yourself.
 
 ```ts
 type ContentNavItem = { href: string; title: string; navTitle?: string; badge?: string };
 type ContentNavGroup = { heading?: string; items: readonly ContentNavItem[] };
 ```
 
-`ContentSearchItem` (`ContentNavItem & { description: string; keywords?: readonly string[] }`) is exported too, for a search over the same entries.
+`ContentSearchItem` (`ContentNavItem & { description: string; keywords?: readonly string[] }`) is exported too, for `searchContent`, `ContentSearch` and `ContentIndex` below.
 
 #### `ContentNav` (client)
 
@@ -750,6 +750,29 @@ The grid: `nav` in a 14rem column from `lg` up, the page beside it; one column o
 | --- | --- | --- | --- |
 | `nav` | `ReactNode` | required | The section's navigation, already rendered. |
 | `children` | `ReactNode` | required | The page, inside a `min-w-0` wrapper (so a long line inside it can still shrink and wrap). |
+
+#### `searchContent`
+
+`searchContent(items: readonly ContentSearchItem[], query: string): ContentSearchItem[]`. Pure and server-safe. A blank (or whitespace-only) query returns every item, in input order. Otherwise `query` is lowercased and split on spaces; an item matches when every word appears somewhere in its `title`, `navTitle`, `description`, `badge` or any `keywords`. Matching items whose `title` starts with the trimmed query come first; the rest keep their input order.
+
+#### `ContentSearch` (client)
+
+Port of bb's docs search. A `TextInput` (id `content-search`, `type="search"`), a polite live region with the result count, then `ContentIndex` over what `searchContent` found.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `items` | `readonly ContentSearchItem[]` | required | The section's entries. |
+| `label` | `string` | required | The field's label. |
+| `placeholder` | `string` | none | The field's placeholder. |
+| `countNoun` | `readonly [string, string]` | `["page", "pages"]` | Singular and plural noun for the unfiltered count ("12 pages."). A filtered count always reads "1 match." or "N matches." |
+
+#### `ContentIndex`
+
+The same card grid as `ContentSearch` (one link per item: title, badge, description), with no search field, for a section with too few entries to bother searching (`/legal`, a handful of guides). A Server Component.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `items` | `readonly ContentSearchItem[]` | required | The entries to list. |
 
 ### Shell
 

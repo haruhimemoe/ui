@@ -40,8 +40,11 @@ export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
 export { tabId, tabPanelId } from "./components/basics/tabIds.js";
 
 // Content
+export { ContentIndex, type ContentIndexProps } from "./components/content/ContentIndex.js";
 export { ContentLayout, type ContentLayoutProps } from "./components/content/ContentLayout.js";
 export { ContentNav, type ContentNavProps } from "./components/content/ContentNav.js";
+export { ContentSearch, type ContentSearchProps } from "./components/content/ContentSearch.js";
+export { searchContent } from "./components/content/searchContent.js";
 export type {
   ContentNavGroup,
   ContentNavItem,
