@@ -4,7 +4,7 @@
  *       description, no search field, axe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -41,5 +41,15 @@ describe("ContentIndex", () => {
   it("has no axe violations", async () => {
     const { container } = render(<ContentIndex items={ITEMS} />);
     await expectNoAxeViolations(container);
+  });
+
+  it("lays its tiles out on CardGrid with the shared 10px surface", () => {
+    render(<ContentIndex items={ITEMS} />);
+    const list = screen.getByRole("list");
+    expect(list).toHaveClass("gap-2.5", "sm:grid-cols-2");
+    const tile = screen.getByRole("link", { name: /Terms/ });
+    expect(tile).toHaveClass("rounded-[10px]", "bg-b4", "p-3", "hover:bg-b3");
+    expect(tile.className.split(" ")).not.toContain("rounded-md");
+    expect(tile.parentElement).toHaveClass("flex");
   });
 });

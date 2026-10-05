@@ -10,10 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - `Surface` and `surfaceClasses`: the list-item box (Card's b4 and 10px radius at p-3, `md` p-4, `lg` p-5, `as` div, li, section, article, form or p), and its classes for other elements.
 - `LinkCard` and `CardLink`: a card that is one link. `CardLink`'s cover fills the card, its name stays its own text, and LinkCard lifts every other control above the cover. `media` for a full-bleed banner. No landmark.
+- `CardGrid`: a list of cards, one column on phones, `columns` 2 or 3 from sm/lg, `gap` sm or md, wrapping each child in its own flex `<li>` so cards in a row match height.
 
 ### Changed
 
 - `Card` takes its classes from `surfaceClasses`. No visual change.
+- `ContentIndex` lays its cards out on `CardGrid` and `surfaceClasses`: the tiles get Card's 10px radius (from 6px) and a 10px gap (from 8px).
 
 ## [0.12.0] - 2026-10-04
 

@@ -25,6 +25,7 @@ export {
   buttonClasses,
 } from "./components/basics/buttonStyles.js";
 export { Card, type CardProps } from "./components/basics/Card.js";
+export { CardGrid, type CardGridProps } from "./components/basics/CardGrid.js";
 export { CardLink, type CardLinkProps } from "./components/basics/CardLink.js";
 export type { HeadingLevel } from "./components/basics/cardStyles.js";
 export { Disclosure, type DisclosureProps } from "./components/basics/Disclosure.js";

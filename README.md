@@ -397,6 +397,14 @@ A card that is one click target. `CardLink` is the link: its `after:` box covers
 - `CardLink` works in any `relative` box outside `LinkCard` too; pass `after:rounded-[10px]` when the box is rounded and doesn't clip.
 - Use `Card` for a labelled region and `LinkCard` for a card that goes somewhere.
 
+#### `CardGrid`
+
+A grid of cards as a list: one column on phones, `columns` 2 (default) or 3 from `sm`/`lg`, `gap` `md` (default, 16px then 20px) or `sm` (10px), `as` `ul` or `ol`. It wraps each child in a flex `<li>`, so cards in a row match height: cards render no `<li>` of their own.
+
+```tsx
+<CardGrid columns={3}>{templates.map((t) => <TemplateCard key={t.id} template={t} />)}</CardGrid>
+```
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.
@@ -857,7 +865,7 @@ Port of bb's docs search. A `TextInput` (id `content-search`, `type="search"`), 
 
 #### `ContentIndex`
 
-The same card grid as `ContentSearch` (one link per item: title, badge, description), with no search field, for a section with too few entries to bother searching (`/legal`, a handful of guides). A Server Component.
+The same card grid as `ContentSearch` (one link per item: title, badge, description), with no search field, for a section with too few entries to bother searching (`/legal`, a handful of guides). A Server Component. Its tiles use `CardGrid gap="sm"` and `surfaceClasses` (since 0.13.0).
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
