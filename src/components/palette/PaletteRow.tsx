@@ -10,6 +10,7 @@
  */
 
 import type { ReactNode } from "react";
+import { kbdClasses } from "../basics/kbdStyles.js";
 import type { FuzzyMatch } from "./fuzzy.js";
 import { displayShortcut, parseShortcut } from "./hotkeys.js";
 import type { Command } from "./types.js";
@@ -31,8 +32,6 @@ export type PaletteRowProps = {
 const ROW =
   "flex min-h-9 cursor-default items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2 coarse:min-h-11";
 const ACTIVE = `${ROW} border-h1 bg-b4 forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]`;
-const KBD =
-  "rounded border border-b3 bg-b5 px-1.5 font-sans text-c3 text-xs contrast-more:border-c4";
 
 const highlighted = (title: string, ranges: FuzzyMatch["ranges"]): ReactNode[] => {
   const parts: ReactNode[] = [];
@@ -97,7 +96,7 @@ export function PaletteRow({
         <span className="flex shrink-0 gap-1">
           {displayShortcut(shortcut, mac).map((part, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: parts are static per shortcut
-            <kbd key={index} className={KBD}>
+            <kbd key={index} className={kbdClasses}>
               {part}
             </kbd>
           ))}

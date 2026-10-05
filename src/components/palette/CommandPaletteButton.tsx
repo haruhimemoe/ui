@@ -5,13 +5,14 @@
  *       it only dispatches the palette event.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 "use client";
 
 import { useEffect, useState } from "react";
 import { Button, type ButtonProps } from "../basics/Button.js";
+import { kbdClasses } from "../basics/kbdStyles.js";
 import { openCommandPalette } from "./paletteEvents.js";
 import { isMac } from "./platform.js";
 
@@ -20,8 +21,6 @@ export type CommandPaletteButtonProps = Omit<ButtonProps, "onClick"> & {
   /** The accessible name. Default "Open command palette". */
   label?: string | undefined;
 };
-
-const KBD = "rounded border border-b3 bg-b5 px-1.5 font-sans text-c3 text-xs";
 
 /**
  * @function CommandPaletteButton
@@ -58,7 +57,7 @@ export function CommandPaletteButton({
       </svg>
       {children}
       {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: a kbd is never focusable; the hint is decoration, so the name stays the visible text */}
-      <kbd aria-hidden="true" className={KBD}>
+      <kbd aria-hidden="true" className={kbdClasses}>
         {mac ? "⌘K" : "Ctrl K"}
       </kbd>
     </Button>

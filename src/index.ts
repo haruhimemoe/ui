@@ -31,6 +31,8 @@ export { CodeChip, type CodeChipProps } from "./components/basics/CodeChip.js";
 export type { HeadingLevel } from "./components/basics/cardStyles.js";
 export { Disclosure, type DisclosureProps } from "./components/basics/Disclosure.js";
 export { EmptyState, type EmptyStateProps } from "./components/basics/EmptyState.js";
+export { Kbd, type KbdProps } from "./components/basics/Kbd.js";
+export { kbdClasses } from "./components/basics/kbdStyles.js";
 export { LinkCard, type LinkCardProps } from "./components/basics/LinkCard.js";
 export { LinkRow, type LinkRowItem, type LinkRowProps } from "./components/basics/LinkRow.js";
 export {

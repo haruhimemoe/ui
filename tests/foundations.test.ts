@@ -42,8 +42,9 @@ describe("file-private classes", () => {
     ["filters/FilterPanel.tsx", ["coarse:size-11"]],
     ["shell/LinkTabs.tsx", ["inline-flex", "items-center", "coarse:min-h-11"]],
     ["shell/HeaderMenu.tsx", ["coarse:min-h-11", "coarse:py-3", "contrast-more:border-c4"]],
-    ["palette/PaletteRow.tsx", ["coarse:min-h-11", "contrast-more:border-c4"]],
+    ["palette/PaletteRow.tsx", ["coarse:min-h-11"]],
     ["palette/CommandPalette.tsx", ["contrast-more:border-c4"]],
+    ["basics/kbdStyles.ts", ["contrast-more:border-c4"]],
     ["mdx/CodeCopyButton.tsx", ["coarse:min-h-11", "coarse:min-w-11"]],
     ["mdx/CodeBlock.tsx", ["contrast-more:border-c4"]],
   ];

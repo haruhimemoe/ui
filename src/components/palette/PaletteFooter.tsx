@@ -4,8 +4,10 @@
  *       or the latest copy status, and the key hints (hidden on phones). No hooks, no cx.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
+
+import { KBD_BASE } from "../basics/kbdStyles.js";
 
 /** The option count, whether Backspace goes back, and the latest status (keyed by its run). */
 export type PaletteFooterProps = {
@@ -15,7 +17,7 @@ export type PaletteFooterProps = {
   statusRun: number | null;
 };
 
-const KBD = "rounded border border-b3 bg-b5 px-1 font-sans text-c3";
+const FOOTER_KEY = `${KBD_BASE} px-1`;
 
 /**
  * @function PaletteFooter
@@ -34,18 +36,18 @@ export function PaletteFooter({ count, nested, status, statusRun }: PaletteFoote
       </output>
       <span className="hidden shrink-0 gap-3 sm:flex">
         <span>
-          <kbd className={KBD}>↑</kbd> <kbd className={KBD}>↓</kbd> navigate
+          <kbd className={FOOTER_KEY}>↑</kbd> <kbd className={FOOTER_KEY}>↓</kbd> navigate
         </span>
         <span>
-          <kbd className={KBD}>↵</kbd> select
+          <kbd className={FOOTER_KEY}>↵</kbd> select
         </span>
         {nested ? (
           <span>
-            <kbd className={KBD}>⌫</kbd> back
+            <kbd className={FOOTER_KEY}>⌫</kbd> back
           </span>
         ) : null}
         <span>
-          <kbd className={KBD}>esc</kbd> {nested ? "back" : "close"}
+          <kbd className={FOOTER_KEY}>esc</kbd> {nested ? "back" : "close"}
         </span>
       </span>
     </div>
