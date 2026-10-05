@@ -83,6 +83,7 @@ describe("remarkHaruhime", () => {
       "createSlugger",
       "default",
       "haruhimeSanitizeSchema",
+      "mdxMarkdownTransforms",
       "parseEmbedUrl",
       "rehypeLocalHrefs",
       "remarkCallouts",

@@ -29,6 +29,7 @@ export { remarkFigures } from "./figures.js";
 export { remarkHeadingIds } from "./headingIds.js";
 export type { HastLike } from "./localHrefs.js";
 export { rehypeLocalHrefs } from "./localHrefs.js";
+export { mdxMarkdownTransforms } from "./mdxMarkdownTransforms.js";
 export type { SanitizeSchema } from "./sanitizeSchema.js";
 export { haruhimeSanitizeSchema } from "./sanitizeSchema.js";
 export { createSlugger, slugify } from "./slugify.js";
