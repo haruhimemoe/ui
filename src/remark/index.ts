@@ -27,6 +27,10 @@ export type { EmbedTarget } from "./embedUrl.js";
 export { parseEmbedUrl } from "./embedUrl.js";
 export { remarkFigures } from "./figures.js";
 export { remarkHeadingIds } from "./headingIds.js";
+export type { HastLike } from "./localHrefs.js";
+export { rehypeLocalHrefs } from "./localHrefs.js";
+export type { SanitizeSchema } from "./sanitizeSchema.js";
+export { haruhimeSanitizeSchema } from "./sanitizeSchema.js";
 export { createSlugger, slugify } from "./slugify.js";
 
 /** Which of the five plugins `remarkHaruhime` runs; each defaults to on. */
