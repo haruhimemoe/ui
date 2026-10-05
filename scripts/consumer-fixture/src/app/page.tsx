@@ -45,6 +45,7 @@ import { Filters } from "./Filters";
 import { Foundations } from "./Foundations";
 import { MdxExports } from "./MdxExports";
 import { Palette08 } from "./Palette08";
+import { Surfaces } from "./Surfaces";
 
 const LINKS: SiteLinkItem[] = [
   { label: "Home", href: "/" },
@@ -148,6 +149,7 @@ export default function Page() {
       <Filters />
       <Foundations />
       <MdxExports />
+      <Surfaces />
       <ContentLayout
         nav={
           <ContentNav

@@ -11,7 +11,20 @@ import { render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it } from "vitest";
 import { Card } from "../../../src/components/basics/Card.js";
+import { CARD } from "../../../src/components/basics/cardStyles.js";
+import { surfaceClasses } from "../../../src/components/basics/surfaceStyles.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
+
+// 0.12.0's CARD. Card's look must not change when its classes come from surfaceClasses.
+const R1_CARD = [
+  "rounded-[10px]",
+  "bg-b4",
+  "p-5",
+  "text-c2",
+  "contrast-more:inset-ring",
+  "contrast-more:inset-ring-c4",
+  "forced-colors:border",
+];
 
 describe("Card", () => {
   it("renders a titled card as a region labelled by its h2", () => {
@@ -141,5 +154,10 @@ describe("Card", () => {
       </main>,
     );
     await expectNoAxeViolations(container);
+  });
+
+  it("keeps 0.12.0's classes, now from surfaceClasses", () => {
+    expect(new Set(CARD.split(" "))).toEqual(new Set(R1_CARD));
+    expect(CARD).toBe(surfaceClasses({ padding: "lg" }));
   });
 });

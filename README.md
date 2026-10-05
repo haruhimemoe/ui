@@ -363,6 +363,24 @@ export function Hero() {
 }
 ```
 
+### Layout
+
+The list and page layout pieces apps used to build by hand (since 0.13.0). All are Server Components except `CopyField` and `SegmentedControl`, which are under Forms.
+
+#### `Surface`
+
+The list-item box: Card's color and radius at p-3, no heading and no landmark. `as` picks `div` (default), `li`, `section`, `article`, `form` or `p`; `padding` is `sm` (p-3), `md` (p-4) or `lg` (p-5). It adds no layout: pass `flex flex-col gap-2`. A `p-0` in `className` replaces the padding.
+
+```tsx
+<ul className="flex flex-col gap-3">
+  <Surface as="li" padding="md" className="flex flex-col gap-1">…</Surface>
+</ul>
+```
+
+#### `surfaceClasses`
+
+Surface's classes for an element it doesn't render, such as a next/link tile: `surfaceClasses({ padding, className })`.
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.

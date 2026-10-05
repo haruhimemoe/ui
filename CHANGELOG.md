@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `Surface` and `surfaceClasses`: the list-item box (Card's b4 and 10px radius at p-3, `md` p-4, `lg` p-5, `as` div, li, section, article, form or p), and its classes for other elements.
+
+### Changed
+
+- `Card` takes its classes from `surfaceClasses`. No visual change.
+
 ## [0.12.0] - 2026-10-04
 
 ### Added

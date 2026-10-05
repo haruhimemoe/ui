@@ -35,6 +35,16 @@ export {
 export { Notice, type NoticeProps, type NoticeTone } from "./components/basics/Notice.js";
 export { PageHeader, type PageHeaderProps } from "./components/basics/PageHeader.js";
 export { Prose, type ProseProps } from "./components/basics/Prose.js";
+export {
+  Surface,
+  type SurfaceElement,
+  type SurfaceProps,
+} from "./components/basics/Surface.js";
+export {
+  type SurfaceClassOptions,
+  type SurfacePadding,
+  surfaceClasses,
+} from "./components/basics/surfaceStyles.js";
 export { type TabItem, Tabs, type TabsProps } from "./components/basics/Tabs.js";
 export { Text, type TextProps } from "./components/basics/Text.js";
 export { TextLink, type TextLinkProps } from "./components/basics/TextLink.js";
