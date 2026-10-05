@@ -98,6 +98,9 @@ describe("shipped source", () => {
       "src/components/content/ContentNav.tsx",
       "src/components/content/ContentSearch.tsx",
       "src/components/content/CopyMarkdownButton.tsx",
+      "src/components/dialogs/ConfirmDialog.tsx",
+      "src/components/dialogs/Dialog.tsx",
+      "src/components/dialogs/scrollLock.ts",
       "src/components/filters/FilterPanel.tsx",
       "src/components/filters/RangeBox.tsx",
       "src/components/filters/RangeSlider.tsx",
@@ -180,6 +183,29 @@ describe("shipped source", () => {
     const ui = await import("../src/index.js");
     for (const name of ["useMotionAllowed", "Text", "textClasses"])
       expect(ui, name).toHaveProperty(name);
+  });
+
+  it('starts every dialogs/ file except dialogStyles.ts with "use client"', () => {
+    const dialogs = sources.filter(({ name }) => name.startsWith("src/components/dialogs/"));
+    expect(dialogs.map(({ name }) => name).sort()).toEqual([
+      "src/components/dialogs/ConfirmDialog.tsx",
+      "src/components/dialogs/Dialog.tsx",
+      "src/components/dialogs/confirmTypes.ts",
+      "src/components/dialogs/dialogStyles.ts",
+      "src/components/dialogs/scrollLock.ts",
+    ]);
+    // dialogStyles.ts holds class strings, confirmTypes.ts types and text: both server-safe.
+    const serverSafe = ["dialogStyles.ts", "confirmTypes.ts"];
+    for (const { name, text } of dialogs) {
+      if (serverSafe.some((file) => name.endsWith(file))) expect(isClient(name), name).toBe(false);
+      else expect(firstStatement(text), name).toBe('"use client";');
+    }
+  });
+
+  it("exports the dialogs from the root", async () => {
+    const ui = await import("../src/index.js");
+    expect(typeof ui.Dialog).toBe("function");
+    expect(typeof ui.ConfirmDialog).toBe("function");
   });
 });
 

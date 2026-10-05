@@ -395,6 +395,8 @@ try {
       ],
       [/<legend[^>]*>Who can see this pool<\/legend>/, "RadioGroup (client)"],
       [/>Type OWC 2026 to confirm<\/label>/, "TypeToConfirm (client)"],
+      [/>Delete pool<\/button>/, "ConfirmDialog (client)"],
+      [/<dialog[^>]*aria-label="Consumer dialog"/, "Dialog (client)"],
       [/<nav aria-label="What to search"/, "LinkTabs"],
       [/<span class="sr-only">5\.23<!-- --> <!-- -->stars/, "StarRating"],
       [

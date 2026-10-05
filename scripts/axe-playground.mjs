@@ -4,14 +4,14 @@
  *       and runs axe-core in headless Chromium over the command palette's states on / at a desktop
  *       and a phone width, on a touch phone (rows measured at 44px) and under more contrast, color
  *       contrast on: closed, open, a nested page, an argument prompt and no results. Then it runs
- *       the same pass over /mdx (the MDX components: callouts, Shiki code blocks, a wide table) and
+ *       the same pass over /mdx (the MDX components: callouts, Shiki code blocks, a wide table),
  *       /surfaces (the 0.13.0 layout pieces) at both widths, /surfaces a second time after a Copy
- *       press and a SegmentedControl pick, and once more under forced colors, checking that the
- *       current LinkRow link and the checked SegmentedControl option keep their underline. The
- *       jsdom tests can't see contrast or scrollable regions, and the consumer check only sees
- *       closed pages. Prints one line per violation (with up to five targets) and exits 1 on any.
- *       Usage: `bun run play:axe` (CI runs it after the consumer check; Chromium is installed for
- *       that).
+ *       press and a SegmentedControl pick, then /dialogs (ConfirmDialog closed, open, part-typed,
+ *       pending, failed), and once more under forced colors, checking that the current LinkRow
+ *       link and the checked SegmentedControl option keep their underline. The jsdom tests can't
+ *       see contrast or scrollable regions, and the consumer check only sees closed pages. Prints
+ *       one line per violation (with up to five targets) and exits 1 on any. Usage:
+ *       `bun run play:axe` (CI runs it after the consumer check; Chromium is installed for that).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
  * @modified Mon Oct 5, 2026
@@ -61,6 +61,50 @@ const STATES = [
     // The root has a provider, so the empty state is its "No results" row after its 400 ms.
     expect: { text: "No results for “zzzz”" },
     wait: 900,
+  },
+];
+
+/** /dialogs: each state from a fresh load, with a check that it was reached. */
+const DIALOG_STATES = [
+  {
+    name: "closed",
+    run: async () => {},
+    reached: async (page) => (await page.locator("dialog[open]").count()) === 0,
+  },
+  {
+    name: "open",
+    run: (page) => page.getByRole("button", { name: "Archive pack" }).click(),
+    reached: async (page) =>
+      (await page.getByRole("alertdialog", { name: "Archive this pack?" }).count()) === 1,
+  },
+  {
+    name: "typed partial",
+    run: async (page) => {
+      await page.getByRole("button", { name: "Delete pool", exact: true }).click();
+      await page.keyboard.type("OWC");
+    },
+    reached: async (page) => (await page.locator("dialog[open] input").inputValue()) === "OWC",
+  },
+  {
+    name: "pending",
+    run: async (page) => {
+      await page.getByRole("button", { name: "Revoke key" }).click();
+      await page.getByRole("button", { name: "Revoke now" }).click();
+    },
+    reached: async (page) => (await page.locator("dialog[open] [aria-busy=true]").count()) === 1,
+  },
+  {
+    name: "failed",
+    run: async (page) => {
+      await page.getByRole("button", { name: "Hand over pool" }).click();
+      await page.getByRole("button", { name: "Hand it over" }).click();
+      await page.getByRole("alert").filter({ hasText: "peppy already owns 50 pools." }).waitFor();
+    },
+    reached: async (page) =>
+      (await page
+        .getByRole("alert")
+        .filter({ hasText: "peppy already owns 50 pools." })
+        .count()) === 1,
   },
 ];
 
@@ -205,6 +249,26 @@ try {
       throw new Error(`${viewportName} /surfaces after copy: state not reached`);
     if (shots) await page.screenshot({ path: path.join(shots, `${viewportName}-surfaces.png`) });
     await runAxe(page, `${viewportName} /surfaces after copy`);
+    // /dialogs: ConfirmDialog closed, open, part-typed, pending and failed.
+    for (const state of DIALOG_STATES) {
+      const loaded = await page.goto(`${origin}/dialogs`, { waitUntil: "load" });
+      if (loaded?.status() !== 200) {
+        throw new Error(`/dialogs answered ${loaded?.status() ?? "nothing"}`);
+      }
+      await page.waitForTimeout(300);
+      await state.run(page);
+      // Past the 150 ms open fade, so contrast is measured at full opacity.
+      await page.waitForTimeout(400);
+      if (!(await state.reached(page))) {
+        throw new Error(`${viewportName} /dialogs ${state.name}: state not reached`);
+      }
+      if (shots) {
+        await page.screenshot({
+          path: path.join(shots, `${viewportName}-dialogs-${state.name.replace(/\s+/g, "-")}.png`),
+        });
+      }
+      await runAxe(page, `${viewportName} /dialogs ${state.name}`);
+    }
     await context.close();
   }
   // Forced colors: the current-state underlines must survive the system palette.

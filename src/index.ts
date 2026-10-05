@@ -5,7 +5,7 @@
  *       their own "use client" directive, so this barrel is safe to import from Server Components.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 // Actions
@@ -71,7 +71,6 @@ export {
   textClasses,
 } from "./components/basics/textStyles.js";
 export { useMotionAllowed } from "./components/basics/useMotionAllowed.js";
-
 // Brand
 export {
   BrandPage,
@@ -96,6 +95,17 @@ export type {
   ContentNavItem,
   ContentSearchItem,
 } from "./components/content/types.js";
+// Dialogs
+export {
+  ConfirmDialog,
+  type ConfirmDialogProps,
+  type ConfirmTone,
+} from "./components/dialogs/ConfirmDialog.js";
+export {
+  Dialog,
+  type DialogDismissReason,
+  type DialogProps,
+} from "./components/dialogs/Dialog.js";
 
 // Filters
 export { Chip, type ChipProps } from "./components/filters/Chip.js";

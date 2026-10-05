@@ -21,6 +21,7 @@ export default function Page() {
             { label: "Home", href: "/" },
             { label: "Second", href: "/second" },
             { label: "MDX", href: "/mdx" },
+            { label: "Dialogs", href: "/dialogs" },
             { label: "Surfaces", href: "/surfaces" },
           ]}
           actions={<CommandPaletteButton>Search</CommandPaletteButton>}

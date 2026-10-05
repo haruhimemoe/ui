@@ -41,6 +41,7 @@ import Link from "next/link";
 import { Additions } from "./Additions";
 import { ClientAdditions } from "./ClientAdditions";
 import { ClientAdditions05 } from "./ClientAdditions05";
+import { ClientDialogs } from "./ClientDialogs";
 import { ClientSurfaces } from "./ClientSurfaces";
 import { Filters } from "./Filters";
 import { Foundations } from "./Foundations";
@@ -147,6 +148,7 @@ export default function Page() {
       <Additions />
       <ClientAdditions />
       <ClientAdditions05 />
+      <ClientDialogs />
       <Filters />
       <Foundations />
       <MdxExports />
