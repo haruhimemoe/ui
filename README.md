@@ -405,6 +405,30 @@ A grid of cards as a list: one column on phones, `columns` 2 (default) or 3 from
 <CardGrid columns={3}>{templates.map((t) => <TemplateCard key={t.id} template={t} />)}</CardGrid>
 ```
 
+#### `StatList`
+
+Label and value pairs as a `<dl>`: `variant` `inline` (default, a wrapping row), `tiles` (b4 boxes; on a b4 parent pass `className="[&>div]:bg-b3"`) or `grid` (2 columns on phones, `columns` 2, 3 or 4 from `sm`). Labels are c4 at `text-xs`, values bold c1 with tabular numbers. Values take any node.
+
+```tsx
+<StatList variant="tiles" items={[{ label: "Maps", value: "12" }, { label: "Avg ★", value: "5.2" }]} />
+```
+
+#### `EmptyState`
+
+The "nothing here yet" box: `variant` `dashed` (default) or `filled`, `size` `md` (default, centered, p-6) or `sm` (left, tight), optional `title` and `action`. It has no role; announce it with your own live region when it appears after a search.
+
+```tsx
+<EmptyState className="min-h-48">Drop an image here to start.</EmptyState>
+```
+
+#### `Progress`
+
+A native `<progress>` with a name and a status line: `label` (shown unless `hideLabel`), `value` (left out for indeterminate) and `max` (default 1), `status` in an `<output>` under the bar that the bar's `aria-describedby` points at. The output is always mounted, so a status set later is announced.
+
+```tsx
+<Progress label="Download progress" hideLabel value={ready} max={total} status={`${ready} of ${total} sets ready`} />
+```
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.

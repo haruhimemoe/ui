@@ -29,6 +29,7 @@ export { CardGrid, type CardGridProps } from "./components/basics/CardGrid.js";
 export { CardLink, type CardLinkProps } from "./components/basics/CardLink.js";
 export type { HeadingLevel } from "./components/basics/cardStyles.js";
 export { Disclosure, type DisclosureProps } from "./components/basics/Disclosure.js";
+export { EmptyState, type EmptyStateProps } from "./components/basics/EmptyState.js";
 export { LinkCard, type LinkCardProps } from "./components/basics/LinkCard.js";
 export {
   type LinkClassOptions,
@@ -37,7 +38,14 @@ export {
 } from "./components/basics/linkStyles.js";
 export { Notice, type NoticeProps, type NoticeTone } from "./components/basics/Notice.js";
 export { PageHeader, type PageHeaderProps } from "./components/basics/PageHeader.js";
+export { Progress, type ProgressProps } from "./components/basics/Progress.js";
 export { Prose, type ProseProps } from "./components/basics/Prose.js";
+export {
+  type StatItem,
+  StatList,
+  type StatListProps,
+  type StatListVariant,
+} from "./components/basics/StatList.js";
 export {
   Surface,
   type SurfaceElement,

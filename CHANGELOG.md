@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `Surface` and `surfaceClasses`: the list-item box (Card's b4 and 10px radius at p-3, `md` p-4, `lg` p-5, `as` div, li, section, article, form or p), and its classes for other elements.
 - `LinkCard` and `CardLink`: a card that is one link. `CardLink`'s cover fills the card, its name stays its own text, and LinkCard lifts every other control above the cover. `media` for a full-bleed banner. No landmark.
 - `CardGrid`: a list of cards, one column on phones, `columns` 2 or 3 from sm/lg, `gap` sm or md, wrapping each child in its own flex `<li>` so cards in a row match height.
+- `StatList`: label/value pairs as a `<dl>`, `inline`, `tiles` or `grid`.
+- `EmptyState`: the "nothing here yet" box, `dashed` or `filled`, `sm` or `md`, with an optional title and action.
+- `Progress`: a native `<progress>` named by its label, described by an always-mounted `<output>` status line.
 
 ### Changed
 
