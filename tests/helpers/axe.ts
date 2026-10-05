@@ -3,7 +3,7 @@
  * @desc Accessibility assertion on axe-core, run locally against the jsdom tree (no network).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Wed Sep 23, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import axe from "axe-core";
@@ -11,9 +11,12 @@ import { expect } from "vitest";
 
 // WCAG 2.x A and AA. Color contrast is off: jsdom has no layout and the tests load no CSS, so
 // axe can't compute colors here. The palette's contrast is checked by eye against the sites.
+// Iframes are off too: jsdom never actually loads an iframe's src, so axe's cross-frame
+// postMessage probing has nothing real to talk to and throws instead of skipping.
 const OPTIONS: axe.RunOptions = {
   runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] },
   rules: { "color-contrast": { enabled: false } },
+  iframes: false,
 };
 
 /**
