@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-05
+
+### Added
+
+- `Dialog` (client): the modal base, a native `<dialog>` that follows a controlled `open`. It focuses `initialFocus`, locks the page's scroll (counted, restoring the page's own inline overflow), and hands focus back on close or on unmount to the opener, else to `returnFocus()`. Escape and a backdrop press call `onDismiss` instead of closing; a press only counts as a backdrop press when it starts and ends there; a close the browser makes is reported as `"browser"`. A dialog opened from inside one that closes at the same time returns focus to that one's opener. Fades in on the motion tokens (`motion`), closes at once. New types: `DialogProps`, `DialogDismissReason`.
+- `ConfirmDialog` (client): a confirm in a modal `alertdialog` on `Dialog`, opened from its own trigger or a controlled `open`/`onOpenChange`. Focus starts on Cancel; Enter submits; one run at a time with `pendingLabel`, busy buttons that keep focus, and Escape and backdrop ignored while pending; a throw keeps it open with `failedMessage` in an alert; `tone="destructive"` uses the `danger` button; `typeToConfirm` adds a field (no autocomplete, autocapitalize or spellcheck) and keeps Confirm `aria-disabled` until the text matches; `returnFocus` for a confirm that removed its own row. New types: `ConfirmDialogProps`, `ConfirmTone`.
+- `danger` Button variant: white on rose-700, rose-800 on hover. `InlineConfirm`'s `confirmVariant` and `TypeToConfirm`'s `variant` take it too.
+- README: "Which confirm", the rule for no confirm, `InlineConfirm`, `ConfirmDialog`, `ConfirmDialog` with `typeToConfirm`, and `TypeToConfirm`.
+
+### Fixed
+
+- `CommandPalette` is built on `Dialog`: closing it puts back the page's own inline `overflow` instead of clearing it, a text selection dragged from the input onto the backdrop no longer closes it, and a command that opens another dialog sends focus back to whatever opened the palette once that dialog closes.
+
 ## [0.13.0] - 2026-10-05
 
 ### Added
@@ -214,7 +227,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.13.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/haruhimemoe/ui/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/haruhimemoe/ui/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/haruhimemoe/ui/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/haruhimemoe/ui/compare/v0.11.1...v0.11.2

@@ -159,7 +159,7 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`, and since 0.14.0 `Dialog` and `ConfirmDialog`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **`ContentNav`** (since 0.11.0) reads the path to mark the current page, like `NavLinks`, but it always hydrates: its class strings are finished (no `cx`), so it ships no tailwind-merge to the browser. `CopyMarkdownButton` (since 0.11.0) is the same: finished classes, no tailwind-merge, even though `ContentPage` (a Server Component) renders it. `ContentLayout` and `ContentPage` are Server Components. `BrandSwatch` (since 0.11.0) is the same again: `BrandPage` is a Server Component and only its swatches hydrate, with no tailwind-merge.
 - **`CopyField` and `SegmentedControl`** (since 0.13.0) are client components you render from your own `"use client"` file (a form, a toolbar), not ones a server component renders for you: they merge classes with `cx` like the other client components above.
@@ -179,11 +179,11 @@ A Server Component can't pass a function to a Client Component. So callback prop
 
 #### `Button`
 
-A pill button. Every native `<button>` prop.
+A pill button. Every native `<button>` prop. Variants: `primary` (default), `secondary`, `ghost`, and since 0.14.0 `danger` (white on rose-700, rose-800 on hover) for a confirm that deletes.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `variant` | `"primary" \| "secondary" \| "ghost"` | `"primary"` | `primary` is the `h2` pill that lights up to `h1` on hover, `secondary` is `b3`, `ghost` is transparent. |
+| `variant` | `"primary" \| "secondary" \| "ghost" \| "danger"` | `"primary"` | `primary` is the `h2` pill that lights up to `h1` on hover, `secondary` is `b3`, `ghost` is transparent, `danger` is rose-700 (rose-800 on hover). |
 | `size` | `"md" \| "lg"` | `"md"` | Height, padding and text size. |
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Never submits a form unless you ask for `"submit"`. |
 
@@ -527,13 +527,15 @@ Since 0.4.0. A confirm for something that can't be undone: a `<form>` whose subm
 | `submitLabel` | `ReactNode` | required | The button's text. |
 | `pendingLabel` | `ReactNode` | `submitLabel` | The button's text while `onConfirm` runs. It runs once at a time. |
 | `onConfirm` | `() => void \| Promise<void>` | required | Runs on submit once the text matches. If it throws or rejects, the form stays as typed. |
-| `variant` | `"primary" \| "secondary" \| "ghost"` | `"secondary"` | The button's look. |
+| `variant` | `"primary" \| "secondary" \| "ghost" \| "danger"` | `"secondary"` | The button's look. |
 
 ```tsx
 <TypeToConfirm id="delete-pool" expected={pool.name} submitLabel="Delete this pool" onConfirm={remove} error={error}>
   <p>This deletes the pool for everyone who edits it. It can't be undone.</p>
 </TypeToConfirm>
 ```
+
+In a dialog, use `ConfirmDialog`'s `typeToConfirm` (see Which confirm).
 
 #### `CharCounter`
 
@@ -692,9 +694,98 @@ Since 0.4.0. A two-step confirm in the page, no dialog: a trigger button, then t
 | `pendingLabel` | `ReactNode` | `confirmLabel` | The confirm button's text while `onConfirm` runs. |
 | `onCancel` | `() => void` | none | Called when it closes without confirming. |
 | `triggerProps` | `ButtonProps` | none | Props for the trigger (`aria-label`, `variant`, `disabled`). It is `secondary` by default. |
-| `confirmVariant` | `"primary" \| "secondary" \| "ghost"` | `"secondary"` | The confirm button's look. Cancel is always `ghost`. |
+| `confirmVariant` | `"primary" \| "secondary" \| "ghost" \| "danger"` | `"secondary"` | The confirm button's look. Cancel is always `ghost`. |
 
-If a confirm removes the item (and the `InlineConfirm` with it), move focus somewhere sensible yourself, such as the list's heading.
+If a confirm removes the item (and the `InlineConfirm` with it), move focus somewhere sensible yourself, such as the list's heading. For a delete that affects other people or sits in a table cell, use `ConfirmDialog` (see Which confirm).
+
+### Dialogs
+
+Since 0.14.0. A modal base and a confirm built on it. Both are client components: their callbacks come from your own `"use client"` file.
+
+#### `Dialog` (client)
+
+The bare modal: a native `<dialog>` that follows `open`. Opening records what had focus, runs `showModal()` (the rest of the page goes inert), focuses `initialFocus` and locks the page's scroll. Closing puts focus back on what opened it, or on `returnFocus()` when that has left the page, and puts the page's own inline `overflow` back. Unmounting while open does the same and asks no one. Nothing closes by itself: Escape and a backdrop press call `onDismiss`, and you set `open` to false. A backdrop press counts only when it starts and ends on the backdrop, so a text selection dragged out of the dialog never closes it. When the browser closes it itself (a back gesture), `onDismiss("browser")` tells you to follow. A dialog opened from inside one that closes at the same time (a palette command) sends focus back to that one's opener. It fades in (`motion`); close is instant, and reduced motion shows it at once. Every native `<dialog>` prop except `open`, `onCancel` and `onClose`. Name it with `aria-label` or `aria-labelledby`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `open` | `boolean` | required | Controlled. `true` runs `showModal()`, `false` runs `close()`. |
+| `onDismiss` | `(reason: "escape" \| "backdrop" \| "browser") => void` | required | The person or the browser asked to close. On `"browser"` it is already closed: set `open` to false. |
+| `initialFocus` | `RefObject<HTMLElement \| null>` | the browser's rule | Focused after opening. |
+| `returnFocus` | `() => HTMLElement \| null` | none | Where focus goes on close when the opener is gone (a deleted row). |
+| `dismissible` | `boolean` | `true` | `false` ignores Escape and the backdrop, for while an action runs. |
+| `motion` | `boolean` | `true` | The open fade. |
+| `lockScroll` | `boolean` | `true` | Lock the page's scroll while open. Locks are counted, so stacked dialogs share one. |
+
+The `<dialog>` is the backdrop's hit area: make it cover the viewport and put your panel inside it, or a press on the panel's own padding counts as a backdrop press.
+
+```tsx
+"use client";
+
+const [open, setOpen] = useState(false);
+
+<Button onClick={() => setOpen(true)}>Preview</Button>
+<Dialog
+  open={open}
+  onDismiss={() => setOpen(false)}
+  aria-labelledby="preview-title"
+  className="m-0 h-dvh max-h-none w-full max-w-none open:flex"
+>
+  <div className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-b3 bg-b6 p-5">
+    <h2 id="preview-title" className="font-bold text-lg">Template preview</h2>
+    <Button onClick={() => setOpen(false)}>Close</Button>
+  </div>
+</Dialog>
+```
+
+#### `ConfirmDialog` (client)
+
+A confirm in a modal `alertdialog`, on `Dialog`. The title names it and the description describes it. Cancel (ghost) and Confirm sit in a form, so Enter submits. Below `sm` the buttons go full width with Confirm on top. Focus starts on Cancel, the safe choice, or on the type field with `typeToConfirm`. While `onConfirm` runs (once at a time), both buttons keep focus but ignore presses, Confirm shows `pendingLabel`, and Escape and the backdrop do nothing. When it resolves the dialog closes and focus goes back to the trigger, or to `returnFocus()` if the trigger is gone. When it throws or rejects the dialog stays open, keeps what was typed, and says `failedMessage` in an alert. Content renders only while open, so each open starts fresh.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `title` | `ReactNode` | required | The heading. Names the dialog. |
+| `description` | `ReactNode` | none | What happens, under the title. Describes the dialog. |
+| `children` | `ReactNode` | none | Extra content above the buttons (a list of what goes). |
+| `onConfirm` | `() => void \| Promise<void>` | required | Resolve closes it. Throw to keep it open: `throw new Error(answer.message)`. |
+| `failedMessage` | `ReactNode \| ((error: unknown) => ReactNode)` | `"Something went wrong. Try again."` | Shown in an alert on failure. `(e) => (e as Error).message` shows what you threw. |
+| `tone` | `"default" \| "destructive"` | `"default"` | `"destructive"` makes Confirm the `danger` button. |
+| `typeToConfirm` | `string \| { expected, label?, hint? }` | none | Confirm stays `aria-disabled` until this is typed: exact, case-sensitive, spaces around it ignored (`TypeToConfirm`'s rule). The label defaults to `"Type <expected> to confirm"`. |
+| `confirmLabel`, `cancelLabel` | `ReactNode` | `"Confirm"`, `"Cancel"` | The two buttons' text. |
+| `pendingLabel` | `ReactNode` | `confirmLabel` | Confirm's text while `onConfirm` runs. |
+| `onCancel` | `() => void` | none | Called when it closes without confirming. |
+| `returnFocus` | `() => HTMLElement \| null` | none | Where focus goes when the trigger is gone after a confirm. |
+| `trigger`, `triggerProps` | `ReactNode`, `ButtonProps` | none | Uncontrolled: a `secondary` Button that opens it. |
+| `open`, `onOpenChange` | `boolean`, `(open: boolean) => void` | none | Controlled, instead of `trigger`: for palette commands and rows that own the state. |
+
+```tsx
+<ConfirmDialog
+  trigger="Delete this pool"
+  triggerProps={{ variant: "danger" }}
+  title={`Delete ${pool.name}?`}
+  description="This deletes the pool for you and everyone who edits it. It can't be undone."
+  tone="destructive"
+  typeToConfirm={pool.name}
+  confirmLabel="Delete for good"
+  pendingLabel="Deleting…"
+  failedMessage={(error) => (error as Error).message}
+  onConfirm={async () => {
+    const answer = await deletePool(pool.id);
+    if (!answer.ok) throw new Error(answer.message);
+  }}
+/>
+```
+
+#### Which confirm
+
+Pick by what is lost and who loses it, then by where the trigger sits.
+
+1. **No confirm.** The change can be undone in place (an Undo, Ctrl+Z), it only touches an unsaved form, or redoing it costs a click. Never confirm something that has an Undo.
+2. **`InlineConfirm`.** It can't be undone, touches only your own things, and the consequence fits one short sentence. The trigger sits in a row or toolbar with room to grow.
+3. **`ConfirmDialog`.** It can't be undone, and it affects other people (shared links, editors, someone else's content), or the consequence needs more than one sentence, or the trigger sits where inline growth breaks the layout (a table cell, a header menu, a palette command).
+4. **`ConfirmDialog` with `typeToConfirm`.** It can't be undone and it deletes an account, deletes a thing other people edit, or gives ownership away. Type the account's or the thing's name.
+5. **`TypeToConfirm`.** Only when the confirm is the whole page, or a step in a flow with nothing else on screen.
+
+Never `window.confirm()`, and never a hand-built modal: build on `Dialog`.
 
 ### Icons
 
@@ -1346,7 +1437,7 @@ export function Palette() {
 
 #### `CommandPalette`
 
-The dialog. Renders nothing until opened, then a native `<dialog>` (modal, backdrop, scroll locked) with a combobox over a listbox. Mount one per app.
+The dialog. Renders nothing until opened, then a native `<dialog>` (modal, backdrop, scroll locked) with a combobox over a listbox. Mount one per app. Built on `Dialog` since 0.14.0: closing puts back the page's own inline overflow, and a drag that ends on the backdrop doesn't close it.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -1467,7 +1558,7 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 - **High contrast.** Under `prefers-contrast: more` the text steps lighten, `h2` darkens and shapes that rely on a background shade get a `c4` edge (since 0.12.0). Forced colors (Windows high contrast) keep a 1px border on buttons, cards, chips and badges.
 - **Color never carries meaning alone.** Accent links are underlined, a pressed `Chip` is `aria-pressed`, the current nav link is `aria-current`, `CharCounter` says "over the limit" in words, errors are text.
 - **Live regions exist before they speak.** `CopyButton`, `AsyncButton`, `CharCounter live`, `FilterPanel`'s count and `ReportDisclosure`'s outcome render their `<output>` or `role="status"` node up front, empty, and swap the text in. Field errors are `role="status"` (polite); `Notice live tone="error"` is the one `role="alert"`.
-- **Focus never falls to the body.** When the control you pressed goes away, focus moves somewhere sensible: `FilterPanel` to its heading, `Pagination` to "Page X of Y", `InlineConfirm` back to its trigger, `ReportDisclosure` to its outcome line. Pending buttons use `aria-disabled`, not `disabled`, so focus stays.
+- **Focus never falls to the body.** When the control you pressed goes away, focus moves somewhere sensible: `FilterPanel` to its heading, `Pagination` to "Page X of Y", `InlineConfirm` back to its trigger, `Dialog` and `ConfirmDialog` back to what opened them, or to `returnFocus`, `ReportDisclosure` to its outcome line. Pending buttons use `aria-disabled`, not `disabled`, so focus stays.
 - **The palette is a combobox.** `CommandPalette` keeps focus on its input and names the active row with `aria-activedescendant`; the row shows its state with an `h1` edge, the input row shows focus, and `bun run play:axe` checks its open states in a real browser (since 0.8.0).
 - **Landmarks are few and named.** `PageShell` gives a skip link and `<main>`; `SiteHeader` one `<nav>` (`navLabel`, default "Main"); `SiteFooter` one `<nav>` (`navLabel`, default "Footer") with a headed `<section>` per column; `Pagination` and `LinkTabs` are labelled `<nav>`s. Give two of a kind different labels.
 - **Scrollable regions take focus.** `Table`'s wrapper is a focusable named section. Do the same for a `pre` inside `Prose`.
