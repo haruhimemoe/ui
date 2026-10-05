@@ -39,4 +39,18 @@ describe("MdxLinkCard", () => {
     rerender(<MdxLinkCard href="/guides/seeding" title="Seeding" source="packs.haruhime.moe" />);
     expect(screen.getByText("packs.haruhime.moe")).toBeInTheDocument();
   });
+
+  it("never links a javascript: or data: href, and treats //host as external", () => {
+    // Built at runtime so the lint rule against script URLs stays on everywhere else.
+    const scriptHref = ["java", "script:alert(1)"].join("");
+    const { rerender } = render(<MdxLinkCard href={scriptHref} title="Bad" />);
+    expect(screen.queryByRole("link")).toBeNull();
+    expect(screen.getByText("Bad")).toBeInTheDocument();
+    rerender(<MdxLinkCard href=" data:text/html,hi" title="Bad" />);
+    expect(screen.queryByRole("link")).toBeNull();
+    rerender(<MdxLinkCard href="//example.com/x" title="Off site" />);
+    expect(screen.getByRole("link")).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("link").getAttribute("rel")).toContain("noopener");
+    expect(screen.getByText("example.com")).toBeInTheDocument();
+  });
 });

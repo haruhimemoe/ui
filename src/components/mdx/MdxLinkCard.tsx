@@ -7,7 +7,7 @@
  *       landmark. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import type { ReactNode } from "react";
@@ -34,7 +34,7 @@ export type MdxLinkCardProps = Omit<LinkCardProps, "title" | "href" | "children"
  */
 const hostOf = (href: string): string | undefined => {
   try {
-    return new URL(href).hostname;
+    return new URL(href, "https://localhost").hostname;
   } catch {
     return undefined;
   }
@@ -55,25 +55,32 @@ export function MdxLinkCard({
   className,
   ...props
 }: MdxLinkCardProps) {
-  const external = /^https?:\/\//i.test(href);
+  // Protocol-relative URLs leave the site, so they count as external. Any other scheme
+  // (javascript:, data:, vbscript: ...) is never linked: the title renders as plain text.
+  const external = /^(https?:)?\/\//i.test(href);
+  const unsafe = !external && /^[a-z][a-z0-9+.-]*:/i.test(href.trim());
   const from = source ?? (external ? hostOf(href) : undefined);
   return (
     // [&_p]:mt-0! beats Prose's [&_p]:mt-3; the card's gap spaces the lines.
     <LinkCard className={cx("mt-4 gap-1 [&_p]:mt-0!", className)} {...props}>
       <p>
-        <CardLink
-          href={href}
-          className="no-underline! text-c1!"
-          {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        >
-          {title}
-          {external ? (
-            <>
-              <span aria-hidden="true"> ↗</span>
-              <span className="sr-only">, opens in a new tab</span>
-            </>
-          ) : null}
-        </CardLink>
+        {unsafe ? (
+          <span className="font-bold text-c1">{title}</span>
+        ) : (
+          <CardLink
+            href={href}
+            className="no-underline! text-c1!"
+            {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          >
+            {title}
+            {external ? (
+              <>
+                <span aria-hidden="true"> ↗</span>
+                <span className="sr-only">, opens in a new tab</span>
+              </>
+            ) : null}
+          </CardLink>
+        )}
       </p>
       {description ? <p className="text-c3 text-sm">{description}</p> : null}
       {from ? <p className="text-c4 text-xs">{from}</p> : null}
