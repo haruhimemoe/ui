@@ -14,10 +14,12 @@
  *       checks, and the 44px handle under touch. The jsdom tests can't see contrast or scrollable
  *       regions, and the consumer check only sees closed pages. Prints one line per violation
  *       (with up to five targets) and exits 1 on any. Usage: `bun run play:axe` (CI runs it after
- *       the consumer check; Chromium is installed for that).
+ *       the consumer check; Chromium is installed for that). Then /maps (the 0.16.0 map display):
+ *       rendered, after a Copy ID press, and after a preview press (the clip is a missing local
+ *       file, so the run needs no network), each axed.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -108,6 +110,32 @@ const DIALOG_STATES = [
         .getByRole("alert")
         .filter({ hasText: "peppy already owns 50 pools." })
         .count()) === 1,
+  },
+];
+
+/**
+ * The map display page's states: what to do from the previous state and how to prove it
+ * happened. Copy ID ends "Copied." or the failure text (headless clipboards may refuse); the
+ * preview press requests the missing local clip, so the player ends freed.
+ */
+const MAP_STATES = [
+  {
+    name: "rendered",
+    act: async () => {},
+    reached: async (page) =>
+      (await page.getByRole("heading", { level: 1, name: "Map display" }).count()) > 0,
+  },
+  {
+    name: "after Copy ID",
+    act: async (page) => page.getByRole("button", { name: "Copy ID 129891" }).first().click(),
+    reached: async (page) =>
+      (await page.getByText(/^(Copied\.|Couldn't copy\. The beatmap ID is 129891\.)$/).count()) > 0,
+  },
+  {
+    name: "after preview",
+    act: async (page) =>
+      page.getByRole("button", { name: "Play preview of xi - FREEDOM DiVE" }).first().click(),
+    reached: async (_page, requests) => requests.some((url) => url.endsWith("/maps/no-clip.mp3")),
   },
 ];
 
@@ -271,6 +299,38 @@ try {
         });
       }
       await runAxe(page, `${viewportName} /dialogs ${state.name}`);
+    }
+    // The map display: layouts x backgrounds x densities, states, a set and a group.
+    const requests = [];
+    page.on("request", (request) => requests.push(request.url()));
+    const maps = await page.goto(`${origin}/maps`, { waitUntil: "load" });
+    if (maps?.status() !== 200) throw new Error(`/maps answered ${maps?.status() ?? "nothing"}`);
+    await page.waitForTimeout(500);
+    for (const state of MAP_STATES) {
+      await state.act(page);
+      await page.waitForTimeout(300);
+      if (!(await state.reached(page, requests))) {
+        throw new Error(`${viewportName} /maps ${state.name}: state not reached`);
+      }
+      if (shots) {
+        await page.screenshot({
+          path: path.join(shots, `${viewportName}-maps-${state.name.replace(/\s+/g, "-")}.png`),
+          fullPage: true,
+        });
+      }
+      const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
+      for (const violation of results.violations) {
+        const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
+        failures.push(
+          [
+            `${viewportName} /maps ${state.name}: ${violation.id} (${violation.impact}) ${violation.help}`,
+            ...targets,
+          ].join("\n"),
+        );
+      }
+      console.log(
+        `${viewportName} /maps ${state.name}: ${results.violations.length ? `${results.violations.length} violations` : "ok"}`,
+      );
     }
     await context.close();
   }

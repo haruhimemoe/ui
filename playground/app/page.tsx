@@ -23,6 +23,7 @@ export default function Page() {
             { label: "MDX", href: "/mdx" },
             { label: "Dialogs", href: "/dialogs" },
             { label: "Surfaces", href: "/surfaces" },
+            { label: "Maps", href: "/maps" },
           ]}
           actions={<CommandPaletteButton>Search</CommandPaletteButton>}
         />
