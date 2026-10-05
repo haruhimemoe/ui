@@ -2,10 +2,11 @@
  * @file src/components/sortable/sortableEngine.ts
  * @desc The state machine behind useSortable, as the hook sees it. The layers under it:
  *       sortableRegistry.ts (what the props getters register), sortableMoves.ts (commit, the
- *       buttons, focus after a move), sortableDrag.ts (lift, step, drop, cancel). This file adds
- *       the layout effect (a vanished lift cancels, focus, pruning, one re-render when the
- *       registry changed), the handle's bindings with its keys, and the Sortable a render
- *       returns. The hook keeps one engine per component and renders from `snapshot`.
+ *       buttons, focus after a move), sortableDrag.ts (lift, step, drop, cancel),
+ *       sortablePointerDrag.ts (pointer sessions). This file adds the layout effect (a vanished
+ *       lift cancels, focus, pruning, one re-render when the registry changed), the handle's
+ *       bindings with its keys, and the Sortable a render returns. The hook keeps one engine per
+ *       component and renders from `snapshot`.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
  * @modified Sun Oct 4, 2026
@@ -14,8 +15,8 @@
 "use client";
 
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
-import { SortableDrag } from "./sortableDrag.js";
 import type { KeyboardStep } from "./sortableKeyboard.js";
+import { SortablePointerDrag } from "./sortablePointerDrag.js";
 import { containerProps, indicatorOf, itemProps } from "./sortableProps.js";
 import type { Sortable, SortableHandleBindings, SortableSnapshot } from "./sortableTypes.js";
 
@@ -33,7 +34,7 @@ const STEPS: Readonly<Record<string, KeyboardStep>> = {
 };
 
 /** The registry, the drag in progress and everything it says. */
-export class SortableEngine extends SortableDrag {
+export class SortableEngine extends SortablePointerDrag {
   private suppressClick = false;
 
   /** Layout effect: a vanished lift cancels, focus moves, stale entries go, one re-render if the registry changed. */
@@ -96,7 +97,7 @@ export class SortableEngine extends SortableDrag {
       "aria-disabled": off ? true : undefined,
       "data-lifted": snapshot.active === id ? "" : undefined,
       "data-sortable-handle": id,
-      onPointerDown: () => undefined,
+      onPointerDown: (event) => this.pointerDown(id, event),
       onKeyDown: (event) => this.keyDown(id, event),
       onKeyUp: (event) => this.keyUp(event),
       onClick: (event) => this.click(id, event),

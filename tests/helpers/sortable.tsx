@@ -10,9 +10,10 @@
  * @modified Sun Oct 4, 2026
  */
 
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
+import { vi } from "vitest";
 import { SortableHandle } from "../../src/components/sortable/SortableHandle.js";
 import { SortableLayer } from "../../src/components/sortable/SortableLayer.js";
 import { SortableMoveButtons } from "../../src/components/sortable/SortableMoveButtons.js";
@@ -148,3 +149,65 @@ export const order = (region: string): (string | null)[] =>
   within(screen.getByRole("region", { name: region }))
     .queryAllByRole("listitem")
     .map((item) => item.getAttribute("data-sortable-item"));
+
+/**
+ * @function mockLayout
+ * @returns the spy: every list 400px wide and 140px tall, NM from y=0 and HD from y=200, each
+ *          item 40px tall in DOM order, anything else an empty box. Restore with
+ *          vi.restoreAllMocks().
+ */
+export const mockLayout = () =>
+  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function layout(
+    this: Element,
+  ) {
+    const box = (top: number, height: number) =>
+      ({
+        top,
+        bottom: top + height,
+        left: 0,
+        right: 400,
+        x: 0,
+        y: top,
+        width: 400,
+        height,
+        toJSON: () => ({}),
+      }) as DOMRect;
+    const tops: Readonly<Record<string, number>> = { nm: 0, hd: 200 };
+    const own = this.getAttribute("data-sortable-container");
+    if (own !== null) return box(tops[own] ?? -1000, 140);
+    const list = this.closest("[data-sortable-container]");
+    if (this.hasAttribute("data-sortable-item") && list) {
+      const index = [...list.children].indexOf(this);
+      return box(
+        (tops[list.getAttribute("data-sortable-container") ?? ""] ?? -1000) + index * 40,
+        40,
+      );
+    }
+    return box(-1000, 0);
+  });
+
+/**
+ * @function pointer
+ * @param kind {string} the fireEvent name
+ * @param target {Element | Window} where it starts (it bubbles to the window listeners)
+ * @param x {number} clientX
+ * @param y {number} clientY
+ * @param init {Record<string, unknown>} overrides (button, isPrimary, pointerId, pointerType)
+ * @returns {boolean} fireEvent's answer
+ */
+export const pointer = (
+  kind: "pointerDown" | "pointerMove" | "pointerUp" | "pointerCancel",
+  target: Element | Window,
+  x: number,
+  y: number,
+  init: Record<string, unknown> = {},
+) =>
+  fireEvent[kind](target, {
+    pointerId: 1,
+    isPrimary: true,
+    button: 0,
+    pointerType: "mouse",
+    clientX: x,
+    clientY: y,
+    ...init,
+  });

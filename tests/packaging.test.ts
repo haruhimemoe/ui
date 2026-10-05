@@ -118,6 +118,8 @@ describe("shipped source", () => {
       "src/components/shell/NavListClient.tsx",
       "src/components/sortable/sortableDrag.ts",
       "src/components/sortable/sortableFocus.ts",
+      "src/components/sortable/sortablePointer.ts",
+      "src/components/sortable/sortablePointerDrag.ts",
       "src/components/sortable/useSortable.ts",
     ]);
     for (const { name, text } of client) {
