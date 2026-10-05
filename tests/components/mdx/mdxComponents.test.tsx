@@ -30,9 +30,24 @@ describe("mdxComponents", () => {
 });
 
 describe("src/mdx.ts", () => {
-  it("exports mdxComponents, CodeBlock, Callout, parseCodeMeta and slugify", () => {
+  it("exports the MDX pieces", () => {
     expect(Object.keys(mdx).sort()).toEqual(
-      ["Callout", "CodeBlock", "mdxComponents", "parseCodeMeta", "slugify"].sort(),
+      [
+        "Callout",
+        "CodeBlock",
+        "Embed",
+        "Figure",
+        "Glossary",
+        "Kbd",
+        "MdxLinkCard",
+        "Schedule",
+        "Steps",
+        "Term",
+        "mdxComponents",
+        "parseCodeMeta",
+        "parseEmbedUrl",
+        "slugify",
+      ].sort(),
     );
   });
 });
