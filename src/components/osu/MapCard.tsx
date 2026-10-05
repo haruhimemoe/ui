@@ -15,6 +15,7 @@ import { cx } from "../../utils/cx.js";
 import { Surface } from "../basics/Surface.js";
 import { CARD_LINK_LIFT } from "../basics/surfaceStyles.js";
 import { Text } from "../basics/Text.js";
+import { MapCardPanel } from "./MapCardPanel.js";
 import {
   MapBackground,
   type MapCardSlot,
@@ -187,7 +188,7 @@ export function MapCard({
       aria-busy={view.loading ? true : undefined}
       className={cx(
         "@container relative isolate",
-        compact && "px-3 py-2",
+        card ? "flex flex-col overflow-hidden p-0" : compact && "px-3 py-2",
         view.whole && WHOLE_CARD,
         className,
       )}
@@ -196,7 +197,7 @@ export function MapCard({
       {view.backgroundUrl !== null ? (
         <MapBackground url={view.backgroundUrl} blur={background === "blur"} />
       ) : null}
-      <MapCardRow parts={parts} />
+      {card ? <MapCardPanel parts={parts} /> : <MapCardRow parts={parts} />}
     </Surface>
   );
 }
