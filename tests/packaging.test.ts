@@ -116,6 +116,9 @@ describe("shipped source", () => {
       "src/components/palette/useProviderSearch.ts",
       "src/components/shell/HeaderMenu.tsx",
       "src/components/shell/NavListClient.tsx",
+      "src/components/sortable/sortableDrag.ts",
+      "src/components/sortable/sortableFocus.ts",
+      "src/components/sortable/useSortable.ts",
     ]);
     for (const { name, text } of client) {
       expect(firstStatement(text), name).toBe('"use client";');
