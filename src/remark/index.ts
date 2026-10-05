@@ -8,13 +8,17 @@
  * @modified Sun Oct 4, 2026
  */
 
+import { type ArticleData, articleData } from "./articleData.js";
 import { remarkCallouts } from "./callouts.js";
 import { remarkCodeMeta } from "./codeMeta.js";
 import { remarkEmbeds } from "./embeds.js";
+import { appendMdxExports } from "./estree.js";
 import { remarkFigures } from "./figures.js";
 import { remarkHeadingIds } from "./headingIds.js";
 import type { MdNode } from "./mdast.js";
 
+export type { ArticleData, TocItem } from "./articleData.js";
+export { articleData } from "./articleData.js";
 export type { CalloutType } from "./callouts.js";
 export { remarkCallouts } from "./callouts.js";
 export { remarkCodeMeta } from "./codeMeta.js";
@@ -32,6 +36,12 @@ export type RemarkHaruhimeOptions = {
   headingIds?: boolean;
   figures?: boolean;
   embeds?: boolean;
+  /** default false; MDX only: react-markdown would render the ESM nodes */
+  mdxExports?: boolean;
+  /** default 200 */
+  wordsPerMinute?: number | undefined;
+  /** react-markdown only: a function can't cross Turbopack's serializable plugin options */
+  collect?: (data: ArticleData) => void;
 };
 
 /**
@@ -48,5 +58,9 @@ export default function remarkHaruhime(options: RemarkHaruhimeOptions = {}) {
     if (options.headingIds !== false) remarkHeadingIds()(tree);
     if (options.figures !== false) remarkFigures()(tree);
     if (options.embeds !== false) remarkEmbeds()(tree);
+    if (!options.collect && !options.mdxExports) return;
+    const data = articleData(tree, { wordsPerMinute: options.wordsPerMinute });
+    options.collect?.(data);
+    if (options.mdxExports) appendMdxExports(tree, data);
   };
 }

@@ -79,6 +79,7 @@ describe("remarkHaruhime", () => {
   it("exposes exactly the public surface", async () => {
     const mod = await import("../../src/remark/index.js");
     expect(Object.keys(mod).sort()).toEqual([
+      "articleData",
       "createSlugger",
       "default",
       "parseEmbedUrl",
