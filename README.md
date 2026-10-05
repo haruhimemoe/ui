@@ -1508,6 +1508,154 @@ Always there: "Copy page URL" (`site.copy-url`, mod+shift+c), "Go back" (`site.b
 
 The input is a `combobox` over a `listbox`; the active row is named by `aria-activedescendant`, so focus never leaves the input. The active row shows an `h1` left edge as well as a tint, the input row's bottom border turns `h1` while it has focus, hint rows ("Searching…", "No matching commands") are disabled options, an argument's error is an always-mounted `role="status"`, group headings aren't uppercase, rows are 36px, and the footer's `<output>` reads the result count and the copy outcome. `bun run play:axe` runs axe-core in Chromium over the open palette's states with contrast on.
 
+### Sortable lists (client)
+
+Since 0.15.0. Reorder rows by mouse, touch or pen, by keyboard, and with Up and Down buttons, every move announced. Pointer events only (no HTML5 drag and drop), no dependencies. Your app owns the data: the kit reports a `SortableMove` and you apply it, change it or refuse it.
+
+#### One list
+
+```tsx
+"use client";
+
+import { SortableList, moveItem } from "@haruhimemoe/ui";
+import { useState } from "react";
+
+function Slots() {
+  const [slots, setSlots] = useState(["NM1", "NM2", "HD1"]);
+  return (
+    <SortableList
+      items={slots}
+      getId={(slot) => slot}
+      getLabel={(slot) => slot}
+      label="Slots"
+      className="gap-2 [--sortable-gap:0.5rem]"
+      itemClassName="flex items-center gap-2 rounded bg-b3 px-2 py-1"
+      onMove={({ from, to }) => setSlots((was) => moveItem(was, from.index, to.index))}
+    >
+      {(slot, { handle, moveButtons, lifted }) => (
+        <>
+          {handle}
+          <span>{lifted ? `${slot} (moving)` : slot}</span>
+          {moveButtons}
+        </>
+      )}
+    </SortableList>
+  );
+}
+```
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `items` | `readonly T[]` | | The rows, in order. |
+| `getId` | `(item: T) => string` | | A stable id per row. |
+| `getLabel` | `(item: T) => string` | | The name spoken in announcements and on the handle and buttons. |
+| `label` | `string` | | The container's own name (used once several lists share a hook). |
+| `sortable?` | `Sortable` | | Join a shared `useSortable()` hook instead of making its own; see "Several lists with the hook". |
+| `id?` | `string` | `useId()` | The container's id. Required (and must be stable) when passing `sortable`. |
+| `onMove?` | `UseSortableOptions["onMove"]` | | Required unless `sortable` is given (the shared hook's `onMove` runs instead). |
+| `canDrop?` | `UseSortableOptions["canDrop"]` | | |
+| `announcements?` | `Partial<SortableAnnouncements>` | | |
+| `disabled?` | `boolean` | `false` | |
+| `mode?` | `"between" \| "onto"` | `"between"` | |
+| `axis?` | `"vertical" \| "horizontal"` | `"vertical"` | |
+| `as?` | `"ol" \| "ul"` | `"ol"` | |
+| `moveButtons?` | `boolean` | `true` | Render `SortableMoveButtons` in the row context. Keep this on; see "Keep the buttons". |
+| `itemClassName?` | `string` | | Added to every `<li>`, after `SORTABLE_ITEM`. |
+| `itemProps?` | `(item: T, index: number) => Omit<ComponentProps<"li">, "children" \| "ref">` | | Per-row `<li>` attributes (a name, a selected border, a focus handler). The sortable data attributes always win over anything returned here. |
+| `children` | `(item: T, ctx: SortableRowContext) => ReactNode` | | The row. `ctx` is `{ index, handle, moveButtons, lifted }`: a ready `SortableHandle` and `SortableMoveButtons` (or `null` with `moveButtons={false}`) to place where the row's layout wants them, and whether this row is the one being dragged. |
+
+#### Several lists with the hook
+
+For more control than `SortableList` gives (custom row markup entirely, several containers with different shapes, a list that isn't a `<ol>`), call `useSortable` directly:
+
+```tsx
+"use client";
+
+import {
+  SortableHandle,
+  SortableLayer,
+  SortableMoveButtons,
+  SORTABLE_CONTAINER,
+  SORTABLE_ITEM,
+  useSortable,
+} from "@haruhimemoe/ui";
+
+function Board({ nm, hd, onMove }) {
+  const sortable = useSortable({
+    onMove,
+    canDrop: (move) => (move.to.container === "hd" && hd.length >= 8 ? "HD is full." : true),
+  });
+  return (
+    <>
+      <SortableLayer sortable={sortable} />
+      <ol {...sortable.container("nm", { label: "NM", mode: "between" })} className={SORTABLE_CONTAINER}>
+        {nm.map((map, index) => (
+          <li
+            key={map.id}
+            {...sortable.item(map.id, { container: "nm", index, label: map.name })}
+            className={SORTABLE_ITEM}
+          >
+            <SortableHandle sortable={sortable} id={map.id} />
+            <span>{map.name}</span>
+            <SortableMoveButtons sortable={sortable} id={map.id} label={map.name} />
+          </li>
+        ))}
+      </ol>
+    </>
+  );
+}
+```
+
+`mode: "between"` shows an insertion line and reports where the item lands; `to.index` is the item's final index in `to.container`, the same meaning as `@haruhimemoe/pool`'s `moveBucket`. `mode: "onto"` drops on an item or on the container's own empty space; `onto` is then the item's id it landed on, or `null` for the container. Containers can nest (a candidate list inside a bucket); the deepest one under the pointer wins the hit test. An item with `draggable: false` is a drop target only, never lifted (an empty slot row). `SortableList`'s `sortable` and `id` props join a list onto a hook made this way, so several `SortableList`s can share one live region and one `canDrop`.
+
+#### Keyboard
+
+| Key | What it does |
+| --- | --- |
+| Space, Enter | Pick up the focused handle; drop the lifted item. |
+| Arrow keys | Move to the next target along the axis (or across to the next "onto" item). |
+| Home, End | Jump to the first or last target in the current container. |
+| PageUp, PageDown | Jump to the previous or next container. |
+| Escape | Cancel, back to where it started. |
+| Tab | Cancels too, and still moves focus on. |
+
+A click with `detail === 0` (how screen readers in browse mode deliver Space and Enter) lifts and drops exactly like a key press; a real mouse click on the handle does nothing. Focus never leaves the handle mid-drag.
+
+#### Keep the buttons
+
+`moveButtons` defaults to on, and should stay on: WCAG 2.2 2.5.7 (Dragging Movements) wants a way to do what a drag does with a single pointer, and screen readers in browse mode and VoiceOver on iOS don't forward arrow keys to the page. Cross-container moves from a button (or from your own code) go through `sortable.moveTo(id, { container, index })`, which clamps the index into the destination's range.
+
+#### Refusing moves
+
+`canDrop` is checked on every hover and keyboard step: return `true` to allow, `false` to refuse with no reason, or a string to refuse with a reason (the target looks refused, and the chip and the announcement say why). `onMove` itself can return `false`, a reason string, or a `Promise` of either; while it is pending every handle in the hook gets `aria-disabled` and new lifts or moves are ignored until it settles. A rejected promise counts as a plain refusal (no reason is read from the error).
+
+#### Focus and announcements
+
+After an accepted move, the handle keeps focus, even when its row remounts in a different container on the next render. If the item itself is gone (the app removed it), the destination container gets focus instead. A move button keeps focus after moving its item, or focus goes to the other button when this one reached an end (Up disables at the top, so focus lands on Down). Every announcement is overridable per key:
+
+```tsx
+useSortable({
+  onMove,
+  announcements: {
+    handle: (label) => `Drag ${label}`,
+  },
+});
+```
+
+Defaults: `"Press Space or Enter to pick up. Use the arrow keys to move, Space or Enter to drop, Escape to cancel."`, `handle: (label) => \`Reorder ${label}\``, and position-based sentences for lifted, over, dropped, refused and cancelled (`"Picked up A. Position 1 of 3 in NM."`, `"A: position 2 of 3 in NM."`, `"Dropped A. Position 1 of 3 in HD."`, `"A can't go there: HD is full. Back at position 1 of 3 in NM."`, `"Cancelled. A is back at position 2 of 3 in NM."`).
+
+#### Look
+
+Data attributes, for your own CSS or for reading in tests: `data-sortable-state="lifted"` on the item being dragged, `data-sortable-drop` (`"before" | "after" | "onto"` on an item, `"inside"` on a container) and `data-sortable-line` (`"top" | "bottom" | "left" | "right"`) on the element showing where a drop lands, and `data-sortable-refused` when that target is refused. `SORTABLE_ITEM` draws the insertion line as a 2px `h1` border (`c4` when refused) in a `before:` pseudo-element, centred in the container's `--sortable-gap` custom property (default `0`; set it to your list's actual row gap), plus a dashed outline for an "onto" target and for the lifted item itself. `SORTABLE_CONTAINER` draws the same dashed outline when the container itself is the target. No opacity is used anywhere (the house rule against opacity on text); the line fades in on the motion tokens, and forced colors (Windows high contrast) keep a solid border. The handle is a 24px target, 44px on coarse pointers (`coarse:size-11`), with `touch-action: none` so a finger on the handle drags while the rest of the row still scrolls normally.
+
+#### Server and client
+
+The barrel stays importable from a Server Component. `moveItem`, `SORTABLE_ITEM` and `SORTABLE_CONTAINER` are plain values and work anywhere. `useSortable` and `SortableList` are client-only. `SortableHandle`, `SortableMoveButtons` and `SortableLayer` carry no directive of their own, but each takes a `Sortable`, so only a client component (one that already called `useSortable` or holds one from `SortableList`) can render them.
+
+#### Not included
+
+Grids (two-dimensional reordering), dragging between separate windows or apps, live sibling reflow or drop animations while dragging, and multi-select drags.
+
 ### Tables
 
 Since 0.4.0. `Table`, `THead`, `TBody`, `Th` and `Td` give a data table the apps' look: full width, small left-aligned text, muted capitals in the head and a rule above each body row. They are Server Components, and each takes its element's native props, `className` (merged last) and `ref`. Use plain `<tr>` for rows.
@@ -1563,6 +1711,7 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 - **Landmarks are few and named.** `PageShell` gives a skip link and `<main>`; `SiteHeader` one `<nav>` (`navLabel`, default "Main"); `SiteFooter` one `<nav>` (`navLabel`, default "Footer") with a headed `<section>` per column; `Pagination` and `LinkTabs` are labelled `<nav>`s. Give two of a kind different labels.
 - **Scrollable regions take focus.** `Table`'s wrapper is a focusable named section. Do the same for a `pre` inside `Prose`.
 - **Native first.** Fields are native inputs, selects and textareas; radios and checkboxes are native with a visible label; `RangeSlider`'s thumbs are native range inputs with `aria-valuetext` ("10+" reads as it shows); `Disclosure` and `HeaderMenu` are buttons with `aria-expanded` and `aria-controls`; `Tabs` follows the ARIA tabs pattern (one tab in the Tab order, arrows, Home and End, `aria-controls`). ARIA only where HTML has no element.
+- **Every drag has a keyboard and a button path.** Sortable lists lift with Space or Enter, move with the arrows and keep Up and Down buttons (WCAG 2.2 2.5.7); every move is announced in an assertive live region that exists before it speaks (since 0.15.0).
 - **Groups are named.** `ChipGroup`, `RangeSlider`, `RadioGroup`, `FilterRow` and `SegmentedControl` (since 0.13.0) are fieldsets named by their label. Inside a `FilterRow`, `hideLabel` leaves the naming to the row, so each row is announced once.
 - **One link per card.** `LinkCard` (since 0.13.0) covers itself with one `CardLink`, named by its own text, and lifts every other link, button and field inside above that cover, so they stay reachable and don't stack a second click target.
 - **Radios, not links, switch a view with no URL.** `SegmentedControl` (since 0.13.0) is native radios: Tab lands on the checked one, arrows move and pick, and a stale value checks none of them without breaking the Tab stop.

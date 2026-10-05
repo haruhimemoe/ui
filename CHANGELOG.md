@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Sortable lists: `useSortable`, `SortableList`, `SortableHandle`, `SortableMoveButtons`, `SortableLayer`, `moveItem`, `SORTABLE_ITEM` and `SORTABLE_CONTAINER`, with their types. Drag by mouse, touch or pen (pointer events only, no HTML5 drag and drop) or by keyboard (Space or Enter to pick up, the arrows, Home, End, PageUp and PageDown to move, Space or Enter to drop, Escape to cancel); a click with `detail` 0 lifts and drops for screen readers in browse mode. Up and Down buttons run on the same path. "between" and "onto" containers, nested containers, `canDrop` refusals with a reason, async `onMove` with a pending state, auto-scroll near edges, an assertive live region with overridable text, a pointer chip that shows the label and why a drop won't take, and focus that stays on the moved item's handle or button. The app owns the data. No new dependencies.
+
 ## [0.14.0] - 2026-10-05
 
 ### Added

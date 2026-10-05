@@ -234,6 +234,39 @@ export {
 } from "./components/shell/SiteFooter.js";
 export { SiteHeader, type SiteHeaderProps } from "./components/shell/SiteHeader.js";
 
+// Sortable
+export type {
+  SortableAnnouncementInfo,
+  SortableAnnouncements,
+} from "./components/sortable/announcements.js";
+export { SortableHandle, type SortableHandleProps } from "./components/sortable/SortableHandle.js";
+export { SortableLayer, type SortableLayerProps } from "./components/sortable/SortableLayer.js";
+export {
+  SortableList,
+  type SortableListProps,
+  type SortableRowContext,
+} from "./components/sortable/SortableList.js";
+export {
+  SortableMoveButtons,
+  type SortableMoveButtonsProps,
+} from "./components/sortable/SortableMoveButtons.js";
+export { moveItem } from "./components/sortable/sortableMath.js";
+export { SORTABLE_CONTAINER, SORTABLE_ITEM } from "./components/sortable/sortableStyles.js";
+export type {
+  Sortable,
+  SortableContainerOptions,
+  SortableContainerProps,
+  SortableHandleBindings,
+  SortableItemOptions,
+  SortableItemProps,
+  SortableMove,
+  SortablePlace,
+  SortableResult,
+  SortableState,
+  UseSortableOptions,
+} from "./components/sortable/sortableTypes.js";
+export { useSortable } from "./components/sortable/useSortable.js";
+
 // Tables
 export { Table, type TableProps } from "./components/tables/Table.js";
 export { TBody, type TBodyProps } from "./components/tables/TBody.js";

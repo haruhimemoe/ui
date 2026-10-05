@@ -178,6 +178,7 @@ describe("shipped source", () => {
       "palette/PaletteInput",
       "forms/CopyField",
       "forms/SegmentedControl",
+      "sortable/SortableList",
     ]) {
       const file = sources.find((s) => s.name === `src/components/${name}.tsx`);
       expect(firstStatement(file?.text ?? ""), name).toBe('"use client";');
