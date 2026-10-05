@@ -38,7 +38,7 @@ describe("file-private classes", () => {
   const cases: [string, string[]][] = [
     ["basics/Badge.tsx", ["forced-colors:border", ...RING, "contrast-more:border-c4"]],
     ["basics/Tabs.tsx", [...RING, "forced-colors:border", "coarse:min-h-11"]],
-    ["basics/Disclosure.tsx", ["coarse:min-h-11"]],
+    ["basics/disclosureStyles.ts", ["coarse:min-h-11"]],
     ["filters/FilterPanel.tsx", ["coarse:size-11"]],
     ["shell/LinkTabs.tsx", ["inline-flex", "items-center", "coarse:min-h-11"]],
     ["shell/HeaderMenu.tsx", ["coarse:min-h-11", "coarse:py-3", "contrast-more:border-c4"]],

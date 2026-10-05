@@ -3,7 +3,7 @@
  * @desc Guards the shape of mdxComponents and the public ./mdx barrel's export surface.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { describe, expect, it } from "vitest";
@@ -11,12 +11,18 @@ import { mdxComponents } from "../../../src/components/mdx/mdxComponents.js";
 import * as mdx from "../../../src/mdx.js";
 
 describe("mdxComponents", () => {
-  it("overrides exactly a, blockquote, h2, h3, pre and table", () => {
+  it("overrides the twelve elements", () => {
     expect(Object.keys(mdxComponents).sort()).toEqual([
       "a",
       "blockquote",
+      "details",
+      "div",
       "h2",
       "h3",
+      "h4",
+      "img",
+      "input",
+      "kbd",
       "pre",
       "table",
     ]);

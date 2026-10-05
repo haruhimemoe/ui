@@ -12,6 +12,7 @@
 
 import { type ComponentProps, type ReactNode, useId, useState } from "react";
 import { cx } from "../../utils/cx.js";
+import { DISCLOSURE_TOGGLE } from "./disclosureStyles.js";
 
 /** Every native `<div>` prop for the wrapper, plus the button's text and the panel. */
 export type DisclosureProps = Omit<ComponentProps<"div">, "children"> & {
@@ -62,10 +63,7 @@ export function Disclosure({
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={toggle}
-        className={cx(
-          "inline-flex coarse:min-h-11 min-h-6 items-center gap-1 self-start font-bold text-c2 text-sm transition-colors hover:text-c1",
-          buttonClassName,
-        )}
+        className={cx(DISCLOSURE_TOGGLE, "self-start", buttonClassName)}
       >
         {summary}
         <span aria-hidden="true">{isOpen ? "▴" : "▾"}</span>
