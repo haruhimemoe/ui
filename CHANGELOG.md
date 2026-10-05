@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-05
+
 ### Added
 
 - Sortable lists: `useSortable`, `SortableList`, `SortableHandle`, `SortableMoveButtons`, `SortableLayer`, `moveItem`, `SORTABLE_ITEM` and `SORTABLE_CONTAINER`, with their types. Drag by mouse, touch or pen (pointer events only, no HTML5 drag and drop) or by keyboard (Space or Enter to pick up, the arrows, Home, End, PageUp and PageDown to move, Space or Enter to drop, Escape to cancel); a click with `detail` 0 lifts and drops for screen readers in browse mode. Up and Down buttons run on the same path. "between" and "onto" containers, nested containers, `canDrop` refusals with a reason, async `onMove` with a pending state, auto-scroll near edges, an assertive live region with overridable text, a pointer chip that shows the label and why a drop won't take, and focus that stays on the moved item's handle or button. The app owns the data. No new dependencies.
@@ -231,7 +233,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.14.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/haruhimemoe/ui/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/haruhimemoe/ui/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/haruhimemoe/ui/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/haruhimemoe/ui/compare/v0.11.2...v0.12.0
