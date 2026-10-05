@@ -107,6 +107,8 @@ describe("shipped source", () => {
       "src/components/forms/ReportDisclosure.tsx",
       "src/components/forms/TypeToConfirm.tsx",
       "src/components/mdx/CodeCopyButton.tsx",
+      "src/components/osu/MapCopyIdButton.tsx",
+      "src/components/osu/MapCopyScope.tsx",
       "src/components/osu/MapPreviewButton.tsx",
       "src/components/palette/CommandPalette.tsx",
       "src/components/palette/CommandPaletteButton.tsx",
