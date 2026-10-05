@@ -2,7 +2,9 @@
  * @file tests/helpers/sortable.tsx
  * @desc Shared sortable test setup: a two-container board (NM: a, b, c; HD: d, e) on
  *       useSortable that applies accepted moves to its own state as an app would, plus queries
- *       for the live region, a handle by label and a region's order.
+ *       for the live region, a handle by label and a region's order. Renders the real
+ *       SortableHandle, SortableMoveButtons and SortableLayer, so every suite on it exercises
+ *       them too.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
  * @modified Sun Oct 4, 2026
@@ -11,6 +13,9 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
+import { SortableHandle } from "../../src/components/sortable/SortableHandle.js";
+import { SortableLayer } from "../../src/components/sortable/SortableLayer.js";
+import { SortableMoveButtons } from "../../src/components/sortable/SortableMoveButtons.js";
 import { moveItem } from "../../src/components/sortable/sortableMath.js";
 import type {
   SortableMove,
@@ -84,12 +89,7 @@ export function Board({
   });
   return (
     <div>
-      <div aria-live="assertive" aria-atomic="true" className="sr-only">
-        {sortable.layer.announcement}
-      </div>
-      <p id={sortable.layer.instructionsId} hidden>
-        {sortable.layer.instructions}
-      </p>
+      <SortableLayer sortable={sortable} />
       {Object.entries(lists).map(([container, ids]) => (
         <section key={container} aria-label={NAMES[container] ?? container}>
           <ol
@@ -104,30 +104,9 @@ export function Board({
                 const label = id.toUpperCase();
                 return (
                   <li key={id} {...sortable.item(id, { container, index, label })}>
-                    <button {...sortable.handle(id)} type="button">
-                      grip
-                    </button>
+                    <SortableHandle sortable={sortable} id={id} />
                     <span>{label}</span>
-                    <button
-                      type="button"
-                      data-sortable-move="up"
-                      data-sortable-for={id}
-                      aria-label={`Move ${label} up`}
-                      disabled={!sortable.canMoveBy(id, -1)}
-                      onClick={() => sortable.moveBy(id, -1)}
-                    >
-                      Up
-                    </button>
-                    <button
-                      type="button"
-                      data-sortable-move="down"
-                      data-sortable-for={id}
-                      aria-label={`Move ${label} down`}
-                      disabled={!sortable.canMoveBy(id, 1)}
-                      onClick={() => sortable.moveBy(id, 1)}
-                    >
-                      Down
-                    </button>
+                    <SortableMoveButtons sortable={sortable} id={id} label={label} />
                     <button
                       type="button"
                       onClick={() =>
