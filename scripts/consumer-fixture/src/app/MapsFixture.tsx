@@ -8,7 +8,17 @@
  * @modified Mon Oct 5, 2026
  */
 
-import { Card, MapCard, MapCover, MapGroup, MapPreviewButton, MapSetCard } from "@haruhimemoe/ui";
+import {
+  Card,
+  MAP_STATUS_LABELS,
+  MapCard,
+  MapCopyScope,
+  MapCover,
+  MapGroup,
+  MapPreviewButton,
+  MapSetCard,
+  mapCoverUrl,
+} from "@haruhimemoe/ui";
 
 /** BeatmapMeta-shaped, extra fields included: MapCard must ignore checksum and mode. */
 const META = {
@@ -37,23 +47,31 @@ const META = {
 export function MapsFixture() {
   return (
     <Card title="Maps" headingLevel={3}>
-      <MapGroup title="NM" count={2} target={3} emptySlots={1} detail="Nomod">
-        <MapCard as="li" beatmapId={129891} map={META} slot={{ label: "NM1" }} copyId />
-        <MapCard as="li" beatmapId={5} state="loading" slot={{ label: "NM2" }} copyId />
-      </MapGroup>
-      <MapCard layout="card" background="cover" beatmapId={129891} map={META} titleAs="h4" />
-      <MapSetCard
-        beatmapsetId={39804}
-        artist="xi"
-        title="FREEDOM DiVE"
-        creator="Nakagawa-Kanon"
-        status="ranked"
-        difficulties={[{ beatmapId: 129891, version: "FOUR DIMENSIONS", stars: 7.12 }]}
-      />
+      <MapCopyScope>
+        <MapGroup title="NM" count={2} target={3} emptySlots={1} detail="Nomod">
+          <MapCard as="li" beatmapId={129891} map={META} slot={{ label: "NM1" }} copyId />
+          <MapCard as="li" beatmapId={5} state="loading" slot={{ label: "NM2" }} copyId />
+        </MapGroup>
+        <MapCard layout="card" background="cover" beatmapId={129891} map={META} titleAs="h4" />
+        <MapSetCard
+          beatmapsetId={39804}
+          artist="xi"
+          title="FREEDOM DiVE"
+          creator="Nakagawa-Kanon"
+          status="ranked"
+          statusLabel={MAP_STATUS_LABELS.ranked}
+          difficulties={[{ beatmapId: 129891, version: "FOUR DIMENSIONS", stars: 7.12 }]}
+        />
+      </MapCopyScope>
       <div className="size-12">
         <MapPreviewButton beatmapsetId={39804} song="xi - FREEDOM DiVE" />
       </div>
       <MapCover beatmapsetId={39804} className="size-12" />
+      <MapCover
+        src={mapCoverUrl(39804, "card") ?? undefined}
+        className="h-8 w-20"
+        alt="Set 39804's cover"
+      />
     </Card>
   );
 }
