@@ -14,6 +14,13 @@
 
 import Link from "next/link.js";
 import { usePathname } from "next/navigation.js";
+import {
+  CONTENT_NAV_COLUMN,
+  CONTENT_NAV_CURRENT,
+  CONTENT_NAV_DISCLOSURE,
+  CONTENT_NAV_LINK,
+  CONTENT_NAV_SUMMARY,
+} from "./contentNavStyles.js";
 import type { ContentNavGroup, ContentNavItem } from "./types.js";
 
 /** `ContentNav`'s props. */
@@ -26,11 +33,6 @@ export type ContentNavProps = {
   indexLabel?: string;
   groups: readonly ContentNavGroup[];
 };
-
-const LINK_CLASS_NAME =
-  "flex items-baseline justify-between gap-2 rounded px-2 py-1 text-sm hover:bg-b4 hover:text-c1 text-c3 coarse:py-2.5";
-const CURRENT_CLASS_NAME =
-  "flex items-baseline justify-between gap-2 rounded px-2 py-1 text-sm hover:bg-b4 hover:text-c1 bg-b4 font-bold text-c1 coarse:py-2.5";
 
 /**
  * @function ContentNav
@@ -48,7 +50,7 @@ export function ContentNav({ label, indexHref, indexLabel = "Overview", groups }
           href={item.href}
           aria-current={current ? "page" : undefined}
           title={item.title}
-          className={current ? CURRENT_CLASS_NAME : LINK_CLASS_NAME}
+          className={current ? CONTENT_NAV_CURRENT : CONTENT_NAV_LINK}
         >
           <span className="line-clamp-2 min-w-0 break-words">{item.navTitle ?? item.title}</span>
           {item.badge ? <span className="font-mono text-c4 text-xs">{item.badge}</span> : null}
@@ -74,10 +76,10 @@ export function ContentNav({ label, indexHref, indexLabel = "Overview", groups }
   return (
     <>
       <nav aria-label={label} className="hidden lg:block">
-        <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">{list}</div>
+        <div className={CONTENT_NAV_COLUMN}>{list}</div>
       </nav>
-      <details className="rounded-md bg-b4 p-2 lg:hidden">
-        <summary className="cursor-pointer px-2 py-1 font-bold text-c2 text-sm">Contents</summary>
+      <details className={`${CONTENT_NAV_DISCLOSURE} lg:hidden`}>
+        <summary className={CONTENT_NAV_SUMMARY}>Contents</summary>
         <nav aria-label={label} className="mt-2">
           {list}
         </nav>

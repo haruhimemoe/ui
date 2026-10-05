@@ -54,7 +54,7 @@ describe("file-private classes", () => {
   });
 
   it("pads both ContentNav link strings on a coarse pointer", () => {
-    const text = source("content/ContentNav.tsx");
+    const text = source("content/contentNavStyles.ts");
     expect(text.match(/coarse:py-2\.5/g)).toHaveLength(2);
   });
 });

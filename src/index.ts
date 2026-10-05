@@ -5,7 +5,7 @@
  *       their own "use client" directive, so this barrel is safe to import from Server Components.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 // Actions
@@ -92,6 +92,7 @@ export {
   type CopyMarkdownButtonProps,
 } from "./components/content/CopyMarkdownButton.js";
 export { searchContent } from "./components/content/searchContent.js";
+export { Toc, type TocProps } from "./components/content/Toc.js";
 export type {
   ContentNavGroup,
   ContentNavItem,
@@ -108,7 +109,6 @@ export {
   type DialogDismissReason,
   type DialogProps,
 } from "./components/dialogs/Dialog.js";
-
 // Filters
 export { Chip, type ChipProps } from "./components/filters/Chip.js";
 export { ChipGroup, type ChipGroupProps, type ChipOption } from "./components/filters/ChipGroup.js";
@@ -124,7 +124,6 @@ export {
   type RangeSliderProps,
   type RangeSliderValue,
 } from "./components/filters/RangeSlider.js";
-
 // Forms
 export { CharCounter, type CharCounterProps } from "./components/forms/CharCounter.js";
 export { Checkbox, type CheckboxProps } from "./components/forms/Checkbox.js";
@@ -158,7 +157,6 @@ export {
   type VisibilitySelectProps,
   type VisibilityText,
 } from "./components/forms/VisibilitySelect.js";
-
 // Icons
 export { DiscordIcon, type DiscordIconProps } from "./components/icons/DiscordIcon.js";
 export { GitHubIcon, type GitHubIconProps } from "./components/icons/GitHubIcon.js";
@@ -170,10 +168,8 @@ export {
   HaruhimeWordmarkLink,
   type HaruhimeWordmarkLinkProps,
 } from "./components/icons/HaruhimeWordmarkLink.js";
-
 // Meta
 export { JsonLd, type JsonLdProps } from "./components/meta/JsonLd.js";
-
 // osu!
 export {
   type BeatmapStatKey,
@@ -207,7 +203,6 @@ export {
 } from "./components/osu/PlayerCard.js";
 export { stopMapPreview } from "./components/osu/previewPlayer.js";
 export { StarRating, type StarRatingProps } from "./components/osu/StarRating.js";
-
 // Palette
 export { CommandPalette } from "./components/palette/CommandPalette.js";
 export {
@@ -227,7 +222,6 @@ export type {
   PaletteContext,
   Provider,
 } from "./components/palette/types.js";
-
 // Shell
 export {
   HeaderMenu,
@@ -251,7 +245,6 @@ export {
   type SiteFooterProps,
 } from "./components/shell/SiteFooter.js";
 export { SiteHeader, type SiteHeaderProps } from "./components/shell/SiteHeader.js";
-
 // Sortable
 export type {
   SortableAnnouncementInfo,
@@ -284,13 +277,13 @@ export type {
   UseSortableOptions,
 } from "./components/sortable/sortableTypes.js";
 export { useSortable } from "./components/sortable/useSortable.js";
-
 // Tables
 export { Table, type TableProps } from "./components/tables/Table.js";
 export { TBody, type TBodyProps } from "./components/tables/TBody.js";
 export { Td, type TdProps } from "./components/tables/Td.js";
 export { THead, type THeadProps } from "./components/tables/THead.js";
 export { Th, type ThProps } from "./components/tables/Th.js";
+export type { TocItem } from "./remark/articleData.js";
 
 // Utilities
 export { type ClassValue, cx } from "./utils/cx.js";
