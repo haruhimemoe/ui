@@ -6,7 +6,8 @@
  *       tailwind-merge out of the browser bundle, the Tailwind peer range covers only versions
  *       with the utilities the components use, no declaration maps point at source that isn't
  *       published, and the changelog matches the package version, links every release, and
- *       holds only fixes in a 0.x patch release.
+ *       holds only fixes in a 0.x patch release, and that src/remark imports nothing from react,
+ *       unified, unist-util-visit or the sanitizer packages.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
  * @modified Sun Oct 4, 2026
@@ -263,6 +264,26 @@ describe("package manifest and build", () => {
     expect(pkg.peerDependencies.shiki).toBe(">=4.5.0 <5");
     expect(pkg.peerDependenciesMeta?.shiki?.optional).toBe(true);
     expect(pkg.devDependencies.shiki).toBe("4.5.0");
+  });
+
+  // ./remark is plain mdast/hast functions, so it never carries a React, unified, unist-util-visit
+  // or sanitizer runtime into an app that only wants the remark plugin (e.g. a Turbopack config).
+  it("keeps src/remark free of react, unified, unist-util-visit and the sanitizer packages", () => {
+    const banned = [
+      "react",
+      "unified",
+      "unist-util-visit",
+      "hast-util-sanitize",
+      "rehype-sanitize",
+    ];
+    const remarkSources = sources.filter(({ name }) => name.startsWith("src/remark/"));
+    expect(remarkSources.length).toBeGreaterThan(0);
+    const offenders = remarkSources.flatMap(({ name, text }) =>
+      banned
+        .filter((pkgName) => new RegExp(`from "${pkgName}(/|")`).test(text))
+        .map((pkgName) => `${name}: ${pkgName}`),
+    );
+    expect(offenders).toEqual([]);
   });
 });
 

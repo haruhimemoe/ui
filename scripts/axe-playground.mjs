@@ -16,10 +16,13 @@
  *       (with up to five targets) and exits 1 on any. Usage: `bun run play:axe` (CI runs it after
  *       the consumer check; Chromium is installed for that). Then /maps (the 0.16.0 map display):
  *       rendered, after a Copy ID press, and after a preview press (the clip is a missing local
- *       file, so the run needs no network), each axed.
+ *       file, so the run needs no network), each axed. Then, at 1280 and 390 only, /mdx/article
+ *       (the 0.17.0 sample post): YouTube/Twitch/i.ytimg.com are routed to a stub (no network), the
+ *       toc is reached (visible on desktop, opened from its phone disclosure), axed, then the
+ *       first video facade is clicked and axed again with the iframe excluded.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -141,6 +144,14 @@ const MAP_STATES = [
 
 /** Set AXE_SHOTS to a directory to save a screenshot per state and width. */
 const shots = process.env.AXE_SHOTS;
+
+/** A 1x1 transparent PNG, stubbed in for every third-party embed image. */
+const PIXEL = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+  "base64",
+);
+/** The host the sample post's embeds would otherwise reach: stubbed so the run needs no network. */
+const EMBED_HOSTS = /youtube-nocookie\.com|player\.twitch\.tv|clips\.twitch\.tv|i\.ytimg\.com/;
 
 const waitForServer = async (url, timeoutMs) => {
   const deadline = Date.now() + timeoutMs;
@@ -330,6 +341,56 @@ try {
       }
       console.log(
         `${viewportName} /maps ${state.name}: ${results.violations.length ? `${results.violations.length} violations` : "ok"}`,
+      );
+    }
+    // The sample article (0.17.0): toc, then the first video facade clicked. 1280 and 390 only.
+    if (viewportName === "desktop" || viewportName === "phone") {
+      await page.route(EMBED_HOSTS, (route) =>
+        route.request().resourceType() === "image"
+          ? route.fulfill({ status: 200, contentType: "image/png", body: PIXEL })
+          : route.fulfill({
+              status: 200,
+              contentType: "text/html",
+              body: '<!doctype html><html lang="en"><title>stub</title></html>',
+            }),
+      );
+      const article = await page.goto(`${origin}/mdx/article`, { waitUntil: "load" });
+      if (article?.status() !== 200) {
+        throw new Error(`/mdx/article answered ${article?.status() ?? "nothing"}`);
+      }
+      await page.waitForTimeout(500);
+      if (viewportName === "desktop") {
+        // The wide-screen column, not the phone disclosure's copy (CSS hides it above xl).
+        const visible = await page
+          .locator('nav[aria-label="On this page"]:not(details nav)')
+          .first()
+          .isVisible();
+        if (!visible) throw new Error(`${viewportName} /mdx/article: toc nav not visible`);
+      } else {
+        // The sample post also has a plain <details> ("More about rolls"): scope to the toc's own.
+        await page.getByText("On this page", { exact: true }).click();
+        await page.waitForTimeout(150);
+        const visible = await page
+          .locator('details[open] nav[aria-label="On this page"]')
+          .first()
+          .isVisible();
+        if (!visible) throw new Error(`${viewportName} /mdx/article: toc nav not visible`);
+      }
+      await runAxe(page, `${viewportName} /mdx/article (toc)`);
+      await page.locator('a[aria-label^="Play video"]').first().click();
+      await page.waitForSelector("iframe");
+      const playResults = await new AxeBuilder({ page }).withTags(TAGS).exclude("iframe").analyze();
+      for (const violation of playResults.violations) {
+        const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
+        failures.push(
+          [
+            `${viewportName} /mdx/article (after play): ${violation.id} (${violation.impact}) ${violation.help}`,
+            ...targets,
+          ].join("\n"),
+        );
+      }
+      console.log(
+        `${viewportName} /mdx/article (after play): ${playResults.violations.length ? `${playResults.violations.length} violations` : "ok"}`,
       );
     }
     await context.close();

@@ -1,0 +1,48 @@
+{/**
+ * @file scripts/consumer-fixture/src/content/post.mdx
+ * @desc A fixture blog-style post: headings down to h4, a footnote, a task list, a lone captioned
+ *       image (remarkFigures), a bare video URL (remarkEmbeds), Steps, Kbd and an MdxLinkCard, plus
+ *       a sized Figure. Rendered on ContentPage by src/app/article/page.tsx through mdxExports'
+ *       toc/readingMinutes.
+ * @author David @dvhsh (https://dvh.sh)
+ * @created Sun Oct 4, 2026
+ * @modified Sun Oct 4, 2026
+ */}
+
+import { Figure, Kbd, MdxLinkCard, Steps } from "@haruhimemoe/ui/mdx";
+
+## Seeding
+
+Qualifier seeding follows last split's results[^1].
+
+### Ties
+
+- [x] Confirm the tiebreaker map pool
+- [ ] Assign a backup referee
+
+![A pink square](data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='8'%20height='8'%3E%3Crect%20width='8'%20height='8'%20fill='%23ff66ab'/%3E%3C/svg%3E "A caption")
+
+https://youtu.be/dQw4w9WgXcQ
+
+#### Rolls
+
+<Steps>
+  <ol>
+    <li>Roll for pick order.</li>
+    <li>Higher roll picks first.</li>
+  </ol>
+</Steps>
+
+Press <Kbd>Ctrl</Kbd>+<Kbd>K</Kbd> to open the roll tool.
+
+<MdxLinkCard href="https://osu.ppy.sh/wiki" title="osu! wiki" />
+
+<Figure
+  src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='8'%20height='8'%3E%3Crect%20width='8'%20height='8'%20fill='%23ff66ab'/%3E%3C/svg%3E"
+  alt="Square"
+  width={8}
+  height={8}
+  caption="Sized"
+/>
+
+[^1]: Results from the last qualifier split.

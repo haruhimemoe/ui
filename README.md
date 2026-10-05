@@ -271,7 +271,11 @@ A line of text in a tone and a size, instead of hand-written color classes. Ever
 
 #### `Prose`
 
-Long-form typography for MDX, docs and legal pages. A `max-w-3xl` `<div>` that styles the `h2`, `h3`, `p`, `a`, `strong`, `ul`, `ol`, `li`, `code`, `pre`, `hr` and `table` elements inside it. Every native `<div>` prop. A `pre` scrolls sideways, so give it `tabIndex={0}` (through your Markdown renderer's `components` map) so keyboard users can reach the scroll; CSS can't add that.
+Long-form typography for MDX, docs and legal pages. A `max-w-3xl` `<div>` that styles the `h2`, `h3`, `h4`, `p`, `a`, `strong`, `ul`, `ol`, `li`, `dl`, `code`, `pre`, `hr`, `table`, figures, task lists, footnotes and `details` elements inside it (`h4`, `dl`, figures, task lists, footnotes and `details` since 0.17.0). Every native `<div>` prop. A `pre` scrolls sideways, so give it `tabIndex={0}` (through your Markdown renderer's `components` map) so keyboard users can reach the scroll; CSS can't add that.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `size` | `"base" \| "sm"` | `"base"` | Since 0.17.0. `sm` is a denser scale for legal pages and other dense docs; pass it straight through to `ContentPage`'s own `proseSize`. |
 
 The first element inside gets no top margin (`[&>:first-child]:mt-0`, since 0.2.0), so a heading that opens the block sits flush with what's above it instead of taking the `h2` or `h3` gap. The rule reaches direct children only. If you wrap the content in `<section>`s, the heading at the top of the first section keeps its margin. Reach one level deeper for that:
 
@@ -289,6 +293,17 @@ The first element inside gets no top margin (`[&>:first-child]:mt-0`, since 0.2.
 ```
 
 Later sections keep their heading margin, which spaces them apart.
+
+#### `Kbd` and `kbdClasses`
+
+Since 0.17.0. A keyboard key: `<kbd>` with a small bordered look (`rounded border border-b3 bg-b5 font-sans text-c3`), shared with the command palette's own shortcut hints. Every native `<kbd>` prop. `kbdClasses` is the same classes as a plain string, for a `<kbd>` (or any element) you build yourself.
+
+```tsx
+<p>Press <Kbd>Ctrl</Kbd>+<Kbd>K</Kbd> to open the palette.</p>
+<span className={kbdClasses}>Esc</span>
+```
+
+It also renders for Markdown's `kbd` element through `mdxComponents`, and is exported from `@haruhimemoe/ui/mdx` for `<Kbd>Ctrl</Kbd>` directly in `.mdx` source.
 
 #### `Disclosure` (client)
 
@@ -1043,20 +1058,47 @@ The same card grid as `ContentSearch` (one link per item: title, badge, descript
 | --- | --- | --- | --- |
 | `items` | `readonly ContentSearchItem[]` | required | The entries to list. |
 
+#### `Toc`
+
+Since 0.17.0. An article's table of contents, built from `articleData`'s (or MDX's `mdxExports`') flat `toc: TocItem[]`: a sticky column from `xl` up beside the page, and a phone disclosure above it, both labelled "On this page" (the same column and link classes as `ContentNav`, through `contentNavStyles.ts`). A Server Component; every native `<nav>` prop goes on the wide-screen column (the phone disclosure carries its own `nav`, so the same props on both would duplicate an id).
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `items` | `readonly TocItem[]` | required | The flat TOC, in document order. |
+| `maxDepth` | `2 \| 3 \| 4` | `3` | The deepest heading level kept; deeper headings are dropped, not nested. |
+| `label` | `string` | `"On this page"` | The nav landmark's accessible name, on both the column and the phone disclosure. |
+
+Renders nothing when fewer than two items survive `maxDepth` (a one-heading page needs no toc). A heading whose level jumps more than one step still nests one level at a time (2 then 4 nests once, not twice), and repeated ids keep distinct React keys.
+
+```tsx
+const page = await import(`./posts/${slug}.mdx`); // mdxExports: true
+<ContentPage title={meta.title} toc={<Toc items={page.toc} />} /* ... */>
+  <page.default />
+</ContentPage>
+```
+
 #### `ContentPage`
 
-Since 0.11.0. A content section's page: `PageHeader` (the title and the description as its lead), a meta row with when the page was last updated and a "Copy as Markdown" button, then the body in `Prose`. Optional JSON-LD. A Server Component.
+Since 0.11.0. A content section's page: `PageHeader` (the title and the description as its lead), a meta row (byline, published/updated dates, reading time) with a "Copy as Markdown" button, then the body in `Prose`, with an optional toc beside it and a footer after it. Optional JSON-LD. A Server Component.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `title` | `ReactNode` | required | The page's `<h1>`, passed to `PageHeader`. |
 | `description` | `ReactNode` | none | Passed to `PageHeader` as `lead`. |
-| `lastUpdated` | `string` | none | A `<time dateTime>`-ready string (an ISO date, say), shown next to `lastUpdatedLabel`. |
-| `lastUpdatedLabel` | `ReactNode` | `"Last updated"` | The label before the time. |
+| `authors` | `readonly ContentAuthor[]` | none | Since 0.17.0. Shown first in the meta row, through `ContentByline` (see below). |
+| `published` | `string` | none | Since 0.17.0. A `<time dateTime>`-ready string (an ISO date, say). Formatted "Oct 4, 2026"; anything that isn't a real ISO day (an impossible date, a bare year) prints as given. |
+| `lastUpdated` | `string` | none | A `<time dateTime>`-ready string, shown as "Updated \<date\>" next to `published` when the two differ, or alone (as `lastUpdatedLabel`) when `published` is unset. |
+| `lastUpdatedLabel` | `ReactNode` | `"Last updated"` | The label before the time, when `published` is unset. |
+| `readingMinutes` | `number` | none | Since 0.17.0. Shown as "{n} min read" in the meta row (`articleData`'s or `mdxExports`' `readingMinutes`). |
 | `markdownHref` | `string` | none | The page's raw Markdown source. When set, shows a `CopyMarkdownButton` for it. |
 | `jsonLd` | `Record<string, unknown>` | none | One schema.org object, passed to `JsonLd`. Use `ld.graph(...)` yourself for several nodes. |
-| `actions` | `ReactNode` | none | Extra buttons or links, shown alongside the time and the copy button. |
+| `actions` | `ReactNode` | none | Extra buttons or links, shown alongside the meta row and the copy button. |
+| `toc` | `ReactNode` | none | Since 0.17.0. A table of contents (usually `<Toc items={page.toc} />`), rendered before the body in a two-column layout from `xl` up. |
+| `footer` | `ReactNode` | none | Since 0.17.0. Rendered after the body, outside `Prose` (a `PrevNext`, related links). |
+| `proseSize` | `"base" \| "sm"` | `"base"` | Since 0.17.0. Passed straight to `Prose`'s own `size`; `"sm"` for dense docs and legal pages. |
 | `children` | `ReactNode` | required | The page body, rendered inside `Prose`. |
+
+`ContentAuthor` (`{ name: string; userId?: number; href?: string | null; avatarUrl?: string }`) names an author; `userId` links an osu! profile and draws its avatar unless `href`/`avatarUrl` say otherwise. Several authors join "A, B and C".
 
 #### `CopyMarkdownButton` (client)
 
@@ -1398,7 +1440,7 @@ Accessibility: every control names its own map (Copy ID is "Copy ID \<id\>", the
 
 ### MDX (server)
 
-Since 0.9.0. Three subpaths, so an app that never renders Markdown loads none of this: `@haruhimemoe/ui/mdx` (the React pieces: `mdxComponents`, `CodeBlock`, `Callout`), `@haruhimemoe/ui/remark` (plain functions, no React, for `@next/mdx` and `react-markdown`'s `remarkPlugins`), and `@haruhimemoe/ui/shiki` (opt-in code highlighting). The root `@haruhimemoe/ui` export is unchanged.
+Since 0.9.0. Three subpaths, so an app that never renders Markdown loads none of this: `@haruhimemoe/ui/mdx` (the React pieces: `mdxComponents`, `CodeBlock`, `Callout`, and since 0.17.0 the article pieces `Figure`, `Steps`, `Embed`, `MdxLinkCard`, `Schedule`, `Glossary`, `Term`, `Kbd`), `@haruhimemoe/ui/remark` (plain functions, no React, for `@next/mdx` and `react-markdown`'s `remarkPlugins`), and `@haruhimemoe/ui/shiki` (opt-in code highlighting). The root `@haruhimemoe/ui` export adds `Toc` and `Kbd`/`kbdClasses` (0.17.0; see "Basics" and "Content" above).
 
 **With `@next/mdx`:**
 
@@ -1446,15 +1488,20 @@ If you sanitize the output (`rehype-sanitize` or your own schema), allow `classN
 
 #### `mdxComponents`
 
-The element overrides apps pass to `@next/mdx`'s `useMDXComponents` or `react-markdown`'s `components`: `{ a, blockquote, h2, h3, pre, table }`. Spread it and add your own (`{ ...mdxComponents, Example: LiveExample }`).
+The element overrides apps pass to `@next/mdx`'s `useMDXComponents` or `react-markdown`'s `components`: `{ a, blockquote, details, div, h2, h3, h4, img, input, kbd, pre, table }` (`details`, `div`, `h4`, `img`, `input`, `kbd` since 0.17.0). Spread it and add your own (`{ ...mdxComponents, Example: LiveExample }`); your own key of the same name always wins.
 
 | Element | Renders |
 | --- | --- |
 | `a` | `https://` opens in a new tab (`rel="noopener noreferrer"`); a same-page `#hash` is a plain anchor; everything else goes through `AutoLink` (`next/link`, or a plain `<a>` off-site). |
-| `h2`, `h3` | The heading with its id (from the remark plugin, or a `slugify` of its own text) and, beside it, a `#` anchor link (`aria-label="Link to section: …"`, always visible in `c4`, turning `h1` on hover, never only on hover). |
+| `h2`, `h3`, `h4` | The heading with its id (from the remark plugin, or a `slugify` of its own text) and, beside it, a `#` anchor link (`aria-label="Link to section: …"`, always visible in `c4`, turning `h1` on hover, never only on hover). The GFM footnote label (`<h2 class="sr-only" id="footnote-label">`) renders bare, with no wrapper and no anchor. |
 | `pre` | Reads its single `code` child (text, `language-x` class, the fence's meta) and renders `CodeBlock`. Anything else (a `pre` with no single `code` child) renders as a plain, focusable `<pre>`. |
 | `table` | The table wrapped in a focusable, named scroll region: `<div role="group" tabIndex={0} aria-label="…">`, labelled by the table's `<caption>` text, or `"Table"` without one. |
 | `blockquote` | A blockquote the remark plugin marked `data-callout` renders as `Callout` of that type; any other blockquote renders plainly. |
+| `img` | A plain, lazy, async-decoded `<img>` (never `next/image`, so apps need no `remotePatterns` for Markdown images). |
+| `input` | A GFM task-list checkbox becomes a named, disabled checkbox ("Done" / "Not done"); any other input passes through. |
+| `details` | A native `<details>`/`<summary>` pair, the summary styled like `Disclosure`'s toggle button with a ▾/▴ arrow, server-only (works with no JS). |
+| `kbd` | `Kbd`'s look. |
+| `div` | A `remarkEmbeds` `data-embed` div renders `Embed`; any other div (MDX never routes a hand-written `<div>` here) passes through plainly. |
 
 #### `CodeBlock`
 
@@ -1511,13 +1558,143 @@ Or write `<Callout type="tip">` directly in an `.mdx` file.
 
 Plain functions (no React), for `remarkPlugins`. Default export `remarkHaruhime(options?)` runs all three transforms below in order and is what Turbopack needs by module name: `remarkPlugins: ["@haruhimemoe/ui/remark"]`. Named exports `remarkCodeMeta`, `remarkCallouts` and `remarkHeadingIds` run one each, for `react-markdown`'s array form or a custom pipeline.
 
-| Option (all default `true`) | Turns off |
-| --- | --- |
-| `codeMeta` | Copying a fenced code block's meta string onto `data-meta`, which `CodeBlock`'s fence syntax (`title=`, `{…}`) reads. |
-| `callouts` | The `[!NOTE]` / `[!TIP]` / `[!WARNING]` blockquote markers. |
-| `headingIds` | Slugged, deduplicated ids on `h2`/`h3` (a heading that already has one keeps it). |
+| Option | Default | Turns off |
+| --- | --- | --- |
+| `codeMeta` | `true` | Copying a fenced code block's meta string onto `data-meta`, which `CodeBlock`'s fence syntax (`title=`, `{…}`) reads. |
+| `callouts` | `true` | The `[!NOTE]` / `[!TIP]` / `[!WARNING]` blockquote markers. |
+| `headingIds` | `true` | Slugged, deduplicated ids on `h2`-`h4` (since 0.17.0; was `h2`/`h3`). A heading that already has one keeps it. |
+| `figures` | `true` | Since 0.17.0. A paragraph holding only an image becoming a `<figure>` with a trailing `<figcaption>` from its title. |
+| `embeds` | `true` | Since 0.17.0. A paragraph holding only a bare YouTube/Twitch URL becoming a click-to-load player (see "Embeds" below). |
+| `mdxExports` | `false` | Since 0.17.0. **On** adds `export const toc`, `readingMinutes` and `words` to the MDX module (off by default: react-markdown would try to render the ESM nodes). An export you already wrote under the same name wins. |
+| `wordsPerMinute` | `200` | The rate `mdxExports`'/`articleData`'s reading time divides by. |
+| `collect` | none | A function called with the same `{ toc, words, readingMinutes }` `mdxExports` would export; for react-markdown, which can't pass a function through Turbopack's serializable plugin options. |
 
 `slugify(text)` and `createSlugger()` are also exported: lowercase, Unicode-aware (letters, marks, digits and underscores from any script survive; everything else but whitespace and hyphens is dropped), spaces to hyphens, repeats suffixed `-1`, `-2` like GitHub's own heading anchors. `@haruhimemoe/ui/mdx` re-exports `slugify` for apps that build their own heading links.
+
+#### Articles
+
+Since 0.17.0. `ContentPage` grew `authors`, `published`, `readingMinutes`, `toc` and `footer` for a blog post or a long guide, on top of the docs/legal page props it already had:
+
+```tsx
+// next.config.ts: Turbopack only takes MDX plugins by module name, and `mdxExports`
+// (a boolean) is the one option that's safe to pass as a [name, options] tuple.
+options: { remarkPlugins: ["remark-gfm", ["@haruhimemoe/ui/remark", { mdxExports: true }]] }
+```
+
+```tsx
+const page = await import(`./posts/${slug}.mdx`) as MdxArticleModule;
+<ContentPage
+  title={meta.title}
+  authors={[{ name: "David", userId: 2 }]}
+  published={meta.published}
+  readingMinutes={page.readingMinutes}
+  toc={<Toc items={page.toc} />}
+  footer={<PrevNext label="More posts" prev={prev} next={next} />}
+  proseSize="sm" // dense docs and legal pages only; a blog post leaves it unset
+>
+  <page.default />
+</ContentPage>
+```
+
+`MdxArticleModule` (from `@haruhimemoe/ui/mdx`) types that import: `{ default: (props) => ReactNode; toc: TocItem[]; readingMinutes: number; words: number }`, structural (no `@types/mdx` needed in a consuming app) so it's a plain type assertion (`as unknown as MdxArticleModule`) over whatever your MDX loader's types say.
+
+#### New elements
+
+Since 0.17.0, on top of `h2`/`h3`, code, tables and callouts:
+
+| Element | Renders |
+| --- | --- |
+| `h4` | Same anchor-link treatment as `h2`/`h3` (id from the remark plugin, hover-revealed `#` link). |
+| A lone image (`![alt](src "caption")`) | A `<figure>`; the title becomes a trailing `<figcaption>`. An image inside running text is untouched. Turn off with `{ figures: false }`. In MDX, `Figure` (below) adds sizes, a credit line and eager loading. |
+| A task list (`- [ ] ...`) | `ul.contains-task-list` of `li.task-list-item`, each checkbox a named, disabled `MdxTaskCheckbox` ("Done" / "Not done": the list item's own text sits next to, not inside, the input). |
+| A footnote (`[^1]`) | Standard GFM footnotes; the footnote section's label `h2` (`id="footnote-label"`) renders bare and `sr-only`, with no anchor link (it was a visible anchor beside invisible text). |
+| `<details>`/`<summary>` | A native `details`/`summary` pair (works with no JS; browser find-in-page opens it), the summary styled like `Disclosure`'s toggle with a ▾/▴ arrow. |
+| `` `kbd` `` / `<kbd>` | `Kbd`'s look (see "Basics" above). |
+| A bare video URL on its own line | A click-to-load player; see "Embeds" below. Turn off with `{ embeds: false }`. |
+
+#### Embeds
+
+Since 0.17.0. A line holding only a YouTube or Twitch URL (`https://youtu.be/...`, `https://www.twitch.tv/videos/...`, a clip or a channel) becomes `Embed`: a 16:9 box that loads nothing from the provider until the reader clicks. Before a click it's a plain link to the watch page (works with JS off) over a poster image (YouTube's own thumbnail by default; Twitch has none). A URL `parseEmbedUrl` doesn't recognize renders as a plain link, never an iframe.
+
+```tsx
+<Embed url="https://youtu.be/dQw4w9WgXcQ" />
+<Embed url="https://www.twitch.tv/videos/2245123456" poster={false} />
+```
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `url` | `string` | required | A YouTube or Twitch URL, read by `parseEmbedUrl`. |
+| `title` | `string` | `"YouTube video"` / `"Twitch video"` | The iframe's title and the play link's accessible name ("Play video: …"). |
+| `poster` | `string \| false` | YouTube's thumbnail, none for Twitch | A poster image URL; `false` draws none. |
+
+A modified click (Ctrl, Cmd, Shift, Alt, or a non-primary button) on the play link follows it to the provider's own page instead of swapping in the iframe, so "open in new tab" still works. If you set a Content-Security-Policy, the facade needs `frame-src www.youtube-nocookie.com player.twitch.tv clips.twitch.tv` and, for the YouTube poster, `img-src i.ytimg.com`.
+
+#### Tournament posts
+
+Since 0.17.0, for pool and bracket write-ups:
+
+- `Schedule`: an ordered list of rows, each a `when` (plain text, or a `<time dateTime>` when you pass one), a bold label and an optional note.
+- `Glossary` / `Term`: `Glossary` is a `<dl>` of entries (`{ term, definition, aliases? }`), each `dt` anchored at `#term-<slug>` (and at each alias's slug too); `Term` is a dotted-underline link to that anchor, from the link's own text or an explicit `term`.
+- Task-list checklists (seeding steps, staffing checklists) work as plain Markdown task lists (see "New elements" above).
+- `MapCard` / `MapGroup` (0.16.0) in MDX: add them to your `useMDXComponents` alongside `mdxComponents` (they aren't in `mdxComponents` itself, since most apps that render Markdown never show maps):
+
+```tsx
+import { MapCard, MapGroup } from "@haruhimemoe/ui";
+import { mdxComponents } from "@haruhimemoe/ui/mdx";
+
+export function useMDXComponents() {
+  return { ...mdxComponents, MapCard, MapGroup };
+}
+```
+
+#### Markdown mirrors
+
+Since 0.17.0. An app that serves a page's raw Markdown alongside its rendered MDX (next-kit's `mdxToMarkdown`, for an LLM reader or `ContentPage`'s `markdownHref`) passes `mdxMarkdownTransforms` as `transforms`:
+
+```ts
+import { mdxMarkdownTransforms } from "@haruhimemoe/ui/remark";
+mdxToMarkdown(source, { transforms: mdxMarkdownTransforms });
+```
+
+| Component | Becomes |
+| --- | --- |
+| `<Figure src alt caption />` | `![alt](src "caption")` |
+| `<Embed url />` | The bare URL |
+| `<MdxLinkCard href title description />` | `[title](href): description` |
+
+Fenced code is left alone (the transforms run on the whole raw source, before next-kit's own fence split, so an example showing `<Figure ... />` in a code fence keeps it literal). `Schedule`, `Glossary`, `MapCard` and `MapGroup` have no Markdown shape to degrade to and are left as JSX, invisible to an `.md` mirror: write what an LLM reader needs as plain Markdown text beside them, not only inside their props.
+
+#### Sanitizing Markdown
+
+Since 0.17.0. `haruhimeSanitizeSchema(base, options?)` extends an `hast-util-sanitize` schema (usually `rehype-sanitize`'s `defaultSchema`) with the tags and attributes this kit's plugins write and `mdxComponents` reads (`figure`/`figcaption`/`picture`/`source`, `h2`-`h4` ids, code language and fence meta, callout markers, embed divs). `base` is never mutated. `trusted: true` drops the id prefix (`clobberPrefix: ""`), for content from your own repos only (its own READMEs, changelogs); untrusted content (the default) keeps ids prefixed `user-content-`, so a raw `<img name="getElementById">` or `<a id="location">` can't clobber a global.
+
+`rehypeLocalHrefs(options?)` runs after the sanitizer: an in-page `#x` link whose target only exists as `user-content-x` (the sanitizer prefixed the id but not the href) is rewritten to match. Full react-markdown recipe:
+
+```tsx
+import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import remarkGfm from "remark-gfm";
+import remarkHaruhime, { haruhimeSanitizeSchema, rehypeLocalHrefs } from "@haruhimemoe/ui/remark";
+import { mdxComponents } from "@haruhimemoe/ui/mdx";
+
+let data: ArticleData = { toc: [], words: 0, readingMinutes: 1 };
+const body = Markdown({
+  children: source,
+  components: mdxComponents,
+  remarkPlugins: [remarkGfm, [remarkHaruhime, { collect: (d) => { data = d; } }]],
+  remarkRehypeOptions: { clobberPrefix: "" },
+  rehypePlugins: [rehypeRaw, [rehypeSanitize, haruhimeSanitizeSchema(defaultSchema)], rehypeLocalHrefs],
+});
+```
+
+With `trusted: false` (the default), a `Toc` built from `data.toc` points at ids the sanitizer never prefixed (the TOC is built before sanitizing runs), so map each item's `href` to `user-content-<id>` yourself before passing it to `Toc`:
+
+```tsx
+<Toc items={data.toc.map((item) => ({ ...item, id: `user-content-${item.id}` }))} />
+```
+
+With `trusted: true` (haruhime.moe's own READMEs and changelogs), ids keep no prefix and `Toc` needs no mapping.
 
 #### Accessibility
 
@@ -1525,6 +1702,7 @@ Plain functions (no React), for `remarkPlugins`. Default export `remarkHaruhime(
 - Heading anchor links are always visible (`c4`, turning `h1` on hover), never hover-only, and at least 24px; their `aria-label` ("Link to section: …") keeps the heading's own accessible name as its own text.
 - `CodeCopyButton` reports "Copied" or "Copy failed" through a live region mounted before use, like `CopyButton`.
 - `Callout` is `role="note"` with the type in text, not color alone; highlighted code lines keep a `forced-colors` border so Windows high contrast mode still shows them.
+- Since 0.17.0: `Embed`'s play link is named "Play video: …" and reachable by keyboard; `Toc`'s phone disclosure and wide-screen column share one accessible name ("On this page") without duplicating an id; `MdxDetails` works with no JS at all (native `details`/`summary`, so browser find-in-page can open it).
 
 `Prose` (in "Basics" above) styles a direct-child `pre` with its own fence look, so `CodeBlock` (which isn't a direct child; `mdxComponents`' `pre` override renders it) is untouched when both are in play. `Prose` also styles `blockquote`.
 

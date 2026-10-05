@@ -3,10 +3,10 @@
  * @desc The MDX components by hand, without an MDX compiler: section headings, highlighted and
  *       plain code blocks, each callout type (direct and as a callout blockquote) and a wide table
  *       in its scroll region, inside Prose. Imports @haruhimemoe/ui/shiki so code highlights. `bun
- *       run play:axe` checks it at two widths.
+ *       run play:axe` checks it at two widths. Links to /mdx/article, the 0.17.0 sample post.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import "@haruhimemoe/ui/shiki";
@@ -29,7 +29,12 @@ export default function MdxPage() {
       <PageHeader
         title="MDX components"
         lead="What @haruhimemoe/ui/mdx renders for compiled MDX."
-        actions={<ButtonLink href="/">Home</ButtonLink>}
+        actions={
+          <>
+            <ButtonLink href="/mdx/article">Sample post</ButtonLink>
+            <ButtonLink href="/">Home</ButtonLink>
+          </>
+        }
       />
       <Prose>
         <H2>Usage</H2>

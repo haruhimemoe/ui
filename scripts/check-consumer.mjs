@@ -11,26 +11,30 @@
  *       external and text-only links nothing hydrates beyond a bare page's Next modules; a relative
  *       href skips the client list but hydrates next/link; and NavLinks in an app's own Client
  *       Component brings tailwind-merge. An MDX page (@next/mdx, remark-gfm and the package's
- *       remark plugin) checks callouts, Shiki highlighting, heading ids and the table's scroll
- *       region. Before the build, plain Node imports the installed package and its ./mdx, ./remark
- *       and ./shiki entry points, the way Vitest in a consuming app does. After the build it serves
- *       the app and runs axe-core in headless Chromium over / and /mdx at a desktop and a phone
- *       width with color contrast on (the jsdom tests can't check contrast), WCAG 2.2 AA plus best
- *       practices. It then runs axe again on / under a coarse pointer, more contrast and reduced
- *       motion, and the media pass in scripts/consumer-media.mjs. It also checks the 0.13.0 layout
- *       pieces on / (Surface, LinkCard with CardLink, CardGrid, StatList, LinkRow, SectionHeading
- *       with its anchor, Progress, EmptyState, PrevNext, CopyField and SegmentedControl) and the CSS
- *       for LinkCard's `:not([data-card-link])` lift selector, plus a standalone /code-chip page
- *       that checks CodeChip's copy button loads no tailwind-merge. Last, it removes shiki (an
- *       optional peer) and the fixture's `import "@haruhimemoe/ui/shiki"` lines and builds again:
- *       /mdx must still prerender, with plain code. Usage: `node scripts/check-consumer.mjs
- *       [--keep]` (--keep leaves the app in the temp dir). Needs the npm registry and Google Fonts.
- *       The app's source lives in scripts/consumer-fixture/ as real files; this script writes only
- *       the config that depends on the pins and the temp dir, then runs the build and the
- *       assertions.
+ *       remark plugin, passed by name in a serializable tuple the way Turbopack requires) checks
+ *       callouts, Shiki highlighting, heading ids and the table's scroll region. A second MDX route,
+ *       /article, turns on `mdxExports` and checks the toc nav, heading ids, the formatted published
+ *       date, reading time, a figure's figcaption, an embed facade's aria-label and a footnote's
+ *       prefixed id and href (MDX runs no sanitizer, so remark-rehype's own `user-content-` prefix
+ *       lands on both). Before the build, plain Node imports the installed package and its ./mdx,
+ *       ./remark and ./shiki entry points, the way Vitest in a consuming app does, and fails unless
+ *       the remark subpath carries every 0.17.0 export. After the build it serves the app and runs
+ *       axe-core in headless Chromium over /, /mdx and /article at a desktop and a phone width with
+ *       color contrast on (the jsdom tests can't check contrast), WCAG 2.2 AA plus best practices.
+ *       It then runs axe again on / under a coarse pointer, more contrast and reduced motion, and
+ *       the media pass in scripts/consumer-media.mjs. It also checks the 0.13.0 layout pieces on /
+ *       (Surface, LinkCard with CardLink, CardGrid, StatList, LinkRow, SectionHeading with its
+ *       anchor, Progress, EmptyState, PrevNext, CopyField and SegmentedControl) and the CSS for
+ *       LinkCard's `:not([data-card-link])` lift selector, plus a standalone /code-chip page that
+ *       checks CodeChip's copy button loads no tailwind-merge. Last, it removes shiki (an optional
+ *       peer) and the fixture's `import "@haruhimemoe/ui/shiki"` lines and builds again: /mdx must
+ *       still prerender, with plain code. Usage: `node scripts/check-consumer.mjs [--keep]`
+ *       (--keep leaves the app in the temp dir). Needs the npm registry and Google Fonts. The app's
+ *       source lives in scripts/consumer-fixture/ as real files; this script writes only the config
+ *       that depends on the pins and the temp dir, then runs the build and the assertions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -129,7 +133,7 @@ const waitForServer = async (url, timeoutMs) => {
 };
 
 /** The routes the browser axe pass checks. */
-const AXE_ROUTES = ["/", "/mdx"];
+const AXE_ROUTES = ["/", "/mdx", "/article"];
 
 /**
  * Serves the built app and runs axe over each route at each width. Returns one failure line per
@@ -272,14 +276,15 @@ try {
     )}\n`,
   );
   // @next/mdx has no GFM: without remark-gfm the fixture's pipe table stays a paragraph.
-  // Turbopack takes MDX plugins only as module names, so the library's is a default export.
+  // Turbopack takes MDX plugins only as a module name or a [name, options] tuple of serializable
+  // options, never a function: the tuple form is how /article turns on mdxExports.
   write(
     "next.config.mjs",
     [
       'import createMDX from "@next/mdx";',
       "const withMDX = createMDX({",
       "  extension: /\\.mdx?$/,",
-      '  options: { remarkPlugins: ["remark-gfm", "@haruhimemoe/ui/remark"] },',
+      '  options: { remarkPlugins: ["remark-gfm", ["@haruhimemoe/ui/remark", { mdxExports: true }]] },',
       "});",
       "export default withMDX({",
       '  pageExtensions: ["ts", "tsx", "md", "mdx"],',
@@ -289,6 +294,9 @@ try {
     ].join("\n"),
   );
   write("postcss.config.mjs", `export default { plugins: { "@tailwindcss/postcss": {} } };\n`);
+  // TypeScript 7's automatic @types inclusion doesn't reach @types/mdx's ambient "*.mdx" module
+  // under moduleResolution "bundler": spell it out, the same fix as the repo's own env.d.ts.
+  write("env.d.ts", '/// <reference types="mdx" />\n');
   cpSync(FIXTURE, path.join(dir, "src"), { recursive: true });
 
   console.log(`consumer: installing into ${dir}`);
@@ -306,7 +314,7 @@ try {
         'const remark = await import("@haruhimemoe/ui/remark");',
         'await import("@haruhimemoe/ui/shiki");',
         "console.log(JSON.stringify({ ui: Object.keys(ui), mdx: Object.keys(mdx),",
-        "  remark: typeof remark.default }));",
+        "  remark: typeof remark.default, remarkNames: Object.keys(remark) }));",
       ].join(" "),
     ]),
   );
@@ -316,6 +324,21 @@ try {
   if (imported.mdx.length < 5) throw new Error(`Node imported only ${imported.mdx} from ./mdx`);
   if (imported.remark !== "function") {
     throw new Error(`./remark's default export is a ${imported.remark}, not a plugin function`);
+  }
+  const REMARK_NAMES = [
+    "remarkFigures",
+    "remarkEmbeds",
+    "articleData",
+    "parseEmbedUrl",
+    "haruhimeSanitizeSchema",
+    "rehypeLocalHrefs",
+    "mdxMarkdownTransforms",
+  ];
+  const missingRemark = REMARK_NAMES.filter((name) => !imported.remarkNames.includes(name));
+  if (missingRemark.length > 0) {
+    throw new Error(
+      `./remark is missing ${missingRemark.join(", ")} (has ${imported.remarkNames.join(", ")})`,
+    );
   }
   // Every runtime export has to appear in the fixture, so a new component gets built here too.
   const fixtureText = readdirSync(FIXTURE, { recursive: true, withFileTypes: true })
@@ -584,6 +607,31 @@ try {
     }
     if (!/<div(?=[^>]*role="group")(?=[^>]*aria-label="Table")[^>]*>\s*<table/.test(html)) {
       failures.push('/mdx is missing the table\'s role="group" aria-label="Table" scroll region');
+    }
+  }
+
+  // The 0.17.0 article route: post.mdx on ContentPage, with mdxExports' toc/readingMinutes.
+  const article = readRoute("article");
+  if (!article) {
+    failures.push("/article did not prerender (.next/server/app/article.html is missing)");
+  } else {
+    const html = article.html;
+    const checks = [
+      [/<nav aria-label="On this page"/, "the toc nav"],
+      [/href="#seeding"/, "the Seeding heading's toc link"],
+      [/href="#rolls"/, "the Rolls heading's toc link"],
+      [/<time dateTime="2026-10-01">Oct 1, 2026<\/time>/, "the formatted published date"],
+      [/>1 min read</, "the reading time"],
+      [/<figure[^>]*>[\s\S]*?<figcaption[^>]*>A caption<\/figcaption>/, "the Figure's figcaption"],
+      [/aria-label="Play video: YouTube video"/, "the embed facade's play link"],
+      // MDX runs no sanitizer, so remark-rehype's own user-content- prefix lands on the
+      // footnote's id and href alike (haruhimeSanitizeSchema's clobberPrefix never runs here).
+      [/href="#user-content-fn-1"/, "the footnote reference's prefixed href"],
+      [/id="user-content-fn-1"/, "the footnote definition's prefixed id"],
+      [/<h4[^>]*id="rolls"/, "the h4 heading id"],
+    ];
+    for (const [pattern, from] of checks) {
+      if (!pattern.test(html)) failures.push(`/article is missing ${pattern} (${from})`);
     }
   }
 

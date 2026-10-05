@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-05
+
+### Added
+
+- `@haruhimemoe/ui/remark`: `remarkFigures` (a paragraph holding only an image becomes a `<figure>`, its title moving into a trailing `<figcaption>`), `remarkEmbeds` (a paragraph holding only a bare YouTube/Twitch URL becomes a click-to-load player), `parseEmbedUrl` and `type EmbedTarget` (every YouTube URL form with start times, Twitch videos, clips and channels). `articleData`, `type ArticleData` and `type TocItem`: a flat table of contents (h2 to h4), a word count (`Intl.Segmenter`, Japanese-safe) and a reading time from a document's heading ids. `remarkHaruhime` options `figures`, `embeds` (default `true`), `wordsPerMinute` (default 200), `mdxExports` (default `false`: adds `export const toc`/`readingMinutes`/`words` to a compiled MDX module, an author's own export of the same name kept) and `collect` (hands the same data to a function, for react-markdown, whose plugin options don't have to cross Turbopack's serializable boundary). `haruhimeSanitizeSchema` and `type SanitizeSchema`: extends an `hast-util-sanitize` schema (usually rehype-sanitize's `defaultSchema`) with the tags and attributes this kit's plugins write; `trusted: true` drops the `user-content-` id prefix for an app's own READMEs and changelogs. `rehypeLocalHrefs` and `type HastLike`: rewrites an in-page `#x` link to `#user-content-x` when the sanitizer prefixed the id but not the href. `mdxMarkdownTransforms` (plus `figureMarkdown`, `embedMarkdown`, `linkCardMarkdown`): turns `<Figure>`, `<Embed>` and `<MdxLinkCard>` into their Markdown line for an app's `.md` mirror, skipping fenced code. `remarkHeadingIds` now ids `h2` through `h4` (was `h2`/`h3`).
+- `@haruhimemoe/ui/mdx` new element overrides, through `mdxComponents`: `h4` (same anchor treatment as `h2`/`h3`), `img` (a plain, lazy, async-decoded `<img>`), `input` (a GFM task-list checkbox becomes a named, disabled checkbox), `details` (a native `<details>`/`<summary>` pair styled like `Disclosure`'s toggle, works with no JS), `kbd` (`Kbd`'s look) and `div` (a `remarkEmbeds` `data-embed` div renders `Embed`). The GFM footnote label `h2` now renders bare, `sr-only`, with no anchor.
+- `@haruhimemoe/ui/mdx` new article components: `Figure` (a sized `MdxImg` with an optional caption, credit and eager/priority loading), `Steps` (a numbered-rail wrapper for an ordered list), `Embed` (a click-to-load YouTube/Twitch player in a 16:9 box, with a poster image and a plain-link fallback for an unrecognized URL; `poster={false}` or a local poster replaces YouTube's own thumbnail), `MdxLinkCard` (one link named by its title, a description and a source line), `Schedule` (an ordered list of `when`/label/note rows, `when` a `<time dateTime>` or plain text), `Glossary`/`Term` (a `<dl>` of entries anchored at `#term-<slug>`, with alias anchors, and a dotted-underline link to one), `Kbd`/`kbdClasses` (re-exported from the root), and `type MdxArticleModule` (the structural shape of a compiled MDX module with `mdxExports: true`, for `await import(...)`), `type ArticleData` and `type TocItem` (re-exported from `./remark`).
+- Root `@haruhimemoe/ui`: `Toc`, `type TocProps`, `type TocItem`: an article's table of contents, a sticky column from `xl` up plus a phone disclosure, both labelled "On this page", nesting a flat TOC by heading depth. `Kbd`, `type KbdProps`, `kbdClasses`: a keyboard key, shared with the command palette's own shortcut hints. `ContentPage` grows `authors` (`type ContentAuthor`, through the new `ContentByline`), `published`, `lastUpdated` now formatted "Oct 4, 2026" (see Changed), `readingMinutes`, `toc` (rendered beside the body from `xl` up) and `footer` (rendered after the body, outside `Prose`), plus `proseSize` passed straight to `Prose`.
+- `Prose` new `size` prop (`"base" | "sm"`, same as `ContentPage`'s `proseSize`) and new element styles: `h4`, `dl`, figures, task lists, footnotes and `details`.
+
+### Changed
+
+- h4 headings in existing Markdown and MDX now get an id and a hover-revealed `#` anchor, through `remarkHeadingIds`' new depth-4 support.
+- A paragraph holding only an image now renders as a `<figure>`; one holding only a bare YouTube/Twitch URL now renders a click-to-load player. Turn either off per document with `{ figures: false }` / `{ embeds: false }` passed to `remarkHaruhime`.
+- `Prose` now styles `h4`, `dl`, figures, task lists, footnotes and `details` wherever they appear in its content.
+- `mdxComponents` has six more keys (`h4`, `img`, `input`, `details`, `kbd`, `div`). An app's own key of the same name still wins.
+- The GFM footnotes label `h2` loses its `#` anchor (it was a visible anchor beside invisible text).
+- `ContentPage` prints ISO dates as "Oct 4, 2026" instead of "2026-10-04" on every docs, guides and legal page. `ContentNav`'s classes move to `contentNavStyles.ts`, shared with `Toc`, with no visual change.
+
 ## [0.16.0] - 2026-10-05
 
 ### Added
@@ -240,7 +259,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.16.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/haruhimemoe/ui/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/haruhimemoe/ui/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/haruhimemoe/ui/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/haruhimemoe/ui/compare/v0.13.0...v0.14.0
