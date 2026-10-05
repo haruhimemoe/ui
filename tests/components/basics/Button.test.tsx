@@ -4,7 +4,7 @@
  *       disabled state, focus ring, clicks, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -97,6 +97,16 @@ describe("Button", () => {
     expect(button).not.toHaveClass("disabled:pointer-events-none");
     expect(button).toHaveClass("not-disabled:hover:bg-h1");
     expect(button).not.toHaveClass("hover:bg-h1");
+  });
+
+  it("has a danger variant: white on rose-700, rose-800 on hover", () => {
+    render(<Button variant="danger">Delete</Button>);
+    expect(screen.getByRole("button")).toHaveClass(
+      "bg-rose-700",
+      "text-c1",
+      "not-disabled:hover:bg-rose-800",
+    );
+    expect(buttonClasses({ variant: "danger" })).toContain("bg-rose-700");
   });
 
   it("has no axe violations in any variant", async () => {

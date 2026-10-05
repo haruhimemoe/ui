@@ -6,7 +6,7 @@
  *       delete and transfer forms, as one component.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 "use client";
@@ -16,6 +16,7 @@ import { cx } from "../../utils/cx.js";
 import { Button } from "../basics/Button.js";
 import type { ButtonVariant } from "../basics/buttonStyles.js";
 import { TextInput } from "./TextInput.js";
+import { typedMatches } from "./typedMatches.js";
 
 /** Every native `<form>` prop except `onSubmit`, plus the name to type and the action. */
 export type TypeToConfirmProps = Omit<ComponentProps<"form">, "onSubmit"> & {
@@ -62,7 +63,7 @@ export function TypeToConfirm({
   const [typed, setTyped] = useState("");
   const [pending, setPending] = useState(false);
   const running = useRef(false);
-  const matches = typed.trim() === expected.trim();
+  const matches = typedMatches(typed, expected);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -3,13 +3,16 @@
  * @desc Shared class builder for Button and ButtonLink (osu!-web pill buttons).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import { cx } from "../../utils/cx.js";
 
-/** The pill's colors: `primary` is h2 (h1 on hover), `secondary` b3, `ghost` transparent. */
-export type ButtonVariant = "primary" | "secondary" | "ghost";
+/**
+ * The pill's colors: `primary` is h2 (h1 on hover), `secondary` b3, `ghost` transparent, `danger`
+ * rose-700 (rose-800 on hover) for a confirm that deletes.
+ */
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
 /** The pill's height, padding and text size: `md` is h-9 (h-11 on a coarse pointer) and text-sm, `lg` h-11 and text-base. */
 export type ButtonSize = "md" | "lg";
@@ -35,6 +38,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
     "bg-b3 text-c1 not-disabled:hover:bg-b2 contrast-more:inset-ring contrast-more:inset-ring-c4",
   ghost:
     "bg-transparent text-c2 not-disabled:hover:bg-b4 not-disabled:hover:text-c1 contrast-more:inset-ring contrast-more:inset-ring-c4",
+  danger: "bg-rose-700 text-c1 not-disabled:hover:bg-rose-800",
 };
 
 const SIZES: Record<ButtonSize, string> = {
