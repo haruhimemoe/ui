@@ -381,6 +381,22 @@ The list-item box: Card's color and radius at p-3, no heading and no landmark. `
 
 Surface's classes for an element it doesn't render, such as a next/link tile: `surfaceClasses({ padding, className })`.
 
+#### `LinkCard` and `CardLink`
+
+A card that is one click target. `CardLink` is the link: its `after:` box covers the nearest positioned ancestor, and its name is only its own text. `LinkCard` is the surface (p-5, `relative`, b3 on hover and focus-within) that the cover fills; every other link, button, field and summary inside is lifted above the cover, so they stay clickable without `relative z-10`. `title` plus `href` renders `<h3><CardLink /></h3>` first (`headingLevel` changes the level); without them, put a `CardLink` in your own heading. `media` renders first, full-bleed, above the padded body.
+
+```tsx
+<LinkCard media={<img src="/brand/repos/ui-banner.svg" alt="" />}>
+  <h2 className="font-extrabold text-xl"><CardLink href="/libraries/ui">@haruhimemoe/ui</CardLink></h2>
+  <LinkRow items={links} />
+</LinkCard>
+```
+
+- One `CardLink` per card: two would stack two covers.
+- The lift sets `position: relative` on those elements. Something that must overlay another element inside the card stacks by grid area (`[grid-area:1/1]`), not `absolute`.
+- `CardLink` works in any `relative` box outside `LinkCard` too; pass `after:rounded-[10px]` when the box is rounded and doesn't clip.
+- Use `Card` for a labelled region and `LinkCard` for a card that goes somewhere.
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.

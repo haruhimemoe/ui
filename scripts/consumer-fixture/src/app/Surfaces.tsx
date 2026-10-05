@@ -6,7 +6,7 @@
  * @modified Mon Oct 5, 2026
  */
 
-import { Surface, surfaceClasses } from "@haruhimemoe/ui";
+import { CardLink, LinkCard, Surface, surfaceClasses } from "@haruhimemoe/ui";
 
 // The 0.13.0 server components, rendered straight from the Server Component page.
 export function Surfaces() {
@@ -18,6 +18,16 @@ export function Surfaces() {
       <a href="/docs" className={surfaceClasses({ className: "block hover:bg-b3" })}>
         Surface link
       </a>
+      <LinkCard
+        title="packs"
+        href="/docs"
+        media={<div aria-hidden="true" className="h-12 bg-h2" />}
+      >
+        <p>From the packed tarball.</p>
+      </LinkCard>
+      <div className="relative rounded-[10px] bg-b4 p-5">
+        <CardLink href="/relative">Card link alone</CardLink>
+      </div>
     </section>
   );
 }

@@ -33,3 +33,11 @@ export const SURFACE_PADDING: Record<SurfacePadding, string> = { sm: "p-3", md: 
  */
 export const surfaceClasses = ({ padding = "sm", className }: SurfaceClassOptions = {}): string =>
   cx(SURFACE, SURFACE_PADDING[padding], className);
+
+// Every interactive element inside a card except the card link sits above the link's
+// `after:absolute` cover. One literal string so the app's Tailwind finds both classes through
+// @source; spec 5's MapCard reuses it. The lift sets position: relative, so a control that must
+// overlay something inside the card stacks by grid area ([grid-area:1/1]), not `absolute`.
+/** Internal: lifts a card's other links, buttons and fields above its CardLink cover. */
+export const CARD_LINK_LIFT =
+  "[&_:is(a,button,input,select,textarea,summary,[tabindex]):not([data-card-link])]:relative [&_:is(a,button,input,select,textarea,summary,[tabindex]):not([data-card-link])]:z-10";

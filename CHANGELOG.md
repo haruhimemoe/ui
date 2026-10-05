@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - `Surface` and `surfaceClasses`: the list-item box (Card's b4 and 10px radius at p-3, `md` p-4, `lg` p-5, `as` div, li, section, article, form or p), and its classes for other elements.
+- `LinkCard` and `CardLink`: a card that is one link. `CardLink`'s cover fills the card, its name stays its own text, and LinkCard lifts every other control above the cover. `media` for a full-bleed banner. No landmark.
 
 ### Changed
 
