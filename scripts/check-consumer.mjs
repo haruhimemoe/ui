@@ -455,6 +455,14 @@ try {
         /<input\b(?=[^>]*type="radio")(?=[^>]*value="fit")(?=[^>]*checked="")[^>]*>/,
         "SegmentedControl (client)",
       ],
+      [
+        /<a\b(?=[^>]*href="https:\/\/osu\.ppy\.sh\/beatmaps\/129891")[^>]*>xi - FREEDOM DiVE/,
+        "MapCard",
+      ],
+      [/aria-label="Copy ID 129891"/, "MapCard Copy ID (client)"],
+      [/<h3[^>]*>NM/, "MapGroup"],
+      [/covers\/list@2x\.jpg/, "MapCover"],
+      [/aria-label="Play preview of/, "MapPreviewButton (client)"],
     ];
     for (const [pattern, from] of expected) {
       if (!pattern.test(page)) failures.push(`prerendered / is missing ${pattern} (${from})`);

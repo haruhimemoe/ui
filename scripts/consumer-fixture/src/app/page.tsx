@@ -48,6 +48,7 @@ import { ClientDialogs } from "./ClientDialogs";
 import { ClientSurfaces } from "./ClientSurfaces";
 import { Filters } from "./Filters";
 import { Foundations } from "./Foundations";
+import { MapsFixture } from "./MapsFixture";
 import { MdxExports } from "./MdxExports";
 import { Palette08 } from "./Palette08";
 import { Sortable15 } from "./Sortable15";
@@ -150,6 +151,7 @@ export default function Page() {
         <Palette08 />
       </Card>
       <Additions />
+      <MapsFixture />
       <ClientAdditions />
       <ClientAdditions05 />
       <Sortable15 />

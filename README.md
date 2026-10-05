@@ -159,10 +159,11 @@ export default function Home() {
 
 Import every component from `@haruhimemoe/ui`, in Server and Client Components alike.
 
-- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`, and since 0.14.0 `Dialog` and `ConfirmDialog`. Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
+- **Client components:** `CopyButton`, `Chip`, `ChipGroup`, `RangeSlider` and `FilterPanel`, and since 0.4.0 `AsyncButton`, `InlineConfirm`, `Disclosure`, `ChoiceChips`, `RadioGroup`, `TypeToConfirm` and `HeaderMenu`, and since 0.5.0 `Tabs`, `VisibilitySelect` and `ReportDisclosure`, and since 0.8.0 `CommandPalette` and `CommandPaletteButton`, and since 0.14.0 `Dialog` and `ConfirmDialog`, and since 0.16.0 `MapPreviewButton` and `MapCopyScope` (and the `stopMapPreview()` function). Each file starts with `"use client"`. They merge their classes with tailwind-merge in the browser, so a page that renders any of them loads tailwind-merge (about 9 KB gzipped), however its header renders.
 - **`SiteHeader` and `NavLinks`** are Server Components with a small client part (since 0.2.0; in 0.1.0 `NavLinks` is a client component). When a nav link can be the current page (a path such as `/packs`), a client list reads the path to set `aria-current`. With only external or text-only links, the nav renders on the server alone and nothing in it hydrates. Relative hrefs (`#main`) skip the client list too, but they render `next/link`, which hydrates.
 - **`ContentNav`** (since 0.11.0) reads the path to mark the current page, like `NavLinks`, but it always hydrates: its class strings are finished (no `cx`), so it ships no tailwind-merge to the browser. `CopyMarkdownButton` (since 0.11.0) is the same: finished classes, no tailwind-merge, even though `ContentPage` (a Server Component) renders it. `ContentLayout` and `ContentPage` are Server Components. `BrandSwatch` (since 0.11.0) is the same again: `BrandPage` is a Server Component and only its swatches hydrate, with no tailwind-merge.
 - **`CopyField` and `SegmentedControl`** (since 0.13.0) are client components you render from your own `"use client"` file (a form, a toolbar), not ones a server component renders for you: they merge classes with `cx` like the other client components above.
+- **`MapCard`, `MapSetCard`, `MapGroup` and `MapCover`** (since 0.16.0) are Server Components; with `copyId` they render the kit's own internal Copy ID button, a small client file with finished classes (no tailwind-merge), the same pattern as `CopyMarkdownButton` and `BrandSwatch`. `MapPreviewButton` and `MapCopyScope` are the map display's own client files, for a page that renders them directly.
 - **Everything else is server-safe:** no state, no effects, no browser APIs.
 
 A Server Component can't pass a function to a Client Component. So callback props (`onChange`, `onPressedChange`, `onClear`) have to come from your own `"use client"` file, like the filters example below. Props that are plain data (`CopyButton`'s `text`, `Chip`'s `pressed`) work from a Server Component. `Pagination` takes a function (`hrefFor`), but it is a Server Component itself, so that is fine anywhere. Its button mode (`onPageChange`) is a callback, so render that from a `"use client"` file.
@@ -644,6 +645,8 @@ A button that copies text, with the result in an `<output>` beside it that scree
 | `variant` | `"primary" \| "secondary" \| "ghost"` | `"secondary"` | As on `Button`. |
 | `size` | `"md" \| "lg"` | `"md"` | As on `Button`. |
 | `wrapperClassName` | `string` | none | Classes for the wrapper around the button and the message. |
+| `statusPosition` | `"end" \| "start"` | `"end"` | Since 0.16.0. `"start"` puts the status before the button instead of after it. |
+| `reserveStatus` | `boolean` | `false` | Since 0.16.0. Keeps the status's width (as wide as "Copied.") so a press never moves the button. |
 
 #### `Pagination`
 
@@ -1206,7 +1209,7 @@ The page frame: a skip link, the header, `<main>` and the footer, with the foote
 
 ### osu!
 
-Since 0.4.0. Display pieces for beatmaps, mod pools and (since 0.10.0) players. They take plain values (no osu! API types) and are Server Components.
+Since 0.4.0. Display pieces for beatmaps, mod pools, map lists and (since 0.10.0) players. They take plain values (no osu! API types) and are Server Components.
 
 #### `StarRating`
 
@@ -1273,6 +1276,125 @@ It never fetches. Pass a snapshot you keep yourself (from one osu! API lookup, o
 | `statusNote` | `ReactNode` | none | A small line above it ("Last seen 29 days ago", "formerly RMarc"). |
 
 The bottom row is left out when there is no status, text or note; the card keeps its 120px height so cards line up in a grid. A card with a cover gets a `b5` overlay at 80%, enough for `c2` text at 12px to keep 4.5:1 over a white cover (axe can't check text over an image).
+
+#### Map display (since 0.16.0)
+
+`MapCard`, `MapSetCard`, `MapGroup`, `MapCover`, `MapPreviewButton` and `MapCopyScope` draw one map, a set, a bucket of maps and their covers and preview clips from plain props. None of them fetch. `MapCard`'s `map` prop takes `@haruhimemoe/osu`'s `BeatmapMeta` as-is: `<MapCard beatmapId={meta.beatmapId} map={meta} />` needs no adapter, since `MapData`'s field names match `BeatmapMeta`'s. An app with different field names writes one small mapping function instead (pools' `BuiltMap`, say): `{ beatmapsetId: m.setId, starRating: m.stars, lengthSeconds: m.length, creator: m.setHost, ... }`.
+
+```tsx
+<MapCard
+  beatmapId={meta.beatmapId}
+  map={meta}
+  slot={{ label: "NM1" }}
+  copyId
+/>
+```
+
+**`MapCard`**
+
+One map as a `row` (packs' slot row, the default) or a `card` (osu-web's beatmapset panel). Every native `<div>` prop except `children`, `title` and `slot` (the DOM attribute; `slot` here is the pool slot pill).
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `beatmapId` | `number` | required | The difficulty. Links to its osu! page unless overridden. |
+| `map` | `MapData \| null` | none | The map's data (`BeatmapMeta`-shaped). None draws `labels.fallbackTitle(beatmapId)`. |
+| `state` | `"ready" \| "loading" \| "missing" \| "error"` | `"ready"` | `loading` shows skeleton bars and `aria-busy`; `missing`/`error` show a message instead of the map, with no cover, stats or background. |
+| `message` | `ReactNode` | `labels.missing(id)` | The `error` state's message. |
+| `layout` | `"row" \| "card"` | `"row"` | The row (compact list) or the card (osu-web panel) layout. |
+| `background` | `"none" \| "cover" \| "blur"` | `"none"` | Draws the set's wide cover (or a blurred one) behind the card under a `b5/80` overlay. Ignored for `missing`/`error`. |
+| `density` | `"comfortable" \| "compact"` | `"comfortable"` | `compact` tightens padding, shrinks the cover square and puts the byline on the title's line. |
+| `coverUrl` | `string \| null` | derived from `map.beatmapsetId` | Replaces both the square and background cover URLs. `null` draws neither (no `♪` placeholder either). |
+| `slot` | `{ label, mod?, color?, title? }` | none | A `ModBadge` pill (a pool slot like `NM1`). |
+| `stars` | `number \| null` | `map.starRating` | Overrides the star pill's value. Non-finite numbers draw no pill. |
+| `starsLabel` | `ReactNode` | none | Read after the rating by screen readers (`StarRating`'s `label`). |
+| `starsNote` | `ReactNode` | none | A small note beside the star pill ("with HR"). |
+| `starsTitle` | `string` | none | The star pill's hover `title` (packs' "rating with mods loading/failed" note). |
+| `stats` | `Partial<Pick<MapData, "cs" \| "ar" \| "od" \| "hp" \| "bpm" \| "lengthSeconds">>` | from `map` | Overrides stats key by key; a key present (even `null`) wins over `map`'s. |
+| `showStatus` | `boolean` | `true` for `card`, `false` for `row` | Shows the osu! status pill. |
+| `statusLabel` | `string` | `MAP_STATUS_LABELS[status]` | Replaces the status pill's words. |
+| `href` | `string \| null` | the osu! beatmap page | Replaces the title's link; `null` draws plain text. |
+| `newTab` | `boolean` | `false` | Opens the link in a new tab (`rel="noopener noreferrer"`, and an `aria-label` carrying "(opens in a new tab)"). |
+| `wholeCardLink` | `boolean` | `true` for `card`, `false` for `row` | Makes the whole card one click target (a `CardLink`) instead of linking only the title. |
+| `copyId` | `boolean` | `false` | Shows a Copy ID button for `beatmapId`. |
+| `titleAs` | `"p" \| "h2" \| "h3" \| "h4"` | `"p"` | The title's element, for a page that needs it in the heading outline. |
+| `leading` | `ReactNode` | none | Before everything (a drag handle). |
+| `preview` | `ReactNode` | none | Stacked on the cover square by grid (a `MapPreviewButton`), not `absolute`, so a whole-card link's lift can't move it. |
+| `badges` | `ReactNode` | none | Beside the status pill. |
+| `details` | `ReactNode` | none | A line under the stats (a row layout) or in the always-visible footer (a card layout). |
+| `actions` | `ReactNode` | none | Buttons beside (row, below the 2xl container width) or in the footer (card). |
+| `labels` | `Partial<MapCardLabels>` | `DEFAULT_MAP_LABELS` | Replaces any word MapCard shows or announces. |
+
+Both layouts sit inside a `@container`, so a row's actions wrap under the text below a 42rem (`@2xl`) container width and sit inline from there; a long "Artist - Title" truncates with the full text in the title element's `title`. `MapCover`'s pixel sizes set each cover's aspect: 400x140 (`aspect-[20/7]`) for the card background and panel's wide spot, 900x250 (`aspect-[18/5]`) for a standalone wide cover, square (`aspect-square`) for the list/cover squares. `coverUrl={null}` draws no cover square at all (rows line up anyway); leaving it unset with no usable `beatmapsetId` draws the `♪` placeholder.
+
+**`MapSetCard`**
+
+A beatmapset and its difficulties: a header (cover, "Artist - Title" linked to the set, status, badges, mapper, note) over a list of `MapDifficultyRow`s in the order given. Backgrounds apply to the header only.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `beatmapsetId` | `number` | required | Links to the osu! beatmapset page unless overridden. |
+| `artist`, `title` | `string` | required | The set's "Artist - Title". |
+| `creator` | `string \| null` | none | Shown as `labels.setMappedBy(creator)` ("Mapped by \<creator\>"). |
+| `status`, `statusLabel` | `string \| null`, `string` | none | The status pill, same words as `MapCard`'s. |
+| `badges` | `ReactNode` | none | Beside the status pill. |
+| `note` | `ReactNode` | none | A warning-toned line (a loud section, a removed difficulty). |
+| `href`, `newTab` | `string \| null`, `boolean` | the set's osu! page | Same as `MapCard`'s. |
+| `background`, `coverUrl` | `"none" \| "cover" \| "blur"`, `string \| null` | `"none"`, derived | Same as `MapCard`'s, applied to the header. |
+| `preview` | `ReactNode` | none | Stacked on the header's cover. |
+| `difficulties` | `readonly MapSetDifficulty[]` | required | Each: `beatmapId`, `version`, `stars?`, `starsNote?`, `starsLabel?`, `starsTitle?`, `stats?`, `href?` (`null` = plain text), `badges?`, `details?`, `actions?`. Each `<li>` carries `data-beatmap-id`. |
+| `copyId` | `boolean` | `false` | A Copy ID button per difficulty, named with its version; the whole set is its own `MapCopyScope` (or joins the one it sits in). |
+| `density` | `"comfortable" \| "compact"` | `"comfortable"` | Tightens padding and the cover square. |
+| `emptyText` | `ReactNode` | `"No difficulties."` | Shown when `difficulties` is empty. |
+| `labels` | `Partial<MapCardLabels>` | `DEFAULT_MAP_LABELS` | Same as `MapCard`'s. |
+
+**`MapGroup`**
+
+A bucket of maps: a labelled `<section>` with a heading (title, optional mod pill, a count or "count of target", a detail), actions beside it, the maps as list items, and empty-slot rows or a summary row. Every native `<section>` prop except `title`.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `title` | `ReactNode` | required | The heading's text. |
+| `badge` | `{ mod, color? }` | none | An `aria-hidden` `ModBadge` pill before the title (kept out of the heading's accessible name). |
+| `detail` | `ReactNode` | none | Words after the count ("Nomod"). |
+| `count`, `target` | `number` | none | "(4)" or, with `target`, "(4 of 5)". Leaving `count` out and passing children with no count draws neither the count nor "No maps yet.". |
+| `headingLevel` | `2 \| 3 \| 4` | `3` | The heading element. |
+| `headingProps` | `ComponentProps<"h3">` | none | Extra heading props; its `id` wins over the generated one. |
+| `actions` | `ReactNode` | none | Beside the heading (a "Find maps" button). |
+| `list` | `"ol" \| "ul"` | `"ol"` | The list element. |
+| `empty` | `ReactNode` | `"No maps yet."` | Shown when there is nothing to list. |
+| `emptySlots` | `number` | `0` | Extra dashed `<li data-empty-slot>` rows (or one summary row with `emptySlotsAs="summary"`). |
+| `emptySlotText` | `(n: number) => ReactNode` | `"Empty slot"` / `"N empty slots"` | Replaces an empty-slot row's text. |
+| `emptySlotsAs` | `"rows" \| "summary"` | `"rows"` | One row per empty slot, or one row naming how many. |
+| `copyScope` | `boolean` | `true` | Wraps the list in its own `MapCopyScope` (or joins the one it sits in). |
+
+**`MapCover`**
+
+A beatmapset's cover as a plain lazy `<img>` (no `next/image`, so an app needs no `images.remotePatterns` for `assets.ppy.sh`), sized from osu!'s own cover files so nothing shifts while it loads. With no usable set id and no `src`, it draws a `b5` box with a `♪` glyph instead.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `beatmapsetId` | `number \| null` | none | The set whose cover loads. |
+| `src` | `string` | derived | Replaces the `assets.ppy.sh` URL (self-hosted covers, tests). |
+| `size` | `"card" \| "card@2x" \| "list" \| "list@2x" \| "cover" \| "cover@2x"` | `"list@2x"` | osu!'s cover file: 400x140/800x280 (card), 150x150/300x300 (list, square), 900x250/1800x500 (cover). |
+| `alt` | `string` | `""` | Decorative by default (a title sits beside it); pass one for a standalone banner. |
+| `shape` | `"square" \| "wide"` | square for `list*`, wide otherwise | Overrides the aspect ratio. |
+
+**`MapPreviewButton`**
+
+A play/stop button for a set's preview clip from `b.ppy.sh`, filling its parent (`MapCard` stacks it on the cover square by grid, not `absolute`). One clip plays per page, at half volume (`PREVIEW_VOLUME`); a clip stops once no button for its set is mounted, or when ending on its own. `stopMapPreview()` stops whatever is playing (call it on a route change). Renders nothing for a set id that isn't a positive whole number. Client.
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `beatmapsetId` | `number` | required | The set whose clip plays. |
+| `song` | `string` | required | "Artist - Title", named in the button ("Play preview of \<song\>"). |
+| `src` | `string` | derived | Replaces the `b.ppy.sh` clip. |
+| `labels` | `{ play?, stop? }` | "Play/Stop preview of \<song\>" | Replaces the button's names. |
+
+`mapCoverUrl(beatmapsetId, size?)` and `MAP_STATUS_LABELS` (`ranked`, `approved`, `loved`, `qualified`, `pending`, `wip`, `graveyard`, frozen) are the plain helpers `MapCard` and `MapSetCard` build on, exported for an app that draws its own covers or status words.
+
+CSP: an app using the map display needs `img-src https://assets.ppy.sh` and, if it plays previews, `media-src https://b.ppy.sh`.
+
+Accessibility: every control names its own map (Copy ID is "Copy ID \<id\>", the preview button is "Play/Stop preview of \<song\>"); an app adding its own slot actions should name them with the map the same way. Covers are decorative (`alt=""`); a loading `MapCard` is `aria-busy` with visible skeleton bars plus an sr-only "Loading beatmap \<id\>". Inside a `MapCopyScope`, only the Copy ID pressed last keeps "Copied."; a nested scope joins its outer one, so a page can wrap one scope around several `MapGroup`s (each already scoped) and still get one "Copied." at a time.
 
 ### MDX (server)
 

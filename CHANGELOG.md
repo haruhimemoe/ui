@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `MapCard`, `MapSetCard`, `MapGroup`, `MapCover`, `MapPreviewButton` and `MapCopyScope`: map display from plain props. `MapCard` draws one map as a row (packs' slot row) or a card (osu-web's beatmapset panel), with no background, the set's cover or a blurred cover behind a b5 overlay, comfortable or compact density, loading/missing/error states, an optional slot pill, status, stars and stats (overridable per key), an optional Copy ID, and `leading`, `preview`, `badges`, `details` and `actions` slots. Its `map` prop takes `@haruhimemoe/osu`'s `BeatmapMeta` as-is. `MapSetCard` is a set with its difficulties, `MapGroup` a bucket with its heading, count, empty slots and one shared Copy ID scope. `MapPreviewButton` plays a set's preview clip from b.ppy.sh (one clip per page), `stopMapPreview()` stops it. Also `mapCoverUrl`, `MAP_STATUS_LABELS` and the types `MapCardProps`, `MapCardLabels`, `MapData`, `MapSetCardProps`, `MapSetDifficulty`, `MapGroupProps`, `MapCoverProps`, `MapCoverSize`, `MapPreviewButtonProps`.
+- `CopyButton` `statusPosition` (`"end"` by default, `"start"` puts the status before the button) and `reserveStatus` (keeps the status's width so a press never moves the button).
+
 ## [0.15.0] - 2026-10-05
 
 ### Added
