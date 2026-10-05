@@ -4,25 +4,30 @@
  *       message mounts as a new node on every run, so the same text twice is announced twice.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import type { ReactNode } from "react";
 
-/** The run the message belongs to (null for none), and the message. */
+/** The reserved status width: as wide as "Copied.", text against the button. */
+export const RESERVED_STATUS = "min-w-[4.5rem] text-end";
+
+/** The run the message belongs to (null for none), the message, and extra classes. */
 export type StatusOutputProps = {
   run: number | null;
   children?: ReactNode;
+  /** Appended to the output's classes (no merge: finished strings only). */
+  className?: string | undefined;
 };
 
 /**
  * @function StatusOutput
- * @param props {StatusOutputProps} the run's number and its message
+ * @param props {StatusOutputProps} the run's number, its message and extra classes
  * @returns {JSX.Element} an `<output>` in c3 at text-sm, holding the message keyed by its run
  */
-export function StatusOutput({ run, children }: StatusOutputProps) {
+export function StatusOutput({ run, children, className }: StatusOutputProps) {
   return (
-    <output className="text-c3 text-sm">
+    <output className={className ? `text-c3 text-sm ${className}` : "text-c3 text-sm"}>
       {run === null ? null : <span key={run}>{children}</span>}
     </output>
   );

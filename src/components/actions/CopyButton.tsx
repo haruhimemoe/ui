@@ -7,7 +7,7 @@
  *       too. Only the latest press reports: a slow earlier copy that settles later is ignored.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 "use client";
@@ -15,7 +15,7 @@
 import type { ReactNode } from "react";
 import { cx } from "../../utils/cx.js";
 import { Button, type ButtonProps } from "../basics/Button.js";
-import { StatusOutput } from "./StatusOutput.js";
+import { RESERVED_STATUS, StatusOutput } from "./StatusOutput.js";
 import { useLatestStatus } from "./useLatestStatus.js";
 
 /** Every Button prop (native button props, variant, size) except children and onClick. */
@@ -30,6 +30,10 @@ export type CopyButtonProps = Omit<ButtonProps, "children" | "onClick"> & {
   failedMessage?: ReactNode | undefined;
   /** Classes for the wrapper around the button and its status. */
   wrapperClassName?: string | undefined;
+  /** "end" (default) puts the status after the button; "start" puts it before. */
+  statusPosition?: "end" | "start" | undefined;
+  /** Keeps the status's width (as wide as "Copied.") so a press never moves the button. */
+  reserveStatus?: boolean | undefined;
 };
 
 /**
@@ -44,6 +48,8 @@ export function CopyButton({
   copiedMessage = "Copied.",
   failedMessage = "Couldn't copy. Select the text and copy it by hand.",
   wrapperClassName,
+  statusPosition = "end",
+  reserveStatus = false,
   variant = "secondary",
   ...props
 }: CopyButtonProps) {
@@ -59,14 +65,19 @@ export function CopyButton({
     }
   };
 
+  const output = (
+    <StatusOutput run={status?.run ?? null} className={reserveStatus ? RESERVED_STATUS : undefined}>
+      {status?.result === "copied" ? copiedMessage : failedMessage}
+    </StatusOutput>
+  );
+
   return (
     <div className={cx("flex flex-wrap items-center gap-3", wrapperClassName)}>
+      {statusPosition === "start" ? output : null}
       <Button variant={variant} onClick={copy} {...props}>
         {label}
       </Button>
-      <StatusOutput run={status?.run ?? null}>
-        {status?.result === "copied" ? copiedMessage : failedMessage}
-      </StatusOutput>
+      {statusPosition === "end" ? output : null}
     </div>
   );
 }

@@ -203,3 +203,27 @@ describe("CopyButton", () => {
     await expectNoAxeViolations(container);
   });
 });
+
+describe("CopyButton status placement", () => {
+  it("puts the status after the button by default, at its natural width", () => {
+    render(<CopyButton text="1" />);
+    const button = screen.getByRole("button", { name: "Copy" });
+    const output = screen.getByRole("status");
+    expect(button.compareDocumentPosition(output) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(output.className).toBe("text-c3 text-sm");
+  });
+
+  it("puts the status before the button with statusPosition start", () => {
+    render(<CopyButton text="1" statusPosition="start" />);
+    const button = screen.getByRole("button", { name: "Copy" });
+    const output = screen.getByRole("status");
+    expect(button.compareDocumentPosition(output) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+  });
+
+  it("keeps the status's width with reserveStatus, so a press never moves the button", () => {
+    render(<CopyButton text="1" statusPosition="start" reserveStatus />);
+    const output = screen.getByRole("status");
+    expect(output.className).toContain("min-w-[4.5rem]");
+    expect(output.className).toContain("text-end");
+  });
+});
