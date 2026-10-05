@@ -1,11 +1,11 @@
 /**
  * @file tests/remark/index.test.ts
- * @desc Tests for the default remarkHaruhime export: runs code meta, callouts and heading ids
- *       together, respects per-plugin opt-outs, and the module's exported surface is exactly
- *       what the package's public API promises.
+ * @desc Tests for the default remarkHaruhime export: runs code meta, callouts, heading ids,
+ *       figures and embeds together, respects per-plugin opt-outs, and the module's exported
+ *       surface is exactly what the package's public API promises.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { describe, expect, it } from "vitest";
@@ -81,10 +81,38 @@ describe("remarkHaruhime", () => {
     expect(Object.keys(mod).sort()).toEqual([
       "createSlugger",
       "default",
+      "parseEmbedUrl",
       "remarkCallouts",
       "remarkCodeMeta",
+      "remarkEmbeds",
+      "remarkFigures",
       "remarkHeadingIds",
       "slugify",
     ]);
+  });
+
+  it("runs figures and embeds by default and skips each when turned off", () => {
+    const make = (): MdNode => ({
+      type: "root",
+      children: [
+        { type: "paragraph", children: [{ type: "image", url: "/a.png", alt: "A", title: null }] },
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "link",
+              url: "https://youtu.be/dQw4w9WgXcQ",
+              children: [{ type: "text", value: "https://youtu.be/dQw4w9WgXcQ" }],
+            },
+          ],
+        },
+      ],
+    });
+    const on = make();
+    remarkHaruhime()(on);
+    expect(on.children?.map((c) => c.data?.hName)).toEqual(["figure", "div"]);
+    const off = make();
+    remarkHaruhime({ figures: false, embeds: false })(off);
+    expect(off.children?.map((c) => c.data?.hName)).toEqual([undefined, undefined]);
   });
 });

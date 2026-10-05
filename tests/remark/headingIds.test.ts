@@ -1,11 +1,11 @@
 /**
  * @file tests/remark/headingIds.test.ts
- * @desc Tests for remarkHeadingIds: depth-2/3 headings get a slugged id from their text (inline
- *       code and emphasis included), depth 1/4 get none, duplicates are suffixed, an existing id
+ * @desc Tests for remarkHeadingIds: depth-2 to 4 headings get a slugged id from their text (inline
+ *       code and emphasis included), depth 1/5 get none, duplicates are suffixed, an existing id
  *       is kept, and text that slugs to empty gets no id.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { describe, expect, it } from "vitest";
@@ -37,12 +37,18 @@ describe("remarkHeadingIds", () => {
     expect(h.data?.hProperties?.id).toBe("usage");
   });
 
-  it("does not id depth-1 or depth-4 headings", () => {
+  it("ids a depth-4 heading", () => {
+    const h = heading(4, [{ type: "text", value: "Rolls" }]);
+    remarkHeadingIds()({ type: "root", children: [h] });
+    expect(h.data?.hProperties?.id).toBe("rolls");
+  });
+
+  it("does not id depth-1 or depth-5 headings", () => {
     const h1 = heading(1, [{ type: "text", value: "Title" }]);
-    const h4 = heading(4, [{ type: "text", value: "Sub" }]);
-    remarkHeadingIds()({ type: "root", children: [h1, h4] });
+    const h5 = heading(5, [{ type: "text", value: "Sub" }]);
+    remarkHeadingIds()({ type: "root", children: [h1, h5] });
     expect(h1.data).toBeUndefined();
-    expect(h4.data).toBeUndefined();
+    expect(h5.data).toBeUndefined();
   });
 
   it("suffixes duplicate heading text with -1", () => {

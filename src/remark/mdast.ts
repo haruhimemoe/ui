@@ -5,7 +5,7 @@
  *       No `unist-util-visit` or `@types/mdast` import: this type is the whole contract.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 /** The slice of an mdast node these plugins read and write. */
@@ -15,6 +15,9 @@ export type MdNode = {
   value?: string;
   meta?: string | null;
   depth?: number;
+  url?: string;
+  title?: string | null;
+  alt?: string | null;
   data?: { hProperties?: Record<string, unknown>; [key: string]: unknown };
 };
 
