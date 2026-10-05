@@ -158,6 +158,7 @@ describe("shipped source", () => {
       "src/components/brand/BrandSwatch.tsx",
       "src/components/content/CopyMarkdownButton.tsx",
       "src/components/mdx/CodeCopyButton.tsx",
+      "src/components/osu/MapCopyIdButton.tsx",
       "src/components/shell/NavListClient.tsx",
     ]);
   });
