@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `StatList`: label/value pairs as a `<dl>`, `inline`, `tiles` or `grid`.
 - `EmptyState`: the "nothing here yet" box, `dashed` or `filled`, `sm` or `md`, with an optional title and action.
 - `Progress`: a native `<progress>` named by its label, described by an always-mounted `<output>` status line.
+- `LinkRow`: a wrapping row of text links, plain or in a named nav, `accent` or `quiet`, with a `current` item marked by weight and an underline.
+- `SectionHeading`: the h2 under a page's h1, with an optional `detail`, `actions` and a `#` anchor.
+- `PrevNext`: previous/next links at the end of a page in a series, each named "Previous: <title>" or "Next: <title>".
 
 ### Changed
 

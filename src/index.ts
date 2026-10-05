@@ -31,6 +31,7 @@ export type { HeadingLevel } from "./components/basics/cardStyles.js";
 export { Disclosure, type DisclosureProps } from "./components/basics/Disclosure.js";
 export { EmptyState, type EmptyStateProps } from "./components/basics/EmptyState.js";
 export { LinkCard, type LinkCardProps } from "./components/basics/LinkCard.js";
+export { LinkRow, type LinkRowItem, type LinkRowProps } from "./components/basics/LinkRow.js";
 export {
   type LinkClassOptions,
   linkClasses,
@@ -38,8 +39,10 @@ export {
 } from "./components/basics/linkStyles.js";
 export { Notice, type NoticeProps, type NoticeTone } from "./components/basics/Notice.js";
 export { PageHeader, type PageHeaderProps } from "./components/basics/PageHeader.js";
+export { PrevNext, type PrevNextLink, type PrevNextProps } from "./components/basics/PrevNext.js";
 export { Progress, type ProgressProps } from "./components/basics/Progress.js";
 export { Prose, type ProseProps } from "./components/basics/Prose.js";
+export { SectionHeading, type SectionHeadingProps } from "./components/basics/SectionHeading.js";
 export {
   type StatItem,
   StatList,

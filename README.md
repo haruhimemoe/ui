@@ -429,6 +429,30 @@ A native `<progress>` with a name and a status line: `label` (shown unless `hide
 <Progress label="Download progress" hideLabel value={ready} max={total} status={`${ready} of ${total} sets ready`} />
 ```
 
+#### `LinkRow`
+
+A wrapping row of text links (a card's GitHub / npm / Changelog, a page's filters): plain without a `label`, a named `<nav>` with one. `variant` `accent` (default, bold accent links) or `quiet` (c2, turns c1 on hover). Mark the current item with `current`: it gets `aria-current="page"` and an underline, not color alone. Use `LinkTabs` for pill links that switch a view of the same page family, `ContentNav` for a section's vertical nav.
+
+```tsx
+<LinkRow label="Changelog filter" items={[{ href: "/changelog", label: "All" }, { href: "/changelog/kind/packages", label: "Packages", current: true }]} />
+```
+
+#### `SectionHeading`
+
+The h2 under a page's h1: bold c1 at text-xl, `scroll-mt-20` for a sticky header. `level` changes the tag (default 2). `detail` ("(12)") sits inside the heading's accessible name; `actions` sit to its right; `anchor` (needs `id`) adds a `#` link named after the heading's text.
+
+```tsx
+<SectionHeading id="recent-packs" anchor detail="(12)" actions={<a href="/packs">See all</a>}>Recent public packs</SectionHeading>
+```
+
+#### `PrevNext`
+
+Previous and next links at the end of a page in a series (docs tags, guides): a named nav over a b3 rule. Each link reads "Previous: <title>" or "Next: <title>" to a screen reader; a lone `next` link sits at the end on its own. Renders nothing with neither link.
+
+```tsx
+<PrevNext label="More tags" prev={{ href: "/docs/tags/b", title: "[b] Bold" }} next={{ href: "/docs/tags/i", title: "[i] Italic" }} />
+```
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.
@@ -863,6 +887,8 @@ The index link, then each group of links, the current page marked. A column from
 
 A link's label is `navTitle ?? title`, in a `line-clamp-2` span so a long title wraps to two lines instead of overflowing the 14rem column; the link's `title` attribute always holds the full `title`. The current page's link gets `aria-current="page"`. A `badge` (e.g. a count) shows beside the label, in `font-mono`.
 
+For a page's own vertical nav use `ContentNav`; for a wrapping row of links (a card's GitHub / npm / Changelog, a page's filters) use `LinkRow`.
+
 #### `ContentLayout`
 
 The grid: `nav` in a 14rem column from `lg` up, the page beside it; one column on phones. A Server Component. `nav` takes an already-rendered node (usually a `<ContentNav>`), so this stays section-agnostic. Every native `<div>` prop; `className` merges last.
@@ -1030,6 +1056,8 @@ Since 0.4.0. A row of link tabs (Pools / Maps, All / Hidden): a named `<nav>` wi
 | --- | --- | --- | --- |
 | `label` | `string` | required | The nav landmark's accessible name. |
 | `items` | `readonly LinkTabItem[]` | required | `{ href: string; label: ReactNode; current?: boolean }` for each tab, each with its own href. |
+
+For a plain wrapping row of links instead of pills, use `LinkRow`.
 
 #### `HeaderMenu` (client)
 

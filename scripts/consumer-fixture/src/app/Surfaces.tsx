@@ -11,7 +11,10 @@ import {
   CardLink,
   EmptyState,
   LinkCard,
+  LinkRow,
+  PrevNext,
   Progress,
+  SectionHeading,
   StatList,
   Surface,
   surfaceClasses,
@@ -21,6 +24,9 @@ import {
 export function Surfaces() {
   return (
     <section aria-label="Surfaces" className="flex flex-col gap-4">
+      <SectionHeading id="recent-packs" anchor detail="(2)" actions={<a href="/docs">See all</a>}>
+        Recent packs
+      </SectionHeading>
       <ul className="flex flex-col gap-2">
         <Surface as="li">Surface item</Surface>
       </ul>
@@ -34,6 +40,7 @@ export function Surfaces() {
           media={<div aria-hidden="true" className="h-12 bg-h2" />}
         >
           <p>From the packed tarball.</p>
+          <LinkRow items={[{ href: "https://osu.ppy.sh/wiki", label: "osu! wiki" }]} />
         </LinkCard>
         <div className="relative rounded-[10px] bg-b4 p-5">
           <CardLink href="/relative">Card link alone</CardLink>
@@ -54,6 +61,19 @@ export function Surfaces() {
       </EmptyState>
       <Progress label="Download progress" value={0.5} status="6 of 12 sets ready" />
       <Progress label="Loading" hideLabel />
+      <LinkRow
+        label="Changelog filter"
+        variant="quiet"
+        items={[
+          { href: "/docs", label: "All" },
+          { href: "/relative", label: "Packages", current: true },
+        ]}
+      />
+      <PrevNext
+        label="More guides"
+        prev={{ href: "/docs", title: "Getting started" }}
+        next={{ href: "/relative", title: "Relative links" }}
+      />
     </section>
   );
 }
