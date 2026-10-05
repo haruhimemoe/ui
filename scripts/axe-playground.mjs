@@ -8,13 +8,16 @@
  *       /surfaces (the 0.13.0 layout pieces) at both widths, /surfaces a second time after a Copy
  *       press and a SegmentedControl pick, then /dialogs (ConfirmDialog closed, open, part-typed,
  *       pending, failed), and once more under forced colors, checking that the current LinkRow
- *       link and the checked SegmentedControl option keep their underline. The jsdom tests can't
- *       see contrast or scrollable regions, and the consumer check only sees closed pages. Prints
- *       one line per violation (with up to five targets) and exits 1 on any. Usage:
- *       `bun run play:axe` (CI runs it after the consumer check; Chromium is installed for that).
+ *       link and the checked SegmentedControl option keep their underline. Then /sortable at 1280
+ *       and at 390 with touch: idle, keyboard-lifted with the line, a refused target and the
+ *       second list, each axed, then one real pointer drag (Bravo to the end) whose order it
+ *       checks, and the 44px handle under touch. The jsdom tests can't see contrast or scrollable
+ *       regions, and the consumer check only sees closed pages. Prints one line per violation
+ *       (with up to five targets) and exits 1 on any. Usage: `bun run play:axe` (CI runs it after
+ *       the consumer check; Chromium is installed for that).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 4, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -296,12 +299,104 @@ try {
   }
   await runAxe(forcedPage, "forced colors /surfaces");
   await forced.close();
+
+  // Sortable lists (0.15.0). jsdom has no layout, so the real pointer drag is checked here.
+  // CONTEXTS (0.12.0) replaced VIEWPORTS: take the desktop and phone viewports from it.
+  const sortableContexts = {
+    desktop: { viewport: CONTEXTS.desktop.viewport, colorScheme: "dark" },
+    "phone touch": {
+      viewport: CONTEXTS.phone.viewport,
+      colorScheme: "dark",
+      hasTouch: true,
+      isMobile: true,
+    },
+  };
+  const focusAndPress = async (page, name, keys) => {
+    await page.getByRole("button", { name }).focus();
+    for (const key of keys) await page.keyboard.press(key);
+  };
+  const sortableStates = [
+    { name: "idle", run: async () => {}, expect: "[data-sortable-container]" },
+    {
+      name: "keyboard lifted",
+      run: (page) => focusAndPress(page, "Reorder NM2", ["Enter"]),
+      expect: "[data-sortable-line]",
+    },
+    {
+      name: "refused target",
+      run: async (page) => {
+        await page.keyboard.press("Escape");
+        await focusAndPress(page, "Reorder NM1", ["Enter", "PageDown"]);
+      },
+      expect: "[data-sortable-refused]",
+    },
+    {
+      name: "second list",
+      run: async (page) => {
+        await page.keyboard.press("Escape");
+        await focusAndPress(page, "Reorder NM2", ["Enter", "PageDown"]);
+      },
+      expect: '[data-sortable-container="hd"] [data-sortable-line]',
+    },
+  ];
+  for (const [contextName, options] of Object.entries(sortableContexts)) {
+    const context = await browser.newContext(options);
+    const page = await context.newPage();
+    const response = await page.goto(`${origin}/sortable`, { waitUntil: "load" });
+    if (response?.status() !== 200) {
+      throw new Error(`/sortable answered ${response?.status() ?? "nothing"}`);
+    }
+    await page.waitForTimeout(300);
+    for (const state of sortableStates) {
+      await state.run(page);
+      await page.waitForTimeout(150);
+      if ((await page.locator(state.expect).count()) === 0) {
+        throw new Error(`${contextName} /sortable ${state.name}: state not reached`);
+      }
+      if (shots) {
+        await page.screenshot({
+          path: path.join(
+            shots,
+            `${contextName.replace(/\s+/g, "-")}-sortable-${state.name.replace(/\s+/g, "-")}.png`,
+          ),
+        });
+      }
+      await runAxe(page, `${contextName} /sortable ${state.name}`);
+    }
+    await page.keyboard.press("Escape");
+    const rows = page.locator('[data-testid="single"] > li');
+    const grip = page.getByRole("button", { name: "Reorder Bravo" });
+    await grip.scrollIntoViewIfNeeded();
+    const from = await grip.boundingBox();
+    const last = await rows.last().boundingBox();
+    if (!from || !last) throw new Error(`${contextName} /sortable: no boxes for the drag`);
+    if (contextName === "phone touch" && from.height < 44) {
+      failures.push(`${contextName} /sortable: the handle is ${from.height}px tall, not 44`);
+    }
+    const x = from.x + from.width / 2;
+    const y = from.y + from.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x, y + 10, { steps: 2 });
+    await page.mouse.move(x, last.y + last.height - 2, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(150);
+    const labels = (await rows.allTextContents()).map(
+      (text) => text.match(/Alpha|Bravo|Charlie|Delta/)?.[0],
+    );
+    if (labels.join() !== "Alpha,Charlie,Delta,Bravo") {
+      failures.push(`${contextName} /sortable pointer drag: order is ${labels.join(", ")}`);
+    }
+    console.log(`${contextName} /sortable pointer drag: ${labels.join(", ")}`);
+    await context.close();
+  }
+
   await browser.close();
 } finally {
   server.kill();
 }
 if (failures.length > 0) {
-  console.error(`\n${failures.join("\n")}\n\n${failures.length} axe violations`);
+  console.error(`\n${failures.join("\n")}\n\n${failures.length} problems`);
   process.exit(1);
 }
-console.log("\nplayground: no axe violations");
+console.log("\nplayground: no problems");

@@ -22,6 +22,7 @@ import {
   HaruhimeWordmark,
   HaruhimeWordmarkLink,
   JsonLd,
+  moveItem,
   NavLinks,
   Notice,
   PageHeader,
@@ -33,6 +34,8 @@ import {
   type SiteFooterColumn,
   SiteHeader,
   type SiteLinkItem,
+  SORTABLE_CONTAINER,
+  SORTABLE_ITEM,
   searchContent,
   Textarea,
   TextInput,
@@ -47,6 +50,7 @@ import { Filters } from "./Filters";
 import { Foundations } from "./Foundations";
 import { MdxExports } from "./MdxExports";
 import { Palette08 } from "./Palette08";
+import { Sortable15 } from "./Sortable15";
 import { Surfaces } from "./Surfaces";
 
 const LINKS: SiteLinkItem[] = [
@@ -148,6 +152,10 @@ export default function Page() {
       <Additions />
       <ClientAdditions />
       <ClientAdditions05 />
+      <Sortable15 />
+      <ol aria-label="Server sortable classes" className={SORTABLE_CONTAINER}>
+        <li className={SORTABLE_ITEM}>{moveItem(["second", "first"], 1, 0).join(" then ")}</li>
+      </ol>
       <ClientDialogs />
       <Filters />
       <Foundations />
