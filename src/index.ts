@@ -27,6 +27,7 @@ export {
 export { Card, type CardProps } from "./components/basics/Card.js";
 export { CardGrid, type CardGridProps } from "./components/basics/CardGrid.js";
 export { CardLink, type CardLinkProps } from "./components/basics/CardLink.js";
+export { CodeChip, type CodeChipProps } from "./components/basics/CodeChip.js";
 export type { HeadingLevel } from "./components/basics/cardStyles.js";
 export { Disclosure, type DisclosureProps } from "./components/basics/Disclosure.js";
 export { EmptyState, type EmptyStateProps } from "./components/basics/EmptyState.js";
@@ -115,6 +116,7 @@ export {
 // Forms
 export { CharCounter, type CharCounterProps } from "./components/forms/CharCounter.js";
 export { Checkbox, type CheckboxProps } from "./components/forms/Checkbox.js";
+export { CopyField, type CopyFieldProps } from "./components/forms/CopyField.js";
 export type { FieldProps } from "./components/forms/FieldFrame.js";
 export { fieldClasses } from "./components/forms/fieldStyles.js";
 export {

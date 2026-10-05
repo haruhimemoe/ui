@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `LinkRow`: a wrapping row of text links, plain or in a named nav, `accent` or `quiet`, with a `current` item marked by weight and an underline.
 - `SectionHeading`: the h2 under a page's h1, with an optional `detail`, `actions` and a `#` anchor.
 - `PrevNext`: previous/next links at the end of a page in a series, each named "Previous: <title>" or "Next: <title>".
+- `CodeChip`: inline code with a copy button, its name `Copy <code>` unless `copyLabel`.
+- `CopyField` (client): a read-only field in mono with focus-selects-all and a Copy row, described by the field's label.
 
 ### Changed
 

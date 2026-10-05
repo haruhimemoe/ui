@@ -453,6 +453,14 @@ Previous and next links at the end of a page in a series (docs tags, guides): a 
 <PrevNext label="More tags" prev={{ href: "/docs/tags/b", title: "[b] Bold" }} next={{ href: "/docs/tags/i", title: "[i] Italic" }} />
 ```
 
+#### `CodeChip`
+
+Inline code with a copy button: `copy={false}` for the code alone; the button's name is `Copy <code>` unless `copyLabel`.
+
+```tsx
+<CodeChip code="bun add @haruhimemoe/ui" />
+```
+
 ### Forms
 
 The fields render a label, the control, an optional hint and an optional error, wired together for screen readers. They are Server Components: you pass the `id`, so they need no generated ids.
@@ -599,6 +607,15 @@ Since 0.5.0. "Report this": a `Disclosure` holding a reason `Textarea` (required
 
 ```tsx
 <select aria-label="Move to" className={fieldClasses("w-auto")}>...</select>
+```
+
+#### `CopyField` (client)
+
+A read-only field to copy from: the value in mono (`mono={false}` to turn it off), focus selects all of it, then a row with a Copy button and your `actions`. The label to input gap is 8px. `ref`, `hint`, `error` and `hideLabel` reach the input; `wrapperClassName` places the whole field. The Copy button is described by the label, so two fields read "Copy, Pack key" and "Copy, Short link". A copy that depends on something only the browser knows (a share link with `window.location.origin`) goes in `actions` as its own `CopyButton`.
+
+```tsx
+<CopyField label="Pack key" value={packKey} copyLabel="Copy key" copyVariant="primary" copiedMessage="Key copied."
+  actions={<CopyButton text={shareLink} disabled={!origin} label="Copy share link" />} />
 ```
 
 ### Actions

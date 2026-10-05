@@ -41,6 +41,7 @@ import Link from "next/link";
 import { Additions } from "./Additions";
 import { ClientAdditions } from "./ClientAdditions";
 import { ClientAdditions05 } from "./ClientAdditions05";
+import { ClientSurfaces } from "./ClientSurfaces";
 import { Filters } from "./Filters";
 import { Foundations } from "./Foundations";
 import { MdxExports } from "./MdxExports";
@@ -150,6 +151,7 @@ export default function Page() {
       <Foundations />
       <MdxExports />
       <Surfaces />
+      <ClientSurfaces />
       <ContentLayout
         nav={
           <ContentNav

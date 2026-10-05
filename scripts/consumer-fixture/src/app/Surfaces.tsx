@@ -9,6 +9,7 @@
 import {
   CardGrid,
   CardLink,
+  CodeChip,
   EmptyState,
   LinkCard,
   LinkRow,
@@ -41,6 +42,7 @@ export function Surfaces() {
         >
           <p>From the packed tarball.</p>
           <LinkRow items={[{ href: "https://osu.ppy.sh/wiki", label: "osu! wiki" }]} />
+          <CodeChip code="bun add @haruhimemoe/ui" />
         </LinkCard>
         <div className="relative rounded-[10px] bg-b4 p-5">
           <CardLink href="/relative">Card link alone</CardLink>

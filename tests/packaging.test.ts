@@ -168,6 +168,7 @@ describe("shipped source", () => {
       "forms/RadioGroup",
       // useId only, which the regex above doesn't match; still a client file.
       "palette/PaletteInput",
+      "forms/CopyField",
     ]) {
       const file = sources.find((s) => s.name === `src/components/${name}.tsx`);
       expect(firstStatement(file?.text ?? ""), name).toBe('"use client";');
