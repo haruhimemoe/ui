@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-05
+
 ### Added
 
 - `Surface` and `surfaceClasses`: the list-item box (Card's b4 and 10px radius at p-3, `md` p-4, `lg` p-5, `as` div, li, section, article, form or p), and its classes for other elements.
@@ -212,7 +214,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.12.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/haruhimemoe/ui/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/haruhimemoe/ui/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/haruhimemoe/ui/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/haruhimemoe/ui/compare/v0.11.0...v0.11.1

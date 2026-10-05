@@ -17,7 +17,11 @@
  *       the app and runs axe-core in headless Chromium over / and /mdx at a desktop and a phone
  *       width with color contrast on (the jsdom tests can't check contrast), WCAG 2.2 AA plus best
  *       practices. It then runs axe again on / under a coarse pointer, more contrast and reduced
- *       motion, and the media pass in scripts/consumer-media.mjs. Last, it removes shiki (an
+ *       motion, and the media pass in scripts/consumer-media.mjs. It also checks the 0.13.0 layout
+ *       pieces on / (Surface, LinkCard with CardLink, CardGrid, StatList, LinkRow, SectionHeading
+ *       with its anchor, Progress, EmptyState, PrevNext, CopyField and SegmentedControl) and the CSS
+ *       for LinkCard's `:not([data-card-link])` lift selector, plus a standalone /code-chip page
+ *       that checks CodeChip's copy button loads no tailwind-merge. Last, it removes shiki (an
  *       optional peer) and the fixture's `import "@haruhimemoe/ui/shiki"` lines and builds again:
  *       /mdx must still prerender, with plain code. Usage: `node scripts/check-consumer.mjs
  *       [--keep]` (--keep leaves the app in the temp dir). Needs the npm registry and Google Fonts.
@@ -26,7 +30,7 @@
  *       assertions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -338,6 +342,13 @@ try {
   if (!css.includes("--contrast-lift")) failures.push("CSS is missing --contrast-lift");
   if (!css.includes("prefers-reduced-motion"))
     failures.push("CSS is missing the reduced-motion rule");
+  // LinkCard's lift (CARD_LINK_LIFT) is one arbitrary variant: if a Tailwind upgrade stops
+  // generating it, links and buttons inside a LinkCard fall under the card link's cover.
+  if (!css.includes(":not([data-card-link])")) {
+    failures.push(
+      "CSS is missing LinkCard's lift selector :not([data-card-link]) (CARD_LINK_LIFT)",
+    );
+  }
 
   const index = readRoute("index");
   if (!index) {
@@ -418,6 +429,30 @@ try {
         /<span class="text-rose-300 contrast-more:text-rose-200 text-sm font-bold">Bold error span\.<\/span>/,
         "Text as span",
       ],
+      [
+        /<a\b(?=[^>]*data-card-link="")(?=[^>]*href="\/docs")[^>]*>packs<\/a>/,
+        "LinkCard with CardLink",
+      ],
+      [/<h2\b(?=[^>]*id="recent-packs")(?=[^>]*scroll-mt-20)[^>]*>Recent packs/, "SectionHeading"],
+      [
+        /<a\b(?=[^>]*href="#recent-packs")(?=[^>]*aria-label="Link to section: Recent packs")[^>]*>#<\/a>/,
+        "SectionHeading anchor",
+      ],
+      [/<li\b(?=[^>]*class="[^"]*\bp-3\b)[^>]*>Surface item<\/li>/, "Surface"],
+      [/<li class="[^"]*\[&amp;&gt;\*\]:w-full[^"]*">/, "CardGrid"],
+      [/<dt class="text-c4 text-xs">Maps<\/dt>/, "StatList"],
+      [/<nav aria-label="Changelog filter"/, "LinkRow"],
+      [/<progress\b(?=[^>]*value="0.5")[^>]*>/, "Progress"],
+      [/<progress\b(?![^>]*\svalue=)(?=[^>]*aria-label="Loading")[^>]*>/, "Progress indeterminate"],
+      [/<nav aria-label="More guides"/, "PrevNext"],
+      [/<div\b(?=[^>]*border-dashed)[^>]*><p[^>]*>Nothing here<\/p>No maps yet\./, "EmptyState"],
+      [/<code class="[^"]*bg-b6[^"]*">bun add @haruhimemoe\/ui<\/code>/, "CodeChip"],
+      [/<button\b[^>]*aria-label="Copy bun add @haruhimemoe\/ui"/, "CodeChip copy button (client)"],
+      [/<input\b(?=[^>]*readOnly="")(?=[^>]*value="PACKKEY123")[^>]*>/, "CopyField (client)"],
+      [
+        /<input\b(?=[^>]*type="radio")(?=[^>]*value="fit")(?=[^>]*checked="")[^>]*>/,
+        "SegmentedControl (client)",
+      ],
     ];
     for (const [pattern, from] of expected) {
       if (!pattern.test(page)) failures.push(`prerendered / is missing ${pattern} (${from})`);
@@ -440,6 +475,19 @@ try {
     }
     if (header.scripts.some((js) => js.includes(TAILWIND_MERGE))) {
       failures.push("/header loads tailwind-merge; the nav's client list must not");
+    }
+  }
+
+  // CodeChip is a Server Component whose copy button is CodeBlock's finished-class client file.
+  const codeChip = readRoute("code-chip");
+  if (!codeChip) {
+    failures.push("/code-chip did not prerender");
+  } else {
+    if (!/aria-label="Copy bun add @haruhimemoe\/ui"/.test(codeChip.html)) {
+      failures.push("/code-chip is missing CodeChip's copy button");
+    }
+    if (codeChip.scripts.some((js) => js.includes(TAILWIND_MERGE))) {
+      failures.push("/code-chip loads tailwind-merge; CodeChip's copy button must not");
     }
   }
 

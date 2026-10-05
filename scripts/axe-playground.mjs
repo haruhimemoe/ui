@@ -4,14 +4,17 @@
  *       and runs axe-core in headless Chromium over the command palette's states on / at a desktop
  *       and a phone width, on a touch phone (rows measured at 44px) and under more contrast, color
  *       contrast on: closed, open, a nested page, an argument prompt and no results. Then it runs
- *       the same pass over /mdx (the MDX components: callouts, Shiki code blocks, a wide table) at
- *       both widths. The jsdom tests can't see contrast or scrollable regions, and the consumer
- *       check only sees closed pages. Prints one line per violation (with up to five targets) and
- *       exits 1 on any. Usage: `bun run play:axe` (CI runs it after the consumer check; Chromium is
- *       installed for that).
+ *       the same pass over /mdx (the MDX components: callouts, Shiki code blocks, a wide table) and
+ *       /surfaces (the 0.13.0 layout pieces) at both widths, /surfaces a second time after a Copy
+ *       press and a SegmentedControl pick, and once more under forced colors, checking that the
+ *       current LinkRow link and the checked SegmentedControl option keep their underline. The
+ *       jsdom tests can't see contrast or scrollable regions, and the consumer check only sees
+ *       closed pages. Prints one line per violation (with up to five targets) and exits 1 on any.
+ *       Usage: `bun run play:axe` (CI runs it after the consumer check; Chromium is installed for
+ *       that).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -91,11 +94,28 @@ const server = spawn(next, ["start", "playground", "-p", String(port)], {
   stdio: ["ignore", "ignore", "inherit"],
 });
 const failures = [];
+/** Runs axe on the page as it is and records each violation under `name`. */
+const runAxe = async (page, name) => {
+  const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
+  for (const violation of results.violations) {
+    const targets = violation.nodes.slice(0, 5).map((node) => `    ${node.target.join(" ")}`);
+    failures.push(
+      [`${name}: ${violation.id} (${violation.impact}) ${violation.help}`, ...targets].join("\n"),
+    );
+  }
+  console.log(
+    `${name}: ${results.violations.length ? `${results.violations.length} violations` : "ok"}`,
+  );
+};
 try {
   await waitForServer(origin, 30000);
   const browser = await chromium.launch();
   for (const [viewportName, options] of Object.entries(CONTEXTS)) {
-    const context = await browser.newContext({ ...options, colorScheme: "dark" });
+    const context = await browser.newContext({
+      ...options,
+      colorScheme: "dark",
+      permissions: ["clipboard-read", "clipboard-write"],
+    });
     const page = await context.newPage();
     const response = await page.goto(`${origin}/`, { waitUntil: "load" });
     if (response?.status() !== 200)
@@ -166,8 +186,52 @@ try {
     console.log(
       `${viewportName} /mdx: ${mdxResults.violations.length ? `${mdxResults.violations.length} violations` : "ok"}`,
     );
+    // The 0.13.0 surfaces: as rendered, then after a copy and a SegmentedControl pick.
+    const surfaces = await page.goto(`${origin}/surfaces`, { waitUntil: "load" });
+    if (surfaces?.status() !== 200)
+      throw new Error(`/surfaces answered ${surfaces?.status() ?? "nothing"}`);
+    await page.waitForTimeout(500);
+    if ((await page.locator("[data-card-link]").count()) === 0) {
+      throw new Error(`${viewportName} /surfaces: no [data-card-link], LinkCard didn't render`);
+    }
+    await runAxe(page, `${viewportName} /surfaces`);
+    await page.getByRole("button", { name: "Copy", exact: true }).click();
+    await page.locator("label", { hasText: "Grid" }).click();
+    await page.waitForTimeout(150);
+    const copied =
+      (await page.locator("output", { hasText: /Copied\.|Couldn't copy/ }).count()) > 0;
+    const picked = (await page.locator("input[type=radio][value=grid]:checked").count()) > 0;
+    if (!copied || !picked)
+      throw new Error(`${viewportName} /surfaces after copy: state not reached`);
+    if (shots) await page.screenshot({ path: path.join(shots, `${viewportName}-surfaces.png`) });
+    await runAxe(page, `${viewportName} /surfaces after copy`);
     await context.close();
   }
+  // Forced colors: the current-state underlines must survive the system palette.
+  // CONTEXTS (0.12.0) replaced VIEWPORTS: take the desktop viewport from it.
+  const forced = await browser.newContext({
+    viewport: CONTEXTS.desktop.viewport,
+    colorScheme: "dark",
+    forcedColors: "active",
+  });
+  const forcedPage = await forced.newPage();
+  await forcedPage.goto(`${origin}/surfaces`, { waitUntil: "load" });
+  await forcedPage.waitForTimeout(500);
+  const underlined = async (selector) =>
+    forcedPage
+      .locator(selector)
+      .first()
+      .evaluate((el) => getComputedStyle(el).textDecorationLine);
+  for (const [selector, what] of [
+    ['nav[aria-label="Changelog filter"] a[aria-current="page"]', "the current LinkRow link"],
+    ["label:has(input[value=list]:checked)", "the checked SegmentedControl option"],
+  ]) {
+    const line = await underlined(selector);
+    if (!line.includes("underline"))
+      failures.push(`forced colors /surfaces: ${what} has no underline (${line})`);
+  }
+  await runAxe(forcedPage, "forced colors /surfaces");
+  await forced.close();
   await browser.close();
 } finally {
   server.kill();
