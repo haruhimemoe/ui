@@ -107,6 +107,7 @@ describe("shipped source", () => {
       "src/components/forms/ReportDisclosure.tsx",
       "src/components/forms/TypeToConfirm.tsx",
       "src/components/mdx/CodeCopyButton.tsx",
+      "src/components/osu/MapPreviewButton.tsx",
       "src/components/palette/CommandPalette.tsx",
       "src/components/palette/CommandPaletteButton.tsx",
       "src/components/palette/PaletteList.tsx",
@@ -125,6 +126,12 @@ describe("shipped source", () => {
     for (const { name, text } of client) {
       expect(firstStatement(text), name).toBe('"use client";');
     }
+  });
+
+  it('marks the preview player "use client" (module state, browser Audio)', () => {
+    expect(firstStatement(textOf.get("src/components/osu/previewPlayer.ts") ?? "")).toBe(
+      '"use client";',
+    );
   });
 
   // A client file that a server component renders ships to every page that server component is
