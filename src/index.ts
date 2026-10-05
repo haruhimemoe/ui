@@ -129,6 +129,11 @@ export {
   type ReportDisclosureProps,
   type ReportResult,
 } from "./components/forms/ReportDisclosure.js";
+export {
+  SegmentedControl,
+  type SegmentedControlProps,
+  type SegmentedOption,
+} from "./components/forms/SegmentedControl.js";
 export { Select, type SelectProps } from "./components/forms/Select.js";
 export { Textarea, type TextareaProps } from "./components/forms/Textarea.js";
 export { TextInput, type TextInputProps } from "./components/forms/TextInput.js";

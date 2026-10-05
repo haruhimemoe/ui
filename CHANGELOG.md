@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `PrevNext`: previous/next links at the end of a page in a series, each named "Previous: <title>" or "Next: <title>".
 - `CodeChip`: inline code with a copy button, its name `Copy <code>` unless `copyLabel`.
 - `CopyField` (client): a read-only field in mono with focus-selects-all and a Copy row, described by the field's label.
+- `SegmentedControl` (client): a two to four way view switch on native radios, drawn like a pill track.
 
 ### Changed
 

@@ -618,6 +618,14 @@ A read-only field to copy from: the value in mono (`mono={false}` to turn it off
   actions={<CopyButton text={shareLink} disabled={!origin} label="Copy share link" />} />
 ```
 
+#### `SegmentedControl` (client)
+
+A two to four way view switch drawn like a pill track, built on native radios: Tab lands on the checked one, arrows move and pick. Radios, not links: use `LinkTabs` when each choice is its own URL, `ChoiceChips` for a filter among other chips. `hideLabel` keeps the group named through an sr-only legend; `size` is `sm` (24px) or `md` (default, 32px).
+
+```tsx
+<SegmentedControl label="Preview size" hideLabel size="sm" options={[{ value: "fit", label: "Fit" }, { value: "actual", label: "Actual size" }]} value={scale} onChange={setScale} />
+```
+
 ### Actions
 
 #### `CopyButton` (client)
@@ -824,6 +832,8 @@ Since 0.4.0. One choice from a few, as a real radio group drawn as chips (a stat
 | `value` | `T` | required | The picked value. |
 | `onChange` | `(value: T) => void` | required | Gets the picked value. |
 | `name` | `string` | generated | The radios' name, for a form. |
+
+For a two to four way view switch drawn as a pill track, use `SegmentedControl`.
 
 #### `RangeSlider` (client)
 
@@ -1074,7 +1084,7 @@ Since 0.4.0. A row of link tabs (Pools / Maps, All / Hidden): a named `<nav>` wi
 | `label` | `string` | required | The nav landmark's accessible name. |
 | `items` | `readonly LinkTabItem[]` | required | `{ href: string; label: ReactNode; current?: boolean }` for each tab, each with its own href. |
 
-For a plain wrapping row of links instead of pills, use `LinkRow`.
+For a plain wrapping row of links instead of pills, use `LinkRow`. For a view switch with no URL of its own, use `SegmentedControl`.
 
 #### `HeaderMenu` (client)
 
