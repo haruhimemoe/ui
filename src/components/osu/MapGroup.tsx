@@ -109,6 +109,7 @@ export function MapGroup({
         >
           {badge ? <ModBadge aria-hidden="true" mod={badge.mod} color={badge.color} /> : null}
           {title}
+          {counted !== null || detail ? " " : null}
           {counted !== null || detail ? (
             <span className="font-normal text-c3 text-sm">
               {counted}

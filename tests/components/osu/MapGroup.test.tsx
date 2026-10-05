@@ -21,8 +21,8 @@ describe("MapGroup", () => {
       </MapGroup>,
     );
     const heading = screen.getByRole("heading", { level: 3 });
-    expect(heading.textContent).toMatch(/^NM\s*\(4 of 5\) · Nomod$/);
-    expect(screen.getByRole("region", { name: /^NM/ })).toContainElement(heading);
+    expect(heading.textContent).toBe("NM (4 of 5) · Nomod");
+    expect(screen.getByRole("region", { name: "NM (4 of 5) · Nomod" })).toContainElement(heading);
     expect(screen.getByText("(4 of 5) · Nomod").className).toContain("text-c3");
   });
 
