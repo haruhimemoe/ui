@@ -5,10 +5,11 @@
  *       Enter runs a command, pushes its page, or starts collecting its args; Escape and
  *       Backspace on an empty input go back a level, then close. Providers search as you type.
  *       Recents are read on open and written on every run. The calculator row copies its result.
- *       Mount once, inside a client component, since commands carry functions.
+ *       Mount once, inside a client component, since commands carry functions. Built on Dialog
+ *       (focus return, scroll lock, Escape and backdrop) since 0.14.0.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 "use client";
@@ -26,6 +27,7 @@ import {
 } from "react";
 import { cx } from "../../utils/cx.js";
 import { useLatestStatus } from "../actions/useLatestStatus.js";
+import { Dialog } from "../dialogs/Dialog.js";
 import { isEditableTarget, matchesCombo, parseShortcut } from "./hotkeys.js";
 import { PaletteFooter } from "./PaletteFooter.js";
 import { PaletteInput } from "./PaletteInput.js";
@@ -70,9 +72,7 @@ export function CommandPalette({
   const [state, dispatch] = useReducer(reduce, undefined, initialState);
   const [recents, setRecents] = useState<Recents>({});
   const [mac, setMac] = useState(false);
-  const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
-  const opener = useRef<Element | null>(null);
   const chord = useRef<{ key: string; at: number } | null>(null);
   // Where the pointer last was over a row. Chrome fires a pointermove at the same spot after the
   // list scrolls under a still cursor; only a real move may take the active row from the keys.
@@ -93,13 +93,11 @@ export function CommandPalette({
 
   const open = useCallback(
     (page?: Page) => {
-      // Opening onto a page while already open keeps the original opener.
-      if (!state.open) opener.current = document.activeElement;
       if (recentsOn) setRecents(readRecents(storageKey));
       setStatusShown(false);
       dispatch({ type: "open", root, page });
     },
-    [root, recentsOn, storageKey, state.open],
+    [root, recentsOn, storageKey],
   );
   const close = useCallback(() => dispatch({ type: "close" }), []);
 
@@ -157,29 +155,6 @@ export function CommandPalette({
     dispatch,
     enabled: state.open && state.arg === null && frame !== undefined,
   });
-
-  // The dialog follows `open`: show it modally, focus the input, lock the page's scroll; on
-  // close, hand focus back to whatever had it.
-  useEffect(() => {
-    const element = dialog.current;
-    if (!element) return;
-    if (state.open) {
-      if (!element.open) element.showModal();
-      input.current?.focus();
-      document.documentElement.style.overflow = "hidden";
-      return;
-    }
-    if (element.open) element.close();
-    document.documentElement.style.overflow = "";
-    if (opener.current instanceof HTMLElement) opener.current.focus();
-    opener.current = null;
-  }, [state.open]);
-  useEffect(
-    () => () => {
-      document.documentElement.style.overflow = "";
-    },
-    [],
-  );
 
   const remember = (id: string) => {
     if (recentsOn && id !== CALC_ID) setRecents(recordRecent(storageKey, id));
@@ -339,21 +314,15 @@ export function CommandPalette({
     : state.stack.slice(1).map((f) => f.page.title);
 
   return (
-    <dialog
-      ref={dialog}
+    <Dialog
       data-palette=""
       aria-label={label}
+      open={state.open}
+      onDismiss={(reason) => (reason === "escape" ? back() : close())}
+      initialFocus={input}
+      motion={false}
       className={DIALOG}
-      onCancel={(event) => {
-        event.preventDefault();
-        back();
-      }}
       onKeyDown={onKeyDown}
-      // The browser can close the dialog itself (a back gesture, a close watcher): follow it.
-      onClose={close}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) close();
-      }}
     >
       {state.open && frame ? (
         <div className={cx(PANEL, className)}>
@@ -394,6 +363,6 @@ export function CommandPalette({
           />
         </div>
       ) : null}
-    </dialog>
+    </Dialog>
   );
 }

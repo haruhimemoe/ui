@@ -2,14 +2,15 @@
  * @file tests/components/palette/CommandPalette.open.test.tsx
  * @desc Opening and closing: the hotkey toggles (also from inside the palette and from a field),
  *       openCommandPalette opens (onto a page too), Escape and a backdrop click close at the
- *       root, focus goes back to the opener, the page's scroll is locked while open, and the
- *       open palette passes axe.
+ *       root, focus goes back to the opener, the page's scroll is locked while open, the page's
+ *       own overflow comes back, a drag that ends on the backdrop doesn't close, and the open
+ *       palette passes axe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Mon Oct 5, 2026
  */
 
-import { act, screen } from "@testing-library/react";
+import { act, fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { openCommandPalette } from "../../../src/components/palette/paletteEvents.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
@@ -81,5 +82,28 @@ describe("CommandPalette opening", () => {
     await pressHotkey(user);
     expect(dialog()).toHaveAttribute("open");
     expect(input()).toHaveFocus();
+  });
+
+  it("puts back the page's own inline overflow when it closes", async () => {
+    document.documentElement.style.overflow = "scroll";
+    try {
+      const { user } = renderPalette();
+      await pressHotkey(user);
+      expect(document.documentElement.style.overflow).toBe("hidden");
+      await user.keyboard("{Escape}");
+      expect(dialog()).not.toHaveAttribute("open");
+      expect(document.documentElement.style.overflow).toBe("scroll");
+    } finally {
+      document.documentElement.style.overflow = "";
+    }
+  });
+
+  it("stays open when a drag starts in the input and ends on the backdrop", async () => {
+    const { user } = renderPalette();
+    await pressHotkey(user);
+    fireEvent.pointerDown(input());
+    fireEvent.click(dialog());
+    expect(dialog()).toHaveAttribute("open");
+    expect(input()).toBeInTheDocument();
   });
 });
