@@ -162,6 +162,11 @@ export {
   type VisibilityText,
 } from "./components/forms/VisibilitySelect.js";
 // Icons
+export {
+  ChevronDownIcon,
+  type ChevronDownIconProps,
+} from "./components/icons/ChevronDownIcon.js";
+export { ChevronUpIcon, type ChevronUpIconProps } from "./components/icons/ChevronUpIcon.js";
 export { DiscordIcon, type DiscordIconProps } from "./components/icons/DiscordIcon.js";
 export { GitHubIcon, type GitHubIconProps } from "./components/icons/GitHubIcon.js";
 export {

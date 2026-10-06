@@ -6,7 +6,7 @@
  *       hook move items between them with one live region; disabled; no axe violations.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Mon Oct 5, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -95,7 +95,9 @@ describe("SortableList", () => {
     }
     expect(live()).toBeEmptyDOMElement();
     expect(handle("Alpha")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Move Alpha down" })).toHaveTextContent("Down");
+    expect(
+      screen.getByRole("button", { name: "Move Alpha down" }).querySelector("svg"),
+    ).toHaveAttribute("aria-hidden", "true");
   });
 
   it("reorders with a keyboard drag", async () => {

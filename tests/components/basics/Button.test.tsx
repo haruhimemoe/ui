@@ -146,6 +146,13 @@ describe("buttonClasses", () => {
   it("grows to 44px on a coarse pointer at md only", () => {
     expect(buttonClasses().split(" ")).toContain("coarse:h-11");
     expect(buttonClasses({ size: "lg" }).split(" ")).not.toContain("coarse:h-11");
+    expect(buttonClasses({ size: "sm" }).split(" ")).not.toContain("coarse:h-11");
+  });
+
+  it("sm is a 28px icon square, still over the 24px WCAG 2.5.8 target", () => {
+    expect(buttonClasses({ size: "sm" }).split(" ")).toEqual(
+      expect.arrayContaining(["size-7", "p-0"]),
+    );
   });
 
   it("draws an edge under more contrast where only a background shade shows the shape", () => {

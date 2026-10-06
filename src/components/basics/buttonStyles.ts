@@ -14,8 +14,12 @@ import { cx } from "../../utils/cx.js";
  */
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
-/** The pill's height, padding and text size: `md` is h-9 (h-11 on a coarse pointer) and text-sm, `lg` h-11 and text-base. */
-export type ButtonSize = "md" | "lg";
+/**
+ * The pill's height, padding and text size: `sm` is a 28px icon square (over the 24px WCAG
+ * 2.5.8 minimum target), `md` is h-9 (h-11 on a coarse pointer) and text-sm, `lg` h-11 and
+ * text-base.
+ */
+export type ButtonSize = "sm" | "md" | "lg";
 
 /** Options for {@link buttonClasses}. */
 export type ButtonClassOptions = {
@@ -42,14 +46,15 @@ const VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const SIZES: Record<ButtonSize, string> = {
+  sm: "size-7 p-0 text-sm",
   md: "h-9 px-4 text-sm coarse:h-11",
   lg: "h-11 px-6 text-base",
 };
 
 /**
  * @function buttonClasses
- * @param opts {ButtonClassOptions} variant (default "primary"), size (default "md") and extra
- *        classes
+ * @param opts {ButtonClassOptions} variant (default "primary"), size (default "md", "sm" is a
+ *        28px icon square) and extra classes
  * @returns {string} the pill button classes, with the caller's className appended last (it
  *          replaces a built-in class that sets the same property)
  */

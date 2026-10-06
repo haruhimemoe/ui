@@ -6,6 +6,8 @@ import {
   buttonClasses,
   Card,
   Checkbox,
+  ChevronDownIcon,
+  ChevronUpIcon,
   Chip,
   ContentIndex,
   ContentLayout,
@@ -147,6 +149,8 @@ export default function Page() {
         <Chip pressed>HD</Chip>
         <DiscordIcon />
         <GitHubIcon />
+        <ChevronUpIcon />
+        <ChevronDownIcon />
         <HaruhimeWordmark />
         <HaruhimeWordmarkLink />
         <Palette08 />
