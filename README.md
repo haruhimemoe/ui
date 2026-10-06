@@ -1172,7 +1172,7 @@ The dark top bar: brand on the left, the nav, and an actions slot on the right. 
 | `links` | `readonly SiteLinkItem[]` | `[]` | The nav entries. No nav renders when empty. |
 | `navLabel` | `string` | `"Main"` | The nav landmark's accessible name. |
 | `navAlign` | `"start" \| "center"` | `"start"` | `"start"` puts small `text-c3` links right after the brand. `"center"` centers larger `text-c2` links in the free space. |
-| `actions` | `ReactNode` | none | The right side, e.g. an account menu. |
+| `actions` | `ReactNode` | none | The right side, e.g. an account menu. Laid out as one centered flex row (`gap-3`), so a palette button and a text link share a center line. Under `sm`, the nav moves to its own full-width row below so the actions stay beside the brand. |
 
 The link for the current page gets `aria-current="page"` and lights up. A section link gets `aria-current="true"` on pages under it (`/packs` while on `/packs/123`). `/` only matches itself.
 
@@ -1784,7 +1784,7 @@ Opens the mounted palette from anywhere (a button, a tour), onto `page` when giv
 
 #### `CommandPaletteButton` (client)
 
-A ghost `Button` with a magnifier, your `children` beside it and the hotkey hint (`Ctrl K`, or `⌘K` once a Mac is detected after mount; decorative, so it isn't part of the name). With `children`, that text is the button's name; without, `label` is (default "Open command palette"). Every `Button` prop except `onClick`.
+A ghost `Button` with a magnifier, your `children` beside it and the hotkey hint (`Ctrl K`, or `⌘K` once a Mac is detected after mount; decorative, so it isn't part of the name; hidden under `sm`, leaving just the magnifier). With `children`, that text is the button's name; without, `label` is (default "Open command palette"). Every `Button` prop except `onClick`.
 
 #### `siteCommands(options)`
 
@@ -2031,7 +2031,7 @@ The target is WCAG 2.2 AA. House rules, which every component follows and your o
 
 ## Changelog and contributing
 
-See [CHANGELOG.md](./CHANGELOG.md) for what changed in each version and [CONTRIBUTING.md](./CONTRIBUTING.md) to work on the package. `bun run play` serves `playground/`, a small Next.js app in the repo that renders the components straight from `src/`, for trying a change by hand. Report security issues as described in [SECURITY.md](./SECURITY.md). Bring questions and feedback to the haruhime.moe [Discord server](https://discord.gg/bKy9kjMV4y).
+See [CHANGELOG.md](./CHANGELOG.md) for what changed in each version and [CONTRIBUTING.md](./CONTRIBUTING.md) to work on the package. `bun run play` serves `playground/`, a small Next.js app in the repo that renders the components straight from `src/`, for trying a change by hand. Report security issues as described in [SECURITY.md](./SECURITY.md). Bring questions and feedback to the haruhime.moe [Discord server](https://haruhime.moe/discord).
 
 ## License
 

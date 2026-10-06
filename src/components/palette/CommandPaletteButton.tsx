@@ -1,11 +1,12 @@
 /**
  * @file src/components/palette/CommandPaletteButton.tsx
  * @desc A header button that opens the mounted CommandPalette: a magnifier, optional text, and
- *       the hotkey hint ("Ctrl K", or "⌘K" once a Mac is detected after mount). Goes anywhere;
+ *       the hotkey hint ("Ctrl K", or "⌘K" once a Mac is detected after mount; hidden under `sm`,
+ *       where there's rarely a keyboard and header room is short). Goes anywhere;
  *       it only dispatches the palette event.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 "use client";
@@ -57,7 +58,7 @@ export function CommandPaletteButton({
       </svg>
       {children}
       {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: a kbd is never focusable; the hint is decoration, so the name stays the visible text */}
-      <kbd aria-hidden="true" className={kbdClasses}>
+      <kbd aria-hidden="true" className={`${kbdClasses} max-sm:hidden`}>
         {mac ? "⌘K" : "Ctrl K"}
       </kbd>
     </Button>

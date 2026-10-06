@@ -4,7 +4,7 @@
  *       "Ctrl K" (or "⌘K" on a Mac after mount), an accessible name, Button props passed through.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -40,5 +40,7 @@ describe("CommandPaletteButton", () => {
     expect(button).toHaveTextContent("Find");
     expect(button).toHaveTextContent("⌘K");
     expect(button.querySelector("kbd")).toHaveAttribute("aria-hidden", "true");
+    // Under sm only the magnifier (and any text) shows.
+    expect(button.querySelector("kbd")).toHaveClass("max-sm:hidden");
   });
 });

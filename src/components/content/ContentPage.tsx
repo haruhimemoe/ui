@@ -9,7 +9,7 @@
  *       `ContentNav` and `ContentLayout` do.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import { Fragment, type ReactNode } from "react";
@@ -113,7 +113,9 @@ export function ContentPage({
   return (
     <>
       {jsonLd ? <JsonLd data={jsonLd} /> : null}
+      {/* mb-8: the meta row and copy button end the header, so without it they touch the body. */}
       <PageHeader
+        className="mb-8"
         title={title}
         lead={description}
         actions={
@@ -136,7 +138,7 @@ export function ContentPage({
         }
       />
       {toc ? (
-        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_14rem]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem] xl:gap-10">
           <div className="xl:order-2">{toc}</div>
           <div className="min-w-0">{body}</div>
         </div>

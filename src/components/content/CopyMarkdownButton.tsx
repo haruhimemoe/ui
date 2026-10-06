@@ -11,7 +11,7 @@
  *       `CopyButton`, which imports `cx`.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 "use client";
@@ -32,10 +32,12 @@ export type CopyMarkdownButtonProps = {
   failedLabel?: ReactNode | undefined;
 };
 
-// buttonClasses({ variant: "secondary" }) copied as a literal, so this file imports no cx. The
-// test pins it to buttonClasses.
+// buttonClasses({ variant: "secondary", className: "h-7 px-3" }) copied as a literal, so this
+// file imports no cx. A compact 28px pill (44px on a coarse pointer) that sits level with the
+// byline's small text; size "sm" is a 28px icon square, too narrow for a label. The test pins
+// it to buttonClasses.
 const BUTTON_CLASS_NAME =
-  "inline-flex w-fit items-center justify-center gap-2 rounded-full font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h1 disabled:cursor-not-allowed disabled:opacity-50 forced-colors:border forced-colors:disabled:text-[GrayText] bg-b3 text-c1 not-disabled:hover:bg-b2 contrast-more:inset-ring contrast-more:inset-ring-c4 h-9 px-4 text-sm coarse:h-11";
+  "inline-flex w-fit items-center justify-center gap-2 rounded-full font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-h1 disabled:cursor-not-allowed disabled:opacity-50 forced-colors:border forced-colors:disabled:text-[GrayText] bg-b3 text-c1 not-disabled:hover:bg-b2 contrast-more:inset-ring contrast-more:inset-ring-c4 text-sm coarse:h-11 h-7 px-3";
 
 /**
  * @function CopyMarkdownButton

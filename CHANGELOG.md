@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-10-06
+
+### Fixed
+
+- `CodeBlock` (and so `MdxPre`'s fenced blocks) no longer shows a blank line between every line. Each line was a `display:block` span with a `"\n"` text node between them, and inside the `<pre>` that text node rendered as an extra empty line. The text node is gone; the copy button still copies the source text with its real newlines. The `<code>` element's `textContent` no longer contains newlines.
+- `ContentPage`'s header has a bottom margin (`mb-8`), so the meta row and "Copy as Markdown" button no longer touch the body.
+- `SiteHeader`'s actions slot is a centered flex row (`flex items-center gap-3`), so `CommandPaletteButton` and an account link like "Sign in" share a center line instead of sitting about 4px apart on their text baselines.
+
+### Changed
+
+- `CopyMarkdownButton` is a compact 28px pill (`h-7 px-3`, still 44px on a coarse pointer) to sit level with the byline's small text. Button `size="sm"` is a 28px icon square, too narrow for a label, so this is the secondary button with a smaller height and padding.
+- `SiteHeader` under `sm`, when it has actions: the nav moves to its own full-width row below, so the actions stay on the brand's row instead of wrapping under the nav. The DOM order (brand, nav, actions) and so the tab order is unchanged.
+- `CommandPaletteButton` hides its `Ctrl K`/`⌘K` hint under `sm`, leaving the magnifier (and any `children`).
+- `ContentPage` with a `toc`: the toc/body grid gap is `gap-6`, `xl:gap-10` (was `gap-8` at every width), matching `ContentLayout`'s nav/body gap (`gap-6`, `lg:gap-10`). On phones the "On this page" disclosure now sits the same 24px above the body as the "Contents" disclosure.
+- README and SECURITY.md: the Discord invite is now `https://haruhime.moe/discord` and the security contact email is `haruhime@haruhime.moe`.
+
 ## [0.18.0] - 2026-10-05
 
 ### Added
@@ -270,7 +286,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.18.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/haruhimemoe/ui/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/haruhimemoe/ui/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/haruhimemoe/ui/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/haruhimemoe/ui/compare/v0.15.0...v0.16.0

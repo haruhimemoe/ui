@@ -3,10 +3,12 @@
  * @desc Site header, the osu!-web dark bar: a brand slot on the left, nav links from data, and an
  *       actions slot on the right (an account menu, say). A server component. The nav list is a
  *       small client component only when a link can be the current page; with only external or
- *       text-only links the whole header renders on the server.
+ *       text-only links the whole header renders on the server. Actions sit in one centered flex row
+ *       (a palette button and a "Sign in" link share a center line); under `sm`, with actions,
+ *       the nav drops to its own full-width row so the actions stay on the brand's row.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Thu Sep 24, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
@@ -55,11 +57,18 @@ export function SiteHeader({
       >
         {brand}
         {links.length > 0 ? (
-          <nav aria-label={navLabel} className={navAlign === "center" ? "flex-1" : undefined}>
+          <nav
+            aria-label={navLabel}
+            className={cx(
+              navAlign === "center" && "flex-1",
+              // Phones: the nav wraps first, so the actions stay beside the brand.
+              actions ? "max-sm:order-last max-sm:basis-full" : undefined,
+            )}
+          >
             <NavLinks links={links} align={navAlign} />
           </nav>
         ) : null}
-        {actions ? <div className="ml-auto">{actions}</div> : null}
+        {actions ? <div className="ml-auto flex items-center gap-3">{actions}</div> : null}
       </div>
     </header>
   );

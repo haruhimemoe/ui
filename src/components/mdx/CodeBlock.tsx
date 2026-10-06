@@ -6,7 +6,7 @@
  *       Server-safe: the only client piece is the copy button (CodeCopyButton).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -91,30 +91,27 @@ export async function CodeBlock({
         className="overflow-x-auto py-3 text-c2 text-sm leading-6"
       >
         <code>
-          {lines.flatMap((line, index) => {
-            const span = (
-              <span
-                // biome-ignore lint/suspicious/noArrayIndexKey: lines have no other identity
-                key={index}
-                className={marked.has(index + 1) ? MARKED : LINE}
-                data-highlighted={marked.has(index + 1) ? "" : undefined}
-              >
-                {line.map((token, i) =>
-                  tokens ? (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: tokens have no other identity
-                    <span key={i} style={tokenStyle(token)}>
-                      {token.content}
-                    </span>
-                  ) : (
-                    token.content
-                  ),
-                )}
-              </span>
-            );
-            // A plain "\n" text node between line spans (no key needed on a bare string): kept
-            // out of the last line so there's no trailing phantom newline.
-            return index < lines.length - 1 ? [span, "\n"] : [span];
-          })}
+          {/* Each line is its own display:block span, so no "\n" text node between them: inside
+              the <pre> it would render as an extra blank line. The copy button copies `text`. */}
+          {lines.map((line, index) => (
+            <span
+              // biome-ignore lint/suspicious/noArrayIndexKey: lines have no other identity
+              key={index}
+              className={marked.has(index + 1) ? MARKED : LINE}
+              data-highlighted={marked.has(index + 1) ? "" : undefined}
+            >
+              {line.map((token, i) =>
+                tokens ? (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: tokens have no other identity
+                  <span key={i} style={tokenStyle(token)}>
+                    {token.content}
+                  </span>
+                ) : (
+                  token.content
+                ),
+              )}
+            </span>
+          ))}
         </code>
       </pre>
     </div>

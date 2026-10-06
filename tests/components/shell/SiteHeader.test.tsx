@@ -5,7 +5,7 @@
  *       accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -108,10 +108,13 @@ describe("SiteHeader", () => {
       <SiteHeader brand={BRAND} links={LINKS} actions={<a href="/signin">Sign in</a>} />,
     );
     const signIn = screen.getByRole("link", { name: "Sign in" });
-    expect(signIn.parentElement).toHaveClass("ml-auto");
+    expect(signIn.parentElement).toHaveClass("ml-auto", "flex", "items-center");
+    // Phones: the nav wraps to its own row so the actions stay beside the brand.
+    expect(screen.getByRole("navigation")).toHaveClass("max-sm:order-last", "max-sm:basis-full");
 
     rerender(<SiteHeader brand={BRAND} links={LINKS} />);
     expect(screen.getByRole("banner").querySelector(".ml-auto")).toBeNull();
+    expect(screen.getByRole("navigation")).not.toHaveClass("max-sm:order-last");
   });
 
   it("keeps packs' spacing for the start layout and centers the nav on request", () => {

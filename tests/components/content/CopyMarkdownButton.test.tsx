@@ -6,7 +6,7 @@
  *       no unhandled rejection; custom labels; finished classes; accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -232,9 +232,11 @@ describe("CopyMarkdownButton", () => {
     expect(screen.getByRole("button")).toHaveClass("bg-b3", "text-c1", "rounded-full");
   });
 
-  it("uses exactly Button's secondary classes, so the copy can't drift", () => {
+  it("uses exactly Button's compact secondary classes, so the copy can't drift", () => {
     render(<CopyMarkdownButton href="/docs/x.md" />);
-    expect(screen.getByRole("button").className).toBe(buttonClasses({ variant: "secondary" }));
+    expect(screen.getByRole("button").className).toBe(
+      buttonClasses({ variant: "secondary", className: "h-7 px-3" }),
+    );
   });
 
   it("has no axe violations before and after copying", async () => {

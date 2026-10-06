@@ -7,7 +7,7 @@
  *       tests; the fallback describe runs last and clears the registration.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -129,10 +129,12 @@ describe("CodeBlock", () => {
     await expectNoAxeViolations(container);
   });
 
-  it("keeps newlines between lines so the pre's textContent matches the normalized code", async () => {
-    const { container } = render(await CodeBlock({ code: "a\n\nb\nc", lang: "ts" }));
-    const pre = container.querySelector("pre");
-    expect(pre?.textContent).toBe("a\n\nb\nc");
+  it("renders a 2-line block as 2 block line spans with no newline text node (no blank line)", async () => {
+    const { container } = render(await CodeBlock({ code: "a\nb", lang: "ts" }));
+    expect(container.querySelectorAll("pre > code > span")).toHaveLength(2);
+    const code = container.querySelector("pre > code");
+    expect(code?.textContent).toBe("ab");
+    expect(code?.textContent).not.toContain("\n");
   });
 
   it("passes id, data-* and className through to the wrapper div", async () => {
