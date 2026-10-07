@@ -294,7 +294,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.19.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.20.0...HEAD
+[0.20.0]: https://github.com/haruhimemoe/ui/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/haruhimemoe/ui/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/haruhimemoe/ui/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/haruhimemoe/ui/compare/v0.16.0...v0.17.0
