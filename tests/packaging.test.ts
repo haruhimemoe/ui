@@ -242,6 +242,13 @@ describe("package manifest and build", () => {
     expect(build.compilerOptions.declarationMap).not.toBe(true);
   });
 
+  it("ships the light scheme next to the theme (0.20)", () => {
+    expect(pkg.exports["./theme-light.css"]).toBe("./dist/theme-light.css");
+    expect(pkg.scripts.build).toContain(
+      "copyFileSync('src/theme-light.css','dist/theme-light.css')",
+    );
+  });
+
   it("exports the MDX components, the remark plugin and the Shiki registration as subpaths", () => {
     expect(pkg.exports["./mdx"]).toEqual({ types: "./dist/mdx.d.ts", default: "./dist/mdx.js" });
     expect(pkg.exports["./remark"]).toEqual({

@@ -82,7 +82,17 @@ At some hues the defaults drop below 4.5:1 contrast, so check yours. Two variabl
 - `--h2-l` sets the lightness of `h2` (default `45%`). White text on `h2` (primary buttons, the skip link) is under 4.5:1 for hues from about 23 to 205. Use `42%` at hue 200, `35%` at hue 150, or `31%` for any hue.
 - `--h1-l` sets the lightness of `h1` (default `76%` since 0.7.0, `70%` before). At `76%`, `h1` text on `b5` (links in cards and prose) is at or above 4.5:1 at every hue. On `b4` ("Clear filters" in a filter panel) it dips under for hues from about 238 to 248. Use `77%` there.
 
-The theme is dark only (`color-scheme: dark`).
+The theme is dark by default (`color-scheme: dark`).
+
+**Light scheme (since 0.20.0).** Import `theme-light.css` after `theme.css` for a white page:
+
+```css
+@import "tailwindcss";
+@import "@haruhimemoe/ui/theme.css";
+@import "@haruhimemoe/ui/theme-light.css";
+```
+
+Same components, same class names. It sets the lightness variables the palette reads (`--b1-l` to `--b6-l`, `--c1-l` to `--c4-l`): `b5` is the page, `b4` white cards, `b6` code and wells, and `c1` to `c4` are tinted ink, `c1` darkest. The highlights swap jobs: `h1` (36%) is the dark accent for links, rings and filled chips, and `h2` (85%) the pale fill under `c1` text on primary buttons and selected tabs. Code tokens get dark values. The wordmark's white turns to `c1` ink through `--wordmark-ink`. Every ink step stays at 4.5:1 on every surface at every hue. `h1` does at the default hue; for hues from about 30 to 200 set `--h1-l: 21%`. Under `prefers-contrast: more` the lift is `-8%`, so ink and `h1` get darker and `h2` lighter.
 
 **5. Motion, contrast and touch (since 0.12.0).** The theme follows three browser settings. There is no in-app toggle.
 
@@ -827,7 +837,7 @@ The GitHub mark as an inline SVG in the current text color. Hidden from screen r
 
 #### `HaruhimeWordmark`
 
-The haruhime.moe wordmark as an inline SVG. It keeps the brand's own white and pink whatever `--hue` is. Every native `<svg>` prop except `children` and `viewBox`.
+The haruhime.moe wordmark as an inline SVG. It keeps the brand's own white and pink whatever `--hue` is; under `theme-light.css` the white becomes `c1` ink (`--wordmark-ink`, since 0.20.0). Every native `<svg>` prop except `children` and `viewBox`.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |

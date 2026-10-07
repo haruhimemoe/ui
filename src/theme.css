@@ -14,12 +14,15 @@
  *       b5 at every hue) moved to keep text at 4.5:1; the README lists values. Load Nunito with next/font as the --font-nunito variable;
  *       without it the sans stack falls back to the system font.
  *
+ *       For a light page, import "@haruhimemoe/ui/theme-light.css" after this file (0.20): it
+ *       sets the b and c lightness variables (--b1-l..--b6-l, --c1-l..--c4-l) the palette reads.
+ *
  *       It also follows three browser settings: prefers-reduced-motion (one global rule,
  *       data-motion="essential" opts out), prefers-contrast: more (--contrast-lift) and a coarse
  *       pointer (the coarse: variant).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 /* This file ships as dist/theme.css, so './' is the package's compiled components. */
@@ -43,14 +46,14 @@
 @custom-variant coarse (@media (pointer: coarse));
 
 @theme inline {
-  --color-b1: hsl(var(--hue) 10% 40%);
-  --color-b2: hsl(var(--hue) 10% 30%);
-  --color-b3: hsl(var(--hue) 10% 25%);
-  --color-b4: hsl(var(--hue) 10% 20%);
-  --color-b5: hsl(var(--hue) 10% 15%);
-  --color-b6: hsl(var(--hue) 10% 10%);
+  --color-b1: hsl(var(--hue) 10% var(--b1-l, 40%));
+  --color-b2: hsl(var(--hue) 10% var(--b2-l, 30%));
+  --color-b3: hsl(var(--hue) 10% var(--b3-l, 25%));
+  --color-b4: hsl(var(--hue) 10% var(--b4-l, 20%));
+  --color-b5: hsl(var(--hue) 10% var(--b5-l, 15%));
+  --color-b6: hsl(var(--hue) 10% var(--b6-l, 10%));
 
-  --color-c1: hsl(var(--hue) 40% 100%);
+  --color-c1: hsl(var(--hue) 40% var(--c1-l, 100%));
   --color-c2: hsl(var(--hue) 40% calc(var(--c2-l, 90%) + var(--contrast-lift)));
   --color-c3: hsl(var(--hue) 40% calc(var(--c3-l, 80%) + var(--contrast-lift)));
   --color-c4: hsl(var(--hue) 40% calc(var(--c4-l, 70%) + var(--contrast-lift)));

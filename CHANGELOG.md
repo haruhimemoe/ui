@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-10-06
+
+### Added
+
+- `@haruhimemoe/ui/theme-light.css`, a light scheme: import it after `theme.css`. Light surfaces, tinted ink, `h1` as the dark accent and `h2` as the pale one, dark code tokens, and a negative contrast lift. Every ink step keeps 4.5:1 on every surface at every hue; the README gives the `--h1-l` for hues 30 to 200. For harumin.haruhime.moe's white site.
+- Lightness variables for every background and content step: `--b1-l` to `--b6-l` and `--c1-l` (`--c2-l` to `--c4-l` already existed). Unset, the dark palette is unchanged.
+- `--wordmark-ink`: `HaruhimeWordmark`'s white parts read it (default `#ffffff`), so the light scheme can ink them.
+
 ## [0.19.0] - 2026-10-06
 
 ### Fixed

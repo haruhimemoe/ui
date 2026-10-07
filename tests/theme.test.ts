@@ -3,10 +3,10 @@
  * @desc Unit tests for theme.css: the h1 and h2 lightness can be overridden, the values the
  *       README gives for other hues meet WCAG AA contrast (4.5:1) where the defaults do not, and
  *       c1 stays white at every hue. Also covers the contrast lift, the motion tokens, the
- *       reduced-motion rule and the coarse variant.
+ *       reduced-motion rule and the coarse variant, and (0.20) the light scheme's pairs at every hue.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Tue Oct 6, 2026
  */
 
 import { readFileSync } from "node:fs";
@@ -52,7 +52,7 @@ describe("theme.css", () => {
   });
 
   it("keeps c1 white at every hue, so SiteFooter's Discord logo stays white", () => {
-    expect(theme).toContain("--color-c1: hsl(var(--hue) 40% 100%);");
+    expect(theme).toContain("--color-c1: hsl(var(--hue) 40% var(--c1-l, 100%));");
     for (const hue of [0, 150, 200, 240, 333]) expect(c1(hue)).toBe(1);
   });
 
@@ -240,6 +240,94 @@ describe("Shiki tokens", () => {
         expect(contrast(hsl(hue, 60, 55, 75), bg), `parameter hue ${hue}`).toBeGreaterThanOrEqual(
           4.5,
         );
+      }
+    }
+  });
+});
+
+describe("theme-light.css", () => {
+  const light = readFileSync(path.join(import.meta.dirname, "../src/theme-light.css"), "utf8");
+  const value = (name: string): number => {
+    const match = light.match(new RegExp(`--${name}: (\\d+)%;`));
+    if (!match) throw new Error(`no --${name}`);
+    return Number(match[1]);
+  };
+  const L = {
+    b3: value("b3-l"),
+    b4: value("b4-l"),
+    b5: value("b5-l"),
+    b6: value("b6-l"),
+    c1: value("c1-l"),
+    c2: value("c2-l"),
+    c3: value("c3-l"),
+    c4: value("c4-l"),
+    h1: value("h1-l"),
+    h2: value("h2-l"),
+  };
+  const bg = (hue: number, l: number) => luminance(hue, 10, l);
+
+  it("reads every b and c step through a lightness variable in theme.css", () => {
+    for (const step of ["b1", "b2", "b3", "b4", "b5", "b6"]) {
+      expect(theme).toMatch(
+        new RegExp(`--color-${step}: hsl\\(var\\(--hue\\) 10% var\\(--${step}-l, \\d+%\\)\\);`),
+      );
+    }
+    expect(light).toContain("color-scheme: light;");
+  });
+
+  it("keeps ink on every surface at 4.5:1 at every hue", () => {
+    for (let hue = 0; hue < 360; hue++) {
+      for (const surface of [L.b3, L.b4, L.b5, L.b6]) {
+        for (const ink of [L.c1, L.c2, L.c3, L.c4]) {
+          expect(
+            contrast(luminance(hue, 40, ink), bg(hue, surface)),
+            `hue ${hue}`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    }
+  });
+
+  it("keeps c1 on h2 (primary buttons, selected tabs) at 4.5:1 at every hue, lifted too", () => {
+    for (let hue = 0; hue < 360; hue++) {
+      expect(contrast(luminance(hue, 40, L.c1), h2(hue, L.h2))).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(luminance(hue, 40, L.c1), h2(hue, L.h2 + 4))).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("keeps h1 links on surfaces and b6 on h1 chips at 4.5:1 at the default hue", () => {
+    for (const surface of [L.b3, L.b4, L.b5, L.b6]) {
+      expect(contrast(h1(333, L.h1), bg(333, surface))).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(contrast(bg(333, L.b6), h1(333, L.h1))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("covers every hue with the README's light override, --h1-l: 21%", () => {
+    for (let hue = 0; hue < 360; hue++) {
+      for (const surface of [L.b3, L.b4, L.b5, L.b6]) {
+        expect(contrast(h1(hue, 21), bg(hue, surface)), `hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
+  it("darkens under prefers-contrast: more", () => {
+    expect(light).toMatch(
+      /@media \(prefers-contrast: more\) \{\s*:root \{\s*--contrast-lift: -8%;/,
+    );
+  });
+
+  it("keeps every code token at 4.5:1 on the light code block at every hue", () => {
+    const tokens = [
+      ...light.matchAll(
+        /--shiki-token-[a-z-]+: hsl\((?:calc\(var\(--hue\) \+ (\d+)\)|var\(--hue\)) (\d+)% (\d+)%\);/g,
+      ),
+    ];
+    expect(tokens).toHaveLength(7);
+    for (const [, offset, s, l] of tokens) {
+      for (let hue = 0; hue < 360; hue++) {
+        const token = luminance((hue + Number(offset ?? 0)) % 360, Number(s), Number(l));
+        expect(contrast(token, bg(hue, L.b6)), `hue ${hue}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(token, bg(hue, L.b4)), `hue ${hue}`).toBeGreaterThanOrEqual(4.5);
       }
     }
   });

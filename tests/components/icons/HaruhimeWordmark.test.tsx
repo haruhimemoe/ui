@@ -43,6 +43,8 @@ describe("HaruhimeWordmark", () => {
     expect(svg).toHaveAttribute("viewBox", "18 228 4447 1179");
     const fills = [...(svg?.querySelectorAll("path") ?? [])].map((p) => p.getAttribute("fill"));
     expect(fills).toEqual(["#ffffff", "#ff66ab", "#ffffff"]);
+    const inked = [...(svg?.querySelectorAll("path") ?? [])].map((p) => p.style.fill);
+    expect(inked).toEqual(["var(--wordmark-ink, #ffffff)", "", "var(--wordmark-ink, #ffffff)"]);
   });
 
   it("is h-6 w-auto by default, and a className replaces the size", () => {

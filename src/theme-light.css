@@ -1,0 +1,52 @@
+/*
+ * @file src/theme-light.css
+ * @desc The light scheme (0.20): import it after theme.css and the same components read on a white
+ *       page. Backgrounds flip to light surfaces (b5 the page, b4 white cards, b6 wells and code),
+ *       content steps flip to tinted ink (c1 darkest), and the two highlights swap jobs: h1 is a
+ *       dark accent for links, rings and filled chips (with b6 text), h2 a pale accent under c1
+ *       text (primary buttons, selected tabs). Every pair the components use keeps 4.5:1 at the
+ *       default hue; hues 30 to 200 need --h1-l lower (README). More contrast darkens c2..c4 and
+ *       h1 and lightens h2, through a negative --contrast-lift.
+ *
+ *         @import "tailwindcss";
+ *         @import "@haruhimemoe/ui/theme.css";
+ *         @import "@haruhimemoe/ui/theme-light.css";
+ * @author David @dvhsh (https://dvh.sh)
+ * @created Tue Oct 6, 2026
+ * @modified Tue Oct 6, 2026
+ */
+
+:root {
+  color-scheme: light;
+
+  --b1-l: 78%;
+  --b2-l: 86%;
+  --b3-l: 92%;
+  --b4-l: 100%;
+  --b5-l: 97%;
+  --b6-l: 94%;
+
+  --c1-l: 10%;
+  --c2-l: 18%;
+  --c3-l: 24%;
+  --c4-l: 30%;
+
+  --h1-l: 36%;
+  --h2-l: 85%;
+
+  --wordmark-ink: var(--color-c1);
+
+  --shiki-token-keyword: hsl(var(--hue) 100% 22%);
+  --shiki-token-string: hsl(calc(var(--hue) + 150) 70% 24%);
+  --shiki-token-string-expression: hsl(calc(var(--hue) + 150) 70% 24%);
+  --shiki-token-constant: hsl(calc(var(--hue) + 40) 70% 24%);
+  --shiki-token-function: hsl(calc(var(--hue) + 200) 70% 24%);
+  --shiki-token-parameter: hsl(calc(var(--hue) + 60) 70% 24%);
+  --shiki-token-link: hsl(var(--hue) 100% 22%);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --contrast-lift: -8%;
+  }
+}
