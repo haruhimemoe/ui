@@ -35,6 +35,7 @@ describe("haruhimeToolsColumn", () => {
       "https://packs.haruhime.moe",
       "https://pools.haruhime.moe",
       "https://bb.haruhime.moe",
+      "https://harumin.haruhime.moe",
       "https://www.haruhime.moe",
     ]);
     expect(column.items[0]?.label).toBe("packs: mappool downloads");
@@ -53,13 +54,14 @@ describe("haruhimeToolsColumn", () => {
     expect(column.items.map((item) => item.label)).toEqual([
       "packs: mappool downloads",
       "bb: osu! BBCode editor",
+      "harumin: osu! Discord bot",
       "haruhime.moe",
     ]);
     expect(column.items.at(-1)?.href).toBe("https://example.com");
   });
 
   it("drops the All tools entry when allLabel is false", () => {
-    expect(haruhimeToolsColumn({ current: "bb", allLabel: false }).items).toHaveLength(2);
+    expect(haruhimeToolsColumn({ current: "bb", allLabel: false }).items).toHaveLength(3);
   });
 });
 

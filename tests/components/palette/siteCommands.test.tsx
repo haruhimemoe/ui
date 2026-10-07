@@ -52,6 +52,7 @@ describe("siteCommands", () => {
       "site.go.osu",
       "site.tool.packs",
       "site.tool.bb",
+      "site.tool.harumin",
       "site.tool.home",
       "site.copy-url",
       "site.back",

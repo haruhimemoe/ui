@@ -1220,7 +1220,7 @@ Link columns, an extra slot, fine print, the haruhime.moe wordmark, a GitHub ico
 | `discordHref` | `string` | none | Where the Discord icon links, such as your server's invite (`https://discord.gg/...`). Without it there is no Discord icon. The icon sits before the GitHub icon at the same size. It stays white (`text-c1`) and dims on hover instead of changing color, since Discord's brand guidelines ask that the logo not be recolored. Since 0.3.0. |
 | `discordLabel` | `string` | `"Discord"` | The Discord link's accessible name. Since 0.4.0. |
 
-`HARUHIME_TOOLS` (each `{ id, name, href, blurb }`, type `HaruhimeTool`, ids `HaruhimeToolId`: `"packs" | "pools" | "bb"`) and `haruhimeToolsColumn(options)` (the same column as plain data, for a footer you lay out yourself) are exported too. Since 0.6.0. They are the one place outside the wordmark that names the haruhime.moe tools: a tool joins the list when it goes live.
+`HARUHIME_TOOLS` (each `{ id, name, href, blurb }`, type `HaruhimeTool`, ids `HaruhimeToolId`: `"packs" | "pools" | "bb" | "harumin"`) and `haruhimeToolsColumn(options)` (the same column as plain data, for a footer you lay out yourself) are exported too. Since 0.6.0. They are the one place outside the wordmark that names the haruhime.moe tools: a tool joins the list when it goes live.
 
 #### `LinkTabs`
 

@@ -6,13 +6,13 @@
  *       others. Server-safe: no directive, no hooks.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Mon Sep 28, 2026
+ * @modified Wed Oct 7, 2026
  */
 
 import type { SiteLinkItem } from "./links.js";
 
 /** A live haruhime.moe tool's id: its subdomain. */
-export type HaruhimeToolId = "packs" | "pools" | "bb";
+export type HaruhimeToolId = "packs" | "pools" | "bb" | "harumin";
 
 /** One live haruhime.moe tool: its name, home page and what it is in a few words. */
 export type HaruhimeTool = {
@@ -28,6 +28,12 @@ export const HARUHIME_TOOLS: readonly HaruhimeTool[] = [
   { id: "packs", name: "packs", href: "https://packs.haruhime.moe", blurb: "mappool downloads" },
   { id: "pools", name: "pools", href: "https://pools.haruhime.moe", blurb: "mappool builder" },
   { id: "bb", name: "bb", href: "https://bb.haruhime.moe", blurb: "osu! BBCode editor" },
+  {
+    id: "harumin",
+    name: "harumin",
+    href: "https://harumin.haruhime.moe",
+    blurb: "osu! Discord bot",
+  },
 ];
 
 /** haruhimeToolsColumn's (and SiteFooter's `tools` prop's) options. */
