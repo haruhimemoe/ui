@@ -44,6 +44,7 @@ import {
 } from "@haruhimemoe/ui";
 import Link from "next/link";
 import { Additions } from "./Additions";
+import { Bracket22 } from "./Bracket22";
 import { ClientAdditions } from "./ClientAdditions";
 import { ClientAdditions05 } from "./ClientAdditions05";
 import { ClientDialogs } from "./ClientDialogs";
@@ -169,6 +170,7 @@ export default function Page() {
       <Foundations />
       <MdxExports />
       <Surfaces />
+      <Bracket22 />
       <ClientSurfaces />
       <ContentLayout
         nav={

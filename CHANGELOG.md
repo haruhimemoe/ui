@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-10-08
+
+### Added
+
+- `BracketView`: a bracket as columns of match cards, one block per side (winners, losers, grand final, third place) and one column per round, connectors drawn with CSS borders. It scrolls sideways inside its own container. It takes a `@haruhimemoe/tourney` `Bracket` as is (typed structurally, so ui has no tourney dependency), names for entrant ids, an optional `href` per match code and an entrant to `highlight`. Unknown sides read "Seed 3", "Winner of M5" or "Loser of M2"; an empty settled side reads "bye". Names truncate and keep their full text in a `title`.
+- `BracketMatchCard`, `bracketColumns` and `sideLabel`, the pieces `BracketView` is built from.
+
 ## [0.21.0] - 2026-10-07
 
 ### Added
@@ -300,7 +307,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.21.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.22.0...HEAD
+[0.22.0]: https://github.com/haruhimemoe/ui/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/haruhimemoe/ui/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/haruhimemoe/ui/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/haruhimemoe/ui/compare/v0.18.0...v0.19.0

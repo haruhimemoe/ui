@@ -5,7 +5,7 @@
  *       their own "use client" directive, so this barrel is safe to import from Server Components.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Thu Oct 8, 2026
  */
 
 // Actions
@@ -73,6 +73,24 @@ export {
   textClasses,
 } from "./components/basics/textStyles.js";
 export { useMotionAllowed } from "./components/basics/useMotionAllowed.js";
+// Bracket
+export {
+  BracketMatchCard,
+  type BracketMatchCardProps,
+} from "./components/bracket/BracketMatchCard.js";
+export { BracketView, type BracketViewProps } from "./components/bracket/BracketView.js";
+export {
+  type BracketBlock,
+  type BracketColumn,
+  type BracketLike,
+  type BracketMatchLike,
+  type BracketRoundLike,
+  type BracketRoundSide,
+  type BracketSideLike,
+  type BracketSourceLike,
+  bracketColumns,
+  sideLabel,
+} from "./components/bracket/layout.js";
 // Brand
 export {
   BrandPage,
