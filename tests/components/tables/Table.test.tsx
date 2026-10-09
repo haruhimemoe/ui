@@ -47,6 +47,8 @@ describe("Table", () => {
     const table = screen.getByRole("table", { name: "The pool's maps" });
     expect(table).toHaveClass("w-full", "text-left", "text-sm");
     expect(table.parentElement).toHaveClass("overflow-x-auto", "mt-4");
+    // relative keeps a header's absolute sr-only text inside the scroll box on a phone.
+    expect(table.parentElement).toHaveClass("relative");
     expect(screen.getByText("The pool's maps")).toHaveClass("font-bold", "text-c3");
   });
 

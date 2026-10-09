@@ -170,6 +170,13 @@ describe("MapCard row", () => {
     expect(screen.getByText(/· \[FOUR DIMENSIONS\]/)).toBeInTheDocument();
   });
 
+  it("keeps compact stats' screen-reader text inside their clip, so a phone never scrolls sideways", () => {
+    const { container } = render(<MapCard beatmapId={1} map={META} density="compact" />);
+    const clip = container.querySelector(".overflow-hidden.whitespace-nowrap") as HTMLElement;
+    expect(clip).toHaveClass("relative");
+    expect(clip.querySelector(".sr-only")).not.toBeNull();
+  });
+
   it("truncates a very long title and keeps the full text in title", () => {
     const long = "x".repeat(300);
     render(<MapCard beatmapId={1} map={{ ...META, artist: long, title: long }} />);

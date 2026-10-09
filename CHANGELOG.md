@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-10-09
+
+### Changed
+
+- `SiteFooter` on a touchscreen: the GitHub and Discord icons get a 44px touch area (same size on screen), and column links get 8px of padding above and below in place of the list gap.
+
+### Fixed
+
+- A page no longer opens zoomed out or scrolls sideways on a phone because of screen-reader-only text. `Table`, `MdxTable`, `CodeBlock`, `BracketView`, Prose code blocks and `MapCard`'s compact stats clip their content with `overflow`, but they weren't positioned, so a `.sr-only` span inside them (absolute) escaped the clip and widened the page. Each of them is now `relative`.
+- `Prose` wraps long inline code and long link text instead of running them past the screen edge.
+
 ## [0.23.0] - 2026-10-09
 
 ### Added
@@ -318,7 +329,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.23.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.24.0...HEAD
+[0.24.0]: https://github.com/haruhimemoe/ui/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/haruhimemoe/ui/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/haruhimemoe/ui/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/haruhimemoe/ui/compare/v0.20.0...v0.21.0

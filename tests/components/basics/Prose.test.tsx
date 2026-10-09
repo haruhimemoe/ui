@@ -212,4 +212,11 @@ describe("Prose", () => {
     );
     await expectNoAxeViolations(container);
   });
+
+  it("wraps long inline code and links but leaves code blocks to scroll", async () => {
+    render(<Prose data-testid="prose" />);
+    const css = await cssFor(screen.getByTestId("prose"));
+    expect(css).toMatch(/:not\(pre\) ?> ?code[^{]*\{ ?overflow-wrap: anywhere/);
+    expect(css).toMatch(/ a[^{]*\{ ?overflow-wrap: break-word/);
+  });
 });

@@ -88,7 +88,7 @@ export async function CodeBlock({
         // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard focus
         tabIndex={0}
         aria-label={name ? `Code: ${name}` : "Code"}
-        className="overflow-x-auto py-3 text-c2 text-sm leading-6"
+        className="relative overflow-x-auto py-3 text-c2 text-sm leading-6"
       >
         <code>
           {/* Each line is its own display:block span, so no "\n" text node between them: inside

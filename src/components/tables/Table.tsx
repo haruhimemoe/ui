@@ -48,7 +48,7 @@ export function Table({
       tabIndex={0}
       aria-labelledby={caption ? captionId : undefined}
       aria-label={caption ? undefined : scrollLabel}
-      className={cx("overflow-x-auto", wrapperClassName)}
+      className={cx("relative overflow-x-auto", wrapperClassName)}
     >
       <table className={cx("w-full text-left text-sm", className)} {...props}>
         {caption ? (

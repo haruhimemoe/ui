@@ -30,7 +30,7 @@ export function MdxTable({ node: _node, children, ...props }: MdxTableProps) {
       aria-label={textOf(caption) || "Table"}
       // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard focus
       tabIndex={0}
-      className="overflow-x-auto"
+      className="relative overflow-x-auto"
     >
       <table {...props}>{children}</table>
     </div>

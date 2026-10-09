@@ -62,11 +62,11 @@ export type SiteFooterProps = Omit<ComponentProps<"footer">, "children"> & {
 };
 
 // The GitHub icon link in the bottom row.
-const ICON_LINK = "shrink-0 text-c3 transition-colors hover:text-c1";
+const ICON_LINK = "shrink-0 text-c3 transition-colors hover:text-c1 coarse:-m-3 coarse:p-3";
 
 // Discord's brand guidelines ask for the logo in color, black or white, never recolored. c1 is
 // white at every hue, so the Discord link stays white and dims on hover instead of changing hue.
-const DISCORD_LINK = "shrink-0 text-c1 transition-opacity hover:opacity-80";
+const DISCORD_LINK = "shrink-0 text-c1 transition-opacity hover:opacity-80 coarse:-m-3 coarse:p-3";
 
 // Longest label first; Array.prototype.sort is stable, so equal lengths keep their order.
 const byLength = (items: readonly SiteLinkItem[]): readonly SiteLinkItem[] =>
@@ -117,7 +117,7 @@ export function SiteFooter({
   // Both icons sit together at the row's end, Discord first. One icon stays a direct child.
   const icons =
     discord && github ? (
-      <div className="flex shrink-0 items-center gap-4">
+      <div className="flex shrink-0 items-center coarse:gap-6 gap-4">
         {discord}
         {github}
       </div>
@@ -148,13 +148,13 @@ export function SiteFooter({
                 >
                   {column.title}
                 </Heading>
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col coarse:gap-0 gap-2">
                   {(sortLinks ? byLength(column.items) : column.items).map((item) => (
                     <li key={linkItemKey(item)}>
                       {item.href ? (
                         <AutoLink
                           href={item.href}
-                          className="wrap-anywhere transition-colors hover:text-c1"
+                          className="wrap-anywhere coarse:inline-block coarse:py-2 transition-colors hover:text-c1"
                         >
                           {item.label}
                         </AutoLink>

@@ -88,7 +88,7 @@ describe("BracketView", () => {
 
   it("scrolls sideways in its own container, one labelled group per round", () => {
     const { container } = render(<BracketView bracket={played()} names={NAMES} />);
-    expect(container.firstElementChild).toHaveClass("overflow-x-auto");
+    expect(container.firstElementChild).toHaveClass("relative", "overflow-x-auto");
     expect(screen.getByRole("heading", { name: "SF" })).toBeInTheDocument();
   });
 

@@ -341,4 +341,19 @@ describe("SiteFooter", () => {
     );
     await expectNoAxeViolations(container);
   });
+
+  it("gives icon and column links a 44px touch target on a coarse pointer", () => {
+    render(
+      <SiteFooter
+        columns={COLUMNS}
+        githubHref="https://github.com/haruhimemoe/ui"
+        discordHref={DISCORD}
+      />,
+    );
+    for (const name of ["haruhimemoe on GitHub", "Discord"]) {
+      expect(screen.getByRole("link", { name })).toHaveClass("coarse:-m-3", "coarse:p-3");
+    }
+    const first = document.querySelector("li > a");
+    expect(first).toHaveClass("coarse:inline-block", "coarse:py-2");
+  });
 });

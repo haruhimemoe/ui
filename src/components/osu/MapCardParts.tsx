@@ -159,7 +159,7 @@ export function MapFacts({
     <div
       className={cx(
         "mt-1 flex items-center gap-2",
-        compact ? "min-w-0 flex-nowrap overflow-hidden whitespace-nowrap" : "flex-wrap",
+        compact ? "relative min-w-0 flex-nowrap overflow-hidden whitespace-nowrap" : "flex-wrap",
       )}
     >
       {stars !== null ? <StarRating value={stars} label={starsLabel} title={starsTitle} /> : null}

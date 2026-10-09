@@ -49,7 +49,7 @@ export function BracketView({
   const blocks = bracketColumns(bracket);
   const many = blocks.length > 1;
   return (
-    <div className={cx("overflow-x-auto pb-2", className)} {...props}>
+    <div className={cx("relative overflow-x-auto pb-2", className)} {...props}>
       <div className="flex w-max flex-col gap-8">
         {blocks.map((block) => (
           <section
