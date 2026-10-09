@@ -4,7 +4,7 @@
  *       tools" last) and SiteFooter's `tools` prop placing it among the columns.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Fri Oct 9, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -36,6 +36,7 @@ describe("haruhimeToolsColumn", () => {
       "https://pools.haruhime.moe",
       "https://bb.haruhime.moe",
       "https://harumin.haruhime.moe",
+      "https://tourney.haruhime.moe",
       "https://www.haruhime.moe",
     ]);
     expect(column.items[0]?.label).toBe("packs: mappool downloads");
@@ -55,13 +56,14 @@ describe("haruhimeToolsColumn", () => {
       "packs: mappool downloads",
       "bb: osu! BBCode editor",
       "harumin: osu! Discord bot",
+      "tourney: osu! tournament runner",
       "haruhime.moe",
     ]);
     expect(column.items.at(-1)?.href).toBe("https://example.com");
   });
 
   it("drops the All tools entry when allLabel is false", () => {
-    expect(haruhimeToolsColumn({ current: "bb", allLabel: false }).items).toHaveLength(3);
+    expect(haruhimeToolsColumn({ current: "bb", allLabel: false }).items).toHaveLength(4);
   });
 });
 
@@ -89,5 +91,53 @@ describe("SiteFooter tools", () => {
     unmount();
     render(<SiteFooter tools={{ position: -2 }} />);
     expect(navTitles()).toEqual(["haruhime tools"]);
+  });
+});
+
+describe("SiteFooter link order", () => {
+  const labels = (title: string) =>
+    within(screen.getByRole("region", { name: title }))
+      .getAllByRole("listitem")
+      .map((item) => item.textContent);
+
+  it("sorts each column's entries longest label first, ties kept in order", () => {
+    render(
+      <SiteFooter
+        columns={[
+          {
+            title: "Links",
+            items: [
+              { label: "API", href: "/api" },
+              { label: "Brand", href: "/brand" },
+              { label: "Source on GitHub", href: "/src" },
+              { label: "Guide", href: "/guide" },
+            ],
+          },
+        ]}
+        tools={{ current: "packs" }}
+      />,
+    );
+    expect(labels("Links")).toEqual(["Source on GitHub", "Brand", "Guide", "API"]);
+    const tools = labels("haruhime tools");
+    expect(tools).toEqual([...tools].sort((a, b) => (b?.length ?? 0) - (a?.length ?? 0)));
+    expect(tools.at(-1)).toBe("All tools");
+  });
+
+  it("keeps the given order with sortLinks false", () => {
+    render(
+      <SiteFooter
+        sortLinks={false}
+        columns={[
+          {
+            title: "Links",
+            items: [
+              { label: "API", href: "/api" },
+              { label: "Source on GitHub", href: "/src" },
+            ],
+          },
+        ]}
+      />,
+    );
+    expect(labels("Links")).toEqual(["API", "Source on GitHub"]);
   });
 });

@@ -6,13 +6,13 @@
  *       others. Server-safe: no directive, no hooks.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Sep 28, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Fri Oct 9, 2026
  */
 
 import type { SiteLinkItem } from "./links.js";
 
 /** A live haruhime.moe tool's id: its subdomain. */
-export type HaruhimeToolId = "packs" | "pools" | "bb" | "harumin";
+export type HaruhimeToolId = "packs" | "pools" | "bb" | "harumin" | "tourney";
 
 /** One live haruhime.moe tool: its name, home page and what it is in a few words. */
 export type HaruhimeTool = {
@@ -33,6 +33,12 @@ export const HARUHIME_TOOLS: readonly HaruhimeTool[] = [
     name: "harumin",
     href: "https://harumin.haruhime.moe",
     blurb: "osu! Discord bot",
+  },
+  {
+    id: "tourney",
+    name: "tourney",
+    href: "https://tourney.haruhime.moe",
+    blurb: "osu! tournament runner",
   },
 ];
 

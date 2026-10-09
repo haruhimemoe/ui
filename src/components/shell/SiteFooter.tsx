@@ -4,10 +4,11 @@
  *       a small note, like "soon"), an optional "haruhime tools" column linking the other tools,
  *       an optional extra slot, one line of fine print, the
  *       haruhime.moe wordmark linking the parent site, a GitHub icon link, and an optional
- *       Discord icon link beside it (white, as Discord's brand guidelines ask).
+ *       Discord icon link beside it (white, as Discord's brand guidelines ask). Each column's
+ *       entries show longest label first unless `sortLinks` is false.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Sep 23, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Fri Oct 9, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
@@ -40,6 +41,8 @@ export type SiteFooterProps = Omit<ComponentProps<"footer">, "children"> & {
    * "All tools". `current` leaves this tool out; `position` places it (default 1).
    */
   tools?: HaruhimeToolsOptions | undefined;
+  /** Show each column's entries longest label first (ties keep their order). Default true. */
+  sortLinks?: boolean | undefined;
   /** Rendered above the fine print, e.g. a "clear local data" control. */
   extra?: ReactNode;
   /** One line of small print, e.g. a trademark notice. */
@@ -65,6 +68,10 @@ const ICON_LINK = "shrink-0 text-c3 transition-colors hover:text-c1";
 // white at every hue, so the Discord link stays white and dims on hover instead of changing hue.
 const DISCORD_LINK = "shrink-0 text-c1 transition-opacity hover:opacity-80";
 
+// Longest label first; Array.prototype.sort is stable, so equal lengths keep their order.
+const byLength = (items: readonly SiteLinkItem[]): readonly SiteLinkItem[] =>
+  [...items].sort((a, b) => b.label.length - a.label.length);
+
 // Static strings so Tailwind sees every class. Four or more columns share the four-column grid.
 const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-4"] as const;
 
@@ -79,6 +86,7 @@ export function SiteFooter({
   navLabel = "Footer",
   headingLevel = 2,
   tools,
+  sortLinks = true,
   extra,
   finePrint,
   parentLink = true,
@@ -141,7 +149,7 @@ export function SiteFooter({
                   {column.title}
                 </Heading>
                 <ul className="flex flex-col gap-2">
-                  {column.items.map((item) => (
+                  {(sortLinks ? byLength(column.items) : column.items).map((item) => (
                     <li key={linkItemKey(item)}>
                       {item.href ? (
                         <AutoLink

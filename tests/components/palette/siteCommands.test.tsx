@@ -53,6 +53,7 @@ describe("siteCommands", () => {
       "site.tool.packs",
       "site.tool.bb",
       "site.tool.harumin",
+      "site.tool.tourney",
       "site.tool.home",
       "site.copy-url",
       "site.back",

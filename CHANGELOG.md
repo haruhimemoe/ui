@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-10-09
+
+### Added
+
+- tourney joins `HARUHIME_TOOLS` ("osu! tournament runner"), so every tool's footer and command palette link it, and `HaruhimeToolId` takes `"tourney"`.
+- `SiteFooter`'s `sortLinks` (default true).
+
+### Changed
+
+- `SiteFooter` shows each column's entries longest label first, ties in their given order. Pass `sortLinks={false}` for the old order.
+
 ## [0.22.0] - 2026-10-08
 
 ### Added
@@ -307,7 +318,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.22.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/haruhimemoe/ui/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/haruhimemoe/ui/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/haruhimemoe/ui/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/haruhimemoe/ui/compare/v0.19.0...v0.20.0
