@@ -7,7 +7,7 @@
  *       Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sat Oct 10, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -49,7 +49,9 @@ export function BracketView({
   const blocks = bracketColumns(bracket);
   const many = blocks.length > 1;
   return (
-    <div className={cx("relative overflow-x-auto pb-2", className)} {...props}>
+    // It scrolls sideways, so the keyboard has to reach it (WCAG 2.1.1). Pass an aria-label.
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard focus
+    <div tabIndex={0} className={cx("relative overflow-x-auto pb-2", className)} {...props}>
       <div className="flex w-max flex-col gap-8">
         {blocks.map((block) => (
           <section

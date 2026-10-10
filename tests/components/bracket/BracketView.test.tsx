@@ -5,7 +5,7 @@
  *       highlighted entrant, a scrolling container, accessibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sat Oct 10, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -97,5 +97,21 @@ describe("BracketView", () => {
       <BracketView bracket={played()} names={NAMES} href={(c) => `/m/${c}`} />,
     );
     await expectNoAxeViolations(container);
+  });
+});
+
+describe("BracketView, keyboard and contrast", () => {
+  it("lets the keyboard reach the sideways scroll", () => {
+    const { container } = render(
+      <BracketView bracket={played()} names={{}} aria-label="Bracket" />,
+    );
+    expect(container.firstElementChild?.getAttribute("tabindex")).toBe("0");
+  });
+
+  it("never draws text in c4, which fails contrast on a card", () => {
+    const { container } = render(
+      <BracketView bracket={played()} names={{}} aria-label="Bracket" />,
+    );
+    expect(container.querySelectorAll(".text-c4")).toHaveLength(0);
   });
 });

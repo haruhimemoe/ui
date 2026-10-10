@@ -5,7 +5,7 @@
  *       title. With `href` the whole card is a link. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sat Oct 10, 2026
  */
 
 import { cx } from "../../utils/cx.js";
@@ -52,7 +52,7 @@ function Side({
       className={cx(
         "flex items-center justify-between gap-2 px-2 py-1",
         lit && "bg-h1/20",
-        won ? "font-bold text-c1" : known ? "text-c2" : "text-c4 italic",
+        won ? "font-bold text-c1" : known ? "text-c2" : "text-c3 italic",
       )}
     >
       <span className="min-w-0 truncate" title={label as string}>
@@ -71,7 +71,7 @@ function Side({
 export function BracketMatchCard({ match, names, href, highlight }: BracketMatchCardProps) {
   const body = (
     <>
-      <span className="block px-2 pt-1 text-c4 text-xs">{match.code}</span>
+      <span className="block px-2 pt-1 text-c3 text-xs">{match.code}</span>
       <Side
         side={match.a}
         score={match.scoreA}
