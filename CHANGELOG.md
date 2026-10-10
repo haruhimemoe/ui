@@ -6,15 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- CI runs CodeQL and a gitleaks scan of the full git history, and Dependabot covers dependencies and pinned actions. Dependencies are on their latest versions.
+
 ## [0.24.1] - 2026-10-10
 
 ### Fixed
 
 - `BracketView`'s sideways scroll takes keyboard focus (`tabIndex={0}`; pass an `aria-label`), and match codes and unknown sides use `c3` instead of `c4`, which failed contrast on a card.
-
-### Changed
-
-- CI runs CodeQL and a gitleaks scan of the full git history, and Dependabot covers dependencies and pinned actions. Dependencies are on their latest versions.
 
 ## [0.24.0] - 2026-10-09
 
