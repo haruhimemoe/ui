@@ -46,6 +46,8 @@ export type BrandPageProps = {
   contact: string;
   /** The family brand page; null hides the Family section. */
   familyHref: string | null;
+  /** The family link's text. Default "Part of the haruhime.moe family." */
+  familyLabel?: string | undefined;
   /** Defaults to Nunito for wordmarks and headings. */
   fonts?: readonly BrandPageFont[] | undefined;
   /** Extra sections after Logo, after Colors, and at the end. */
@@ -75,6 +77,7 @@ export function BrandPage({
   assets,
   contact,
   familyHref,
+  familyLabel = "Part of the haruhime.moe family.",
   fonts = DEFAULT_FONTS,
   slots,
 }: BrandPageProps) {
@@ -156,7 +159,7 @@ export function BrandPage({
       {familyHref ? (
         <Card title="Family">
           <a className={LINK} href={familyHref}>
-            Part of the haruhime.moe family.
+            {familyLabel}
           </a>
         </Card>
       ) : null}

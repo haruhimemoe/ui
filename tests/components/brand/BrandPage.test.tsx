@@ -78,6 +78,21 @@ describe("BrandPage", () => {
     );
   });
 
+  it("words the family link with familyLabel", () => {
+    render(
+      <BrandPage
+        {...props}
+        familyHref="https://example.org/brand"
+        familyLabel="Part of Example."
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Part of Example." })).toHaveAttribute(
+      "href",
+      "https://example.org/brand",
+    );
+    expect(screen.queryByText(/haruhime\.moe family/)).toBeNull();
+  });
+
   it("renders slots in place", () => {
     render(
       <BrandPage

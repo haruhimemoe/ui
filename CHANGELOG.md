@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-10
+
+### Added
+
+- `BrandPage` takes `familyLabel`, the family link's text (default "Part of the haruhime.moe family."), so a brand page outside haruhime.moe can name its own family.
+
 ### Changed
 
 - CI runs CodeQL and a gitleaks scan of the full git history, and Dependabot covers dependencies and pinned actions. Dependencies are on their latest versions.
@@ -339,7 +345,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.24.1...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.25.0...HEAD
+[0.25.0]: https://github.com/haruhimemoe/ui/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/haruhimemoe/ui/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/haruhimemoe/ui/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/haruhimemoe/ui/compare/v0.22.0...v0.23.0

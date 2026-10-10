@@ -1134,7 +1134,7 @@ import { BrandPage } from "@haruhimemoe/ui";
 <BrandPage {...brandPageData("pools")} />;
 ```
 
-The props are typed structurally, so ui doesn't depend on brand. Sections, in order, each a `Card` with an `<h2>`: Name (name, tagline, how to write it, the site), Logo (each file previewed on a dark `b6` or light tile by `dark`, with a `download` link; non-image files get the link only), `slots.afterLogo`, Colors (a `BrandSwatch` per palette token), `slots.afterColors`, Type, Do's and don'ts, osu! ("Not affiliated with osu! or ppy. osu! is a trademark of ppy Pty Ltd."), Family ("Part of the haruhime.moe family.", linking `familyHref`; hidden when it's null, as on haruhime.moe itself), Contact (a `mailto:` link), `slots.end`. The headings and the osu! and family lines are the same on every haruhime brand page. A Server Component.
+The props are typed structurally, so ui doesn't depend on brand. Sections, in order, each a `Card` with an `<h2>`: Name (name, tagline, how to write it, the site), Logo (each file previewed on a dark `b6` or light tile by `dark`, with a `download` link; non-image files get the link only), `slots.afterLogo`, Colors (a `BrandSwatch` per palette token), `slots.afterColors`, Type, Do's and don'ts, osu! ("Not affiliated with osu! or ppy. osu! is a trademark of ppy Pty Ltd."), Family (`familyLabel`, by default "Part of the haruhime.moe family.", linking `familyHref`; hidden when it's null, as on haruhime.moe itself), Contact (a `mailto:` link), `slots.end`. The headings and the osu! and family lines are the same on every haruhime brand page. A Server Component.
 
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -1148,6 +1148,7 @@ The props are typed structurally, so ui doesn't depend on brand. Sections, in or
 | `assets` | `readonly BrandPageAsset[]` | required | `{ label, href, dark }`: `dark: false` is an on-light variant, shown on a light tile. |
 | `contact` | `string` | required | The contact address. |
 | `familyHref` | `string \| null` | required | The family brand page, or null to hide the Family section. |
+| `familyLabel` | `string` | `"Part of the haruhime.moe family."` | The family link's text. |
 | `fonts` | `readonly BrandPageFont[]` | Nunito, "Wordmarks and headings" | `{ name, usage }` under Type. |
 | `slots` | `{ afterLogo?, afterColors?, end?: ReactNode }` | none | Extra sections, for haruhime.moe's own page. |
 
