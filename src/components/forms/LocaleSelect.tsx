@@ -72,7 +72,12 @@ export const writeLocaleCookie = (locale: string, domain?: string): void => {
  * @param props {LocaleSelectProps} the locales, the current one, label, cookie domain, onChange
  * @returns {JSX.Element | null} the select, or nothing with fewer than two locales
  */
-export function LocaleSelect({
+export function LocaleSelect(props: LocaleSelectProps) {
+  // Before any hook: one locale renders nothing and needs no router.
+  return props.locales.length < 2 ? null : <Picker {...props} />;
+}
+
+function Picker({
   locales,
   value,
   label = "Language",
@@ -83,7 +88,6 @@ export function LocaleSelect({
 }: LocaleSelectProps) {
   const router = useRouter();
   const id = useId();
-  if (locales.length < 2) return null;
   return (
     <Select
       id={id}

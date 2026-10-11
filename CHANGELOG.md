@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.27.1] - 2026-10-11
+
+### Fixed
+
+- `LocaleSelect` with one locale no longer calls `useRouter`, so it renders (as nothing) outside the app router, in tests for example.
+
 ## [0.27.0] - 2026-10-11
 
 ### Added
@@ -359,7 +365,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `className` on every component, and the extras passed to `buttonClasses` and `fieldClasses`, merge with tailwind-merge: a caller's class replaces a built-in one that sets the same property (`fieldClasses("w-auto")` drops `w-full`).
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
-[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.27.0...HEAD
+[unreleased]: https://github.com/haruhimemoe/ui/compare/v0.27.1...HEAD
+[0.27.1]: https://github.com/haruhimemoe/ui/compare/v0.27.0...v0.27.1
 [0.27.0]: https://github.com/haruhimemoe/ui/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/haruhimemoe/ui/compare/v0.25.0...v0.26.0
 [0.25.0]: https://github.com/haruhimemoe/ui/compare/v0.24.1...v0.25.0

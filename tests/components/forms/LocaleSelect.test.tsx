@@ -17,19 +17,24 @@ import {
 } from "../../../src/components/forms/LocaleSelect.js";
 import { expectNoAxeViolations } from "../../helpers/axe.js";
 
-const { refresh } = vi.hoisted(() => ({ refresh: vi.fn() }));
-vi.mock("next/navigation.js", () => ({ useRouter: () => ({ refresh }) }));
+const { refresh, useRouter } = vi.hoisted(() => {
+  const refresh = vi.fn();
+  return { refresh, useRouter: vi.fn(() => ({ refresh })) };
+});
+vi.mock("next/navigation.js", () => ({ useRouter }));
 
 afterEach(() => {
   refresh.mockClear();
+  useRouter.mockClear();
   // biome-ignore lint/suspicious/noDocumentCookie: test cleanup
   document.cookie = "NEXT_LOCALE=; max-age=0; path=/";
 });
 
 describe("LocaleSelect", () => {
-  it("renders nothing for one locale", () => {
+  it("renders nothing for one locale, without asking for the router", () => {
     const { container } = render(<LocaleSelect locales={["en"]} value="en" />);
     expect(container).toBeEmptyDOMElement();
+    expect(useRouter).not.toHaveBeenCalled();
   });
 
   it("names each locale in itself, writes the cookie, calls onChange and refreshes", async () => {
