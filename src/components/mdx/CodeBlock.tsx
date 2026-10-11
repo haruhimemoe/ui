@@ -6,13 +6,14 @@
  *       Server-safe: the only client piece is the copy button (CodeCopyButton).
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Tue Oct 6, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { ComponentProps } from "react";
 import type { ThemedToken } from "shiki/core";
 import { cx } from "../../utils/cx.js";
 import { CodeCopyButton } from "./CodeCopyButton.js";
+import { CODE_BLOCK_LABELS, type CodeBlockLabels } from "./codeLabels.js";
 import { getHighlighter, THEME } from "./highlighter.js";
 
 /** The code (any line endings, trailing newline optional), language, title, highlighted lines
@@ -22,6 +23,8 @@ export type CodeBlockProps = Omit<ComponentProps<"div">, "title" | "children"> &
   lang?: string | undefined;
   title?: string | undefined;
   highlight?: readonly number[] | undefined;
+  /** Built-in text, merged over CODE_BLOCK_LABELS. */
+  labels?: Partial<CodeBlockLabels> | undefined;
 };
 
 const BASE = "block min-h-6 border-l-2 px-3";
@@ -61,6 +64,7 @@ export async function CodeBlock({
   lang,
   title,
   highlight = [],
+  labels: labelsProp,
   className,
   ...rest
 }: CodeBlockProps) {
@@ -70,6 +74,7 @@ export async function CodeBlock({
     tokens ?? text.split("\n").map((content) => [{ content, offset: 0 } as ThemedToken]);
   const marked = new Set(highlight);
   const name = title ?? lang;
+  const labels = { ...CODE_BLOCK_LABELS, ...labelsProp };
   return (
     <div
       className={cx(
@@ -79,15 +84,20 @@ export async function CodeBlock({
       {...rest}
     >
       <div className="flex min-h-9 items-center justify-between gap-3 border-b3 border-b px-3 py-1 text-c3 text-sm">
-        <span className="truncate">{name ?? "Code"}</span>
-        <CodeCopyButton code={text} label={title ? `Copy ${title}` : "Copy code"} />
+        <span className="truncate">{name ?? labels.code}</span>
+        <CodeCopyButton
+          code={text}
+          label={labels.copyName(title ?? null)}
+          // Plain strings only: a client component can't receive functions.
+          labels={{ copy: labels.copy, copied: labels.copied, copyFailed: labels.copyFailed }}
+        />
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: a named, focusable scroll box; fieldset is wrong here */}
       <pre
         role="group"
         // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard focus
         tabIndex={0}
-        aria-label={name ? `Code: ${name}` : "Code"}
+        aria-label={name ? labels.codeName(name) : labels.code}
         className="relative overflow-x-auto py-3 text-c2 text-sm leading-6"
       >
         <code>

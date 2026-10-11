@@ -7,7 +7,7 @@
  *       docs section, and later a blog section, can both use it.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -31,6 +31,8 @@ export type ContentNavProps = {
   indexHref: string;
   /** The index link's label. Default `"Overview"`. */
   indexLabel?: string;
+  /** The phone disclosure's summary. Default `"Contents"`. */
+  summaryLabel?: string;
   groups: readonly ContentNavGroup[];
 };
 
@@ -40,7 +42,13 @@ export type ContentNavProps = {
  *        beneath it
  * @returns {JSX.Element} the navigation, as a column and as a phone disclosure
  */
-export function ContentNav({ label, indexHref, indexLabel = "Overview", groups }: ContentNavProps) {
+export function ContentNav({
+  label,
+  indexHref,
+  indexLabel = "Overview",
+  summaryLabel = "Contents",
+  groups,
+}: ContentNavProps) {
   const path = usePathname();
   const link = (item: ContentNavItem) => {
     const current = path === item.href;
@@ -79,7 +87,7 @@ export function ContentNav({ label, indexHref, indexLabel = "Overview", groups }
         <div className={CONTENT_NAV_COLUMN}>{list}</div>
       </nav>
       <details className={`${CONTENT_NAV_DISCLOSURE} lg:hidden`}>
-        <summary className={CONTENT_NAV_SUMMARY}>Contents</summary>
+        <summary className={CONTENT_NAV_SUMMARY}>{summaryLabel}</summary>
         <nav aria-label={label} className="mt-2">
           {list}
         </nav>

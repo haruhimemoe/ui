@@ -6,7 +6,7 @@
  *       no state, no browser APIs.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { Fragment } from "react";
@@ -54,15 +54,22 @@ function Author({ author }: { author: ContentAuthor }) {
 
 /**
  * @function ContentByline
- * @param props {{ authors: readonly ContentAuthor[] }} one or more authors
+ * @param props {{ authors: readonly ContentAuthor[]; and?: string }} one or more authors, and
+ *        the word before the last one (default " and ", spaces included)
  * @returns {JSX.Element} the names, each with a 20px avatar when known, joined "A, B and C"
  */
-export function ContentByline({ authors }: { authors: readonly ContentAuthor[] }) {
+export function ContentByline({
+  authors,
+  and = " and ",
+}: {
+  authors: readonly ContentAuthor[];
+  and?: string | undefined;
+}) {
   return (
     <span>
       {authors.map((author, index) => (
         <Fragment key={`${author.userId ?? ""}${author.name}`}>
-          {index === 0 ? null : index === authors.length - 1 ? " and " : ", "}
+          {index === 0 ? null : index === authors.length - 1 ? and : ", "}
           <Author author={author} />
         </Fragment>
       ))}

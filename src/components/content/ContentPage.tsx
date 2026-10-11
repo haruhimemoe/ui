@@ -9,7 +9,7 @@
  *       `ContentNav` and `ContentLayout` do.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Tue Oct 6, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { Fragment, type ReactNode } from "react";
@@ -21,6 +21,30 @@ import { CopyMarkdownButton } from "./CopyMarkdownButton.js";
 import { formatContentDate } from "./contentDate.js";
 
 export type { ContentAuthor };
+
+/** ContentPage's built-in text. */
+export type ContentPageLabels = {
+  /** Before the last-updated date when `published` is set too. */
+  updated: string;
+  /** The reading time. One string, so it server-renders without a comment node. */
+  readingTime: (minutes: number) => string;
+  /** The word before the last author. Spaces included. */
+  and: string;
+  /** The Copy as Markdown button. */
+  copyMarkdown: string;
+  copied: string;
+  copyFailed: string;
+};
+
+/** The English defaults. */
+export const CONTENT_PAGE_LABELS: ContentPageLabels = {
+  updated: "Updated",
+  readingTime: (minutes) => `${minutes} min read`,
+  and: " and ",
+  copyMarkdown: "Copy as Markdown",
+  copied: "Copied",
+  copyFailed: "Couldn't copy",
+};
 
 /** `ContentPage`'s props. */
 export type ContentPageProps = {
@@ -52,6 +76,10 @@ export type ContentPageProps = {
   footer?: ReactNode | undefined;
   /** `Prose`'s `size`: "sm" for dense docs and legal pages. Defaults to "base". */
   proseSize?: "base" | "sm" | undefined;
+  /** Built-in text, merged over CONTENT_PAGE_LABELS. */
+  labels?: Partial<ContentPageLabels> | undefined;
+  /** The locale dates are written in. Default "en". */
+  locale?: string | undefined;
   /** The page body, rendered inside `Prose`. */
   children: ReactNode;
 };
@@ -79,30 +107,33 @@ export function ContentPage({
   toc,
   footer,
   proseSize,
+  labels: labelsProp,
+  locale = "en",
   children,
 }: ContentPageProps) {
+  const labels = { ...CONTENT_PAGE_LABELS, ...labelsProp };
   const items: { key: string; node: ReactNode }[] = [];
   if (authors && authors.length > 0)
-    items.push({ key: "by", node: <ContentByline authors={authors} /> });
+    items.push({ key: "by", node: <ContentByline authors={authors} and={labels.and} /> });
   if (published)
     items.push({
       key: "published",
-      node: <time dateTime={published}>{formatContentDate(published)}</time>,
+      node: <time dateTime={published}>{formatContentDate(published, locale)}</time>,
     });
   if (lastUpdated && lastUpdated !== published) {
     items.push({
       key: "updated",
       node: (
         <span>
-          {published ? "Updated" : lastUpdatedLabel}{" "}
-          <time dateTime={lastUpdated}>{formatContentDate(lastUpdated)}</time>
+          {published ? labels.updated : lastUpdatedLabel}{" "}
+          <time dateTime={lastUpdated}>{formatContentDate(lastUpdated, locale)}</time>
         </span>
       ),
     });
   }
   // One string: `{n} min read` would server-render as `1<!-- --> min read`.
   if (readingMinutes)
-    items.push({ key: "reading", node: <span>{`${readingMinutes} min read`}</span> });
+    items.push({ key: "reading", node: <span>{labels.readingTime(readingMinutes)}</span> });
   const meta = items.length > 0 || markdownHref || actions;
   const body = (
     <>
@@ -131,7 +162,14 @@ export function ContentPage({
                   ))}
                 </div>
               ) : null}
-              {markdownHref ? <CopyMarkdownButton href={markdownHref} /> : null}
+              {markdownHref ? (
+                <CopyMarkdownButton
+                  href={markdownHref}
+                  label={labels.copyMarkdown}
+                  copiedLabel={labels.copied}
+                  failedLabel={labels.copyFailed}
+                />
+              ) : null}
               {actions}
             </>
           ) : undefined

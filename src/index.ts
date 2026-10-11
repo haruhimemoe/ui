@@ -93,9 +93,11 @@ export {
 } from "./components/bracket/layout.js";
 // Brand
 export {
+  BRAND_PAGE_LABELS,
   BrandPage,
   type BrandPageAsset,
   type BrandPageFont,
+  type BrandPageLabels,
   type BrandPageProps,
 } from "./components/brand/BrandPage.js";
 export { BrandSwatch, type BrandSwatchProps } from "./components/brand/BrandSwatch.js";
@@ -104,8 +106,10 @@ export { ContentIndex, type ContentIndexProps } from "./components/content/Conte
 export { ContentLayout, type ContentLayoutProps } from "./components/content/ContentLayout.js";
 export { ContentNav, type ContentNavProps } from "./components/content/ContentNav.js";
 export {
+  CONTENT_PAGE_LABELS,
   type ContentAuthor,
   ContentPage,
+  type ContentPageLabels,
   type ContentPageProps,
 } from "./components/content/ContentPage.js";
 export { ContentSearch, type ContentSearchProps } from "./components/content/ContentSearch.js";
@@ -238,7 +242,12 @@ export {
 } from "./components/palette/CommandPaletteButton.js";
 export { evaluate, formatResult } from "./components/palette/calc.js";
 export { type FuzzyMatch, fuzzyScore } from "./components/palette/fuzzy.js";
+export { PALETTE_LABELS, type PaletteLabels } from "./components/palette/labels.js";
 export { openCommandPalette } from "./components/palette/paletteEvents.js";
+export {
+  SITE_COMMAND_LABELS,
+  type SiteCommandLabels,
+} from "./components/palette/siteCommandLabels.js";
 export { type SiteCommandsOptions, siteCommands } from "./components/palette/siteCommands.js";
 export type {
   ArgChoice,

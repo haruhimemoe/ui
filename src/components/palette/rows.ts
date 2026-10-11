@@ -7,11 +7,12 @@
  *       state. In a choice prompt: the choices, fuzzy-filtered.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { evaluate, formatResult, isBareNumber } from "./calc.js";
 import { type FuzzyMatch, rankResults } from "./fuzzy.js";
+import { PALETTE_LABELS, type PaletteLabels } from "./labels.js";
 import type { ArgState, ProviderResult } from "./store.js";
 import type { Command, PaletteContext, Provider } from "./types.js";
 
@@ -32,11 +33,12 @@ export type RowsInput = {
   calculator: boolean;
   arg: ArgState | null;
   ctx: PaletteContext;
+  /** Built-in text. Default PALETTE_LABELS. */
+  labels?: PaletteLabels | undefined;
 };
 
 /** The id of the calculator's row and command. */
 export const CALC_ID = "calc";
-const DEFAULT_GROUP = "Commands";
 const DEFAULT_MIN = 2;
 
 const option = (
@@ -89,7 +91,7 @@ const choiceRows = (arg: ArgState): Row[] => {
 // A bare word ("e", "pi") is a search, not a sum, even though the calculator knows it.
 const BARE_WORD = /^[a-z]+$/i;
 
-const calcRow = (query: string): Row | null => {
+const calcRow = (query: string, labels: PaletteLabels): Row | null => {
   if (isBareNumber(query) || BARE_WORD.test(query)) return null;
   const value = evaluate(query);
   if (value === null) return null;
@@ -97,25 +99,25 @@ const calcRow = (query: string): Row | null => {
   const command: Command = {
     id: CALC_ID,
     title: `= ${text}`,
-    subtitle: "Enter to copy",
+    subtitle: labels.enterToCopy,
     closeOnRun: false,
     run: (ctx) => ctx.copy(text),
   };
-  return option(command, "Calculator");
+  return option(command, labels.calculator);
 };
 
-const providerRows = (input: RowsInput): Row[] =>
+const providerRows = (input: RowsInput, labels: PaletteLabels): Row[] =>
   input.providers.flatMap((provider) => {
-    const group = provider.group ?? "Results";
+    const group = provider.group ?? labels.providerResults;
     const min = provider.minLength ?? DEFAULT_MIN;
     const scope = `${provider.id}:`;
-    if (input.query.trim().length < min) return [hint(`Type ${min} characters to search`, scope)];
+    if (input.query.trim().length < min) return [hint(labels.typeToSearch(min), scope)];
     const result = input.providerResults[provider.id];
     const rows = (result?.rows ?? []).map((command) => option(command, group, [], scope));
     // Searching: the last rows stay under the hint, so the list doesn't flash per keystroke.
-    if (!result || result.state === "loading") return [hint("Searching…", scope), ...rows];
-    if (result.state === "error") return [hint("Couldn't search, try again", scope)];
-    if (rows.length === 0) return [hint(`No results for “${input.query.trim()}”`, scope)];
+    if (!result || result.state === "loading") return [hint(labels.searching, scope), ...rows];
+    if (result.state === "error") return [hint(labels.searchFailed, scope)];
+    if (rows.length === 0) return [hint(labels.noResults(input.query.trim()), scope)];
     return rows;
   });
 
@@ -127,27 +129,28 @@ const providerRows = (input: RowsInput): Row[] =>
  */
 export function buildRows(input: RowsInput): Row[] {
   if (input.arg) return choiceRows(input.arg);
+  const labels = input.labels ?? PALETTE_LABELS;
   const commands = visible(input.commands, input.ctx);
   const query = input.query.trim();
   if (query === "") {
     const recent = input.recentIds
       .map((id) => commands.find((command) => command.id === id))
       .filter((command): command is Command => command !== undefined)
-      .map((command) => option(command, "Recent", [], "recent:"));
+      .map((command) => option(command, labels.recent, [], "recent:"));
     return [
       ...recent,
-      ...commands.map((command) => option(command, command.group ?? DEFAULT_GROUP)),
+      ...commands.map((command) => option(command, command.group ?? labels.commands)),
     ];
   }
   const rows: Row[] = [];
-  const calc = input.isRoot && input.calculator ? calcRow(query) : null;
+  const calc = input.isRoot && input.calculator ? calcRow(query, labels) : null;
   if (calc) rows.push(calc);
   for (const scored of rankResults(query, commands, input.boost)) {
-    rows.push(option(scored.command, scored.command.group ?? DEFAULT_GROUP, scored.ranges));
+    rows.push(option(scored.command, scored.command.group ?? labels.commands, scored.ranges));
   }
-  rows.push(...providerRows(input));
+  rows.push(...providerRows(input, labels));
   if (!rows.some((row) => row.kind === "option") && input.providers.length === 0) {
-    rows.push(hint("No matching commands"));
+    rows.push(hint(labels.noMatches));
   }
   return rows;
 }

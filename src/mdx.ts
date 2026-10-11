@@ -17,6 +17,7 @@ export { Kbd, type KbdProps } from "./components/basics/Kbd.js";
 export type { MdxArticleModule } from "./components/mdx/articleModule.js";
 export { Callout, type CalloutProps, type CalloutType } from "./components/mdx/Callout.js";
 export { CodeBlock, type CodeBlockProps } from "./components/mdx/CodeBlock.js";
+export { CODE_BLOCK_LABELS, type CodeBlockLabels } from "./components/mdx/codeLabels.js";
 export { Embed, type EmbedProps } from "./components/mdx/Embed.js";
 export { Figure, type FigureProps } from "./components/mdx/Figure.js";
 export { Glossary, type GlossaryEntry, type GlossaryProps } from "./components/mdx/Glossary.js";

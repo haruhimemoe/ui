@@ -9,7 +9,7 @@
  *       aria-label so mouse users get the same text as a tooltip.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { ComponentProps } from "react";
@@ -26,6 +26,10 @@ export type SortableMoveButtonsProps = Omit<ComponentProps<"span">, "children"> 
   id: string;
   /** The item's name in "Move {label} up". */
   label: string;
+  /** The up button's accessible name from `label`. Default "Move <label> up". */
+  upLabel?: ((label: string) => string) | undefined;
+  /** The down button's accessible name from `label`. Default "Move <label> down". */
+  downLabel?: ((label: string) => string) | undefined;
   /** Default a chevron icon; set to swap in words instead. */
   upText?: string | undefined;
   /** Default a chevron icon; set to swap in words instead. */
@@ -48,6 +52,8 @@ export function SortableMoveButtons({
   sortable,
   id,
   label,
+  upLabel: upName = (item) => `Move ${item} up`,
+  downLabel: downName = (item) => `Move ${item} down`,
   upText,
   downText,
   variant = "ghost",
@@ -57,8 +63,8 @@ export function SortableMoveButtons({
   ...props
 }: SortableMoveButtonsProps) {
   const resolvedSize = size ?? (upText || downText ? "md" : "sm");
-  const upLabel = `Move ${label} up`;
-  const downLabel = `Move ${label} down`;
+  const upLabel = upName(label);
+  const downLabel = downName(label);
   return (
     <span
       {...props}

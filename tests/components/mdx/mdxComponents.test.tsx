@@ -33,6 +33,7 @@ describe("src/mdx.ts", () => {
   it("exports the MDX pieces", () => {
     expect(Object.keys(mdx).sort()).toEqual(
       [
+        "CODE_BLOCK_LABELS",
         "Callout",
         "CodeBlock",
         "Embed",

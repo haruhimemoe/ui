@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Every string a component writes can now be translated. `CommandPalette` and `siteCommands` take `labels` (`PALETTE_LABELS`, `SITE_COMMAND_LABELS`). `CodeBlock`, `ContentPage` and `BrandPage` do too (`CODE_BLOCK_LABELS`, `CONTENT_PAGE_LABELS`, `BRAND_PAGE_LABELS`). `ContentPage` also takes `locale` for its dates.
+- New text props: `SectionHeading` `anchorLabel`, `SortableMoveButtons` `upLabel` / `downLabel`, `ContentNav` `summaryLabel`, `ContentSearch` `countText`, `MapGroup` `countText`.
+- The README has a new "Translating built-in text" section. Every default is unchanged English.
+
 ## [0.25.0] - 2026-10-10
 
 ### Added

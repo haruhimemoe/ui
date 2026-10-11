@@ -7,7 +7,7 @@
  *       is a MapCopyScope. Server-safe (useId works in Server Components).
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Oct 5, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { Children, type ComponentProps, type ReactNode, useId } from "react";
@@ -23,6 +23,8 @@ export type MapGroupProps = Omit<ComponentProps<"section">, "title"> & {
   detail?: ReactNode;
   count?: number | undefined;
   target?: number | undefined;
+  /** The count after the name. Default "(count)" or "(count of target)". */
+  countText?: ((count: number, target: number | undefined) => ReactNode) | undefined;
   headingLevel?: 2 | 3 | 4 | undefined;
   headingProps?: ComponentProps<"h3"> | undefined;
   actions?: ReactNode;
@@ -48,6 +50,7 @@ export function MapGroup({
   detail,
   count,
   target,
+  countText,
   headingLevel = 3,
   headingProps,
   actions,
@@ -68,7 +71,13 @@ export function MapGroup({
   const items = Children.toArray(children);
   const isEmpty = (count === 0 || (count === undefined && items.length === 0)) && emptySlots <= 0;
   const counted =
-    count === undefined ? null : target === undefined ? `(${count})` : `(${count} of ${target})`;
+    count === undefined
+      ? null
+      : countText
+        ? countText(count, target)
+        : target === undefined
+          ? `(${count})`
+          : `(${count} of ${target})`;
   const slotText =
     emptySlotText ??
     ((n: number) =>

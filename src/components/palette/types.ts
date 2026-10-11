@@ -6,10 +6,11 @@
  *       runs with, and CommandPalette's props. Plain types, server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { ReactNode } from "react";
+import type { PaletteLabels } from "./labels.js";
 
 /** One row of a "choice" argument. */
 export type ArgChoice = { value: string; label: string; subtitle?: string | undefined };
@@ -103,4 +104,6 @@ export type CommandPaletteProps = {
   recents?: boolean | undefined;
   /** Classes for the panel. */
   className?: string | undefined;
+  /** Built-in text (counts, hints, key hints, group headings), merged over PALETTE_LABELS. */
+  labels?: Partial<PaletteLabels> | undefined;
 };

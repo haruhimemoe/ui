@@ -7,7 +7,7 @@
  *       tabs and scrolls.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Sat Oct 3, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -15,6 +15,7 @@
 import { isExternalHref } from "../../utils/href.js";
 import { HARUHIME_TOOLS, type HaruhimeToolId } from "../shell/haruhimeTools.js";
 import type { SiteLinkItem } from "../shell/links.js";
+import { SITE_COMMAND_LABELS, type SiteCommandLabels } from "./siteCommandLabels.js";
 import type { Command, PaletteContext } from "./types.js";
 
 /** Which default groups to build and what they need. */
@@ -36,6 +37,8 @@ export type SiteCommandsOptions = {
     | undefined;
   /** Default: every group. */
   include?: readonly ("navigate" | "page" | "account" | "help")[] | undefined;
+  /** Titles and group headings, merged over SITE_COMMAND_LABELS. Ids never change. */
+  labels?: Partial<SiteCommandLabels> | undefined;
 };
 
 const slug = (label: string): string =>
@@ -55,15 +58,15 @@ const reducedMotion = (): boolean =>
   typeof window.matchMedia === "function" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const navigate = (options: SiteCommandsOptions): Command[] => {
+const navigate = (options: SiteCommandsOptions, l: SiteCommandLabels): Command[] => {
   const pages = (options.pages ?? []).flatMap((item): Command[] => {
     const href = item.href;
     if (!href) return [];
     return [
       {
         id: `site.go.${slug(item.label)}`,
-        title: `Go to ${item.label}`,
-        group: "Navigate",
+        title: l.goTo(item.label),
+        group: l.navigate,
         keywords: [href],
         run: (ctx) => go(href, ctx),
       },
@@ -73,60 +76,60 @@ const navigate = (options: SiteCommandsOptions): Command[] => {
   const tools = HARUHIME_TOOLS.filter((tool) => tool.id !== options.tools).map(
     (tool): Command => ({
       id: `site.tool.${tool.id}`,
-      title: `Open ${tool.name}`,
+      title: l.openTool(tool.name),
       subtitle: tool.blurb,
-      group: "Navigate",
+      group: l.navigate,
       run: () => openTab(tool.href),
     }),
   );
   tools.push({
     id: "site.tool.home",
-    title: "Open haruhime.moe",
-    subtitle: "all tools",
-    group: "Navigate",
+    title: l.openHome,
+    subtitle: l.allTools,
+    group: l.navigate,
     run: () => openTab("https://www.haruhime.moe"),
   });
   return [...pages, ...tools];
 };
 
-const page = (options: SiteCommandsOptions): Command[] => {
+const page = (options: SiteCommandsOptions, l: SiteCommandLabels): Command[] => {
   const list: Command[] = [
     {
       id: "site.copy-url",
-      title: "Copy page URL",
-      group: "Page",
+      title: l.copyUrl,
+      group: l.page,
       shortcut: "mod+shift+c",
       closeOnRun: false,
       run: (ctx) => ctx.copy(location.href),
     },
-    { id: "site.back", title: "Go back", group: "Page", run: () => history.back() },
+    { id: "site.back", title: l.back, group: l.page, run: () => history.back() },
     {
       id: "site.top",
-      title: "Scroll to top",
-      group: "Page",
+      title: l.top,
+      group: l.page,
       run: () => window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" }),
     },
-    { id: "site.reload", title: "Reload page", group: "Page", run: () => location.reload() },
+    { id: "site.reload", title: l.reload, group: l.page, run: () => location.reload() },
   ];
   if (options.repo)
     list.push({
       id: "site.github",
-      title: "Open on GitHub",
-      group: "Page",
+      title: l.github,
+      group: l.page,
       keywords: ["source", "repo"],
       run: () => openTab(options.repo as string),
     });
   return list;
 };
 
-const account = (options: SiteCommandsOptions): Command[] => {
+const account = (options: SiteCommandsOptions, l: SiteCommandLabels): Command[] => {
   const acct = options.account;
   if (!acct) return [];
   const list: Command[] = [
     {
       id: "site.sign-in",
-      title: "Sign in",
-      group: "Account",
+      title: l.signIn,
+      group: l.account,
       when: () => !acct.signedIn,
       run: (ctx) => ctx.navigate(acct.signInHref),
     },
@@ -134,34 +137,34 @@ const account = (options: SiteCommandsOptions): Command[] => {
   if (acct.accountHref)
     list.push({
       id: "site.account",
-      title: "My account",
-      group: "Account",
+      title: l.myAccount,
+      group: l.account,
       when: () => acct.signedIn,
       run: (ctx) => ctx.navigate(acct.accountHref as string),
     });
   if (acct.signOutHref)
     list.push({
       id: "site.sign-out",
-      title: "Sign out",
-      group: "Account",
+      title: l.signOut,
+      group: l.account,
       when: () => acct.signedIn,
       run: (ctx) => ctx.navigate(acct.signOutHref as string),
     });
   return list;
 };
 
-const help = (options: SiteCommandsOptions): Command[] => {
+const help = (options: SiteCommandsOptions, l: SiteCommandLabels): Command[] => {
   const list: Command[] = [
     {
       id: "site.shortcuts",
-      title: "Keyboard shortcuts",
-      group: "Help",
+      title: l.shortcuts,
+      group: l.help,
       shortcut: "?",
       closeOnRun: false,
       run: (ctx) =>
         ctx.push({
-          title: "Keyboard shortcuts",
-          placeholder: "Filter shortcuts…",
+          title: l.shortcuts,
+          placeholder: l.filterShortcuts,
           commands: ctx.commands.filter((c) => c.shortcut && c.id !== "site.shortcuts"),
         }),
     },
@@ -169,8 +172,8 @@ const help = (options: SiteCommandsOptions): Command[] => {
   if (options.repo)
     list.push({
       id: "site.report",
-      title: "Report a bug",
-      group: "Help",
+      title: l.reportBug,
+      group: l.help,
       keywords: ["issue", "feedback"],
       run: () => openTab(`${options.repo}/issues/new`),
     });
@@ -186,5 +189,6 @@ const BUILDERS = { navigate, page, account, help } as const;
  */
 export function siteCommands(options: SiteCommandsOptions = {}): Command[] {
   const include = options.include ?? ["navigate", "page", "account", "help"];
-  return include.flatMap((group) => BUILDERS[group](options));
+  const labels = { ...SITE_COMMAND_LABELS, ...options.labels };
+  return include.flatMap((group) => BUILDERS[group](options, labels));
 }

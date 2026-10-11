@@ -4,7 +4,7 @@
  *       overrides that only exist to beat Prose. Named "Link to section: <text>". Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Oct 5, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 const ANCHOR =
@@ -21,15 +21,18 @@ export function HeadingAnchor({
   id,
   text,
   className,
+  label = (section) => `Link to section: ${section}`,
 }: {
   id: string;
   text: string;
   className?: string | undefined;
+  /** The link's accessible name from the heading text. */
+  label?: ((text: string) => string) | undefined;
 }) {
   return (
     <a
       href={`#${id}`}
-      aria-label={`Link to section: ${text}`}
+      aria-label={label(text)}
       className={className ? `${ANCHOR} ${className}` : ANCHOR}
     >
       #

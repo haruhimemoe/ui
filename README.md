@@ -184,6 +184,32 @@ A Server Component can't pass a function to a Client Component. So callback prop
 - `ref` is a normal prop (React 19). It goes where the native props go: the outer element for most components, the control (`<input>`, `<select>`, `<textarea>`) for the form fields, and the `<button>` for `CopyButton`. On `PageShell` that is the wrapper `<div>`, not `<main>`.
 - `className` is added after the built-in classes and wins on conflict: a class that sets the same property as a built-in one replaces it (merged with [tailwind-merge](https://github.com/dcastil/tailwind-merge)). `<Select className="w-auto">` drops the built-in `w-full`. On `DiscordIcon`, `GitHubIcon` and `HaruhimeWordmark`, `className` replaces the default size instead.
 
+## Translating built-in text (since 0.26.0)
+
+Every string a component writes itself can be replaced, and every default is English. ui has no i18n dependency: pass your translator's strings in. Text props (`label`, `copiedLabel` and so on) cover most components. Components that write many strings take one `labels` object, merged over an exported English default. Values that depend on a number or a name are functions, so plural rules stay with your translator.
+
+| Component | Prop | Default constant |
+| --- | --- | --- |
+| `CommandPalette` | `labels`: the count, key hints, list name, group headings, provider hints, argument errors, copy statuses | `PALETTE_LABELS` |
+| `siteCommands` | `labels`: every title, subtitle and group heading. Ids never change, so recents survive | `SITE_COMMAND_LABELS` |
+| `CodeBlock` (`@haruhimemoe/ui/mdx`) | `labels`: `copy`, `copied`, `copyFailed`, `code`, `copyName(title)`, `codeName(name)` | `CODE_BLOCK_LABELS` |
+| `ContentPage` | `labels`: `updated`, `readingTime(n)`, `and`, `copyMarkdown`, `copied`, `copyFailed`. `locale` formats the dates | `CONTENT_PAGE_LABELS` |
+| `BrandPage` | `labels`: section headings, Do / Don't, the osu! line, swatch statuses | `BRAND_PAGE_LABELS` |
+| `SectionHeading` | `anchorLabel(text)` | "Link to section: <text>" |
+| `SortableMoveButtons` | `upLabel(label)`, `downLabel(label)` | "Move <label> up/down" |
+| `ContentNav` | `summaryLabel` | "Contents" |
+| `ContentSearch` | `countText(total, matches)`, with `matches` null for an empty query | "12 pages." / "3 matches." |
+| `MapGroup` | `countText(count, target)` | "(3)" / "(3 of 5)" |
+
+With next-intl, keep each object under one key and pass `t.raw("ui.palette")` for plain strings. Build the function entries from `t`:
+
+```tsx
+const t = useTranslations("ui.palette");
+<CommandPalette commands={commands} labels={{ ...t.raw("text"), results: (count) => t("results", { count }) }} />
+```
+
+The MDX element map (`mdxComponents`) still writes English for callout labels, embed titles and table names. Pass `title` on `Callout` and `Embed` to replace them.
+
 ## Components
 
 ### Basics

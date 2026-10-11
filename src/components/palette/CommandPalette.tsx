@@ -9,7 +9,7 @@
  *       (focus return, scroll lock, Escape and backdrop) since 0.14.0.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sat Oct 3, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -29,6 +29,7 @@ import { cx } from "../../utils/cx.js";
 import { useLatestStatus } from "../actions/useLatestStatus.js";
 import { Dialog } from "../dialogs/Dialog.js";
 import { isEditableTarget, matchesCombo, parseShortcut } from "./hotkeys.js";
+import { PALETTE_LABELS } from "./labels.js";
 import { PaletteFooter } from "./PaletteFooter.js";
 import { PaletteInput } from "./PaletteInput.js";
 import { PaletteList } from "./PaletteList.js";
@@ -66,7 +67,9 @@ export function CommandPalette({
   calculator = true,
   recents: recentsOn = true,
   className,
+  labels: labelsProp,
 }: CommandPaletteProps) {
+  const labels = useMemo(() => ({ ...PALETTE_LABELS, ...labelsProp }), [labelsProp]);
   const router = useRouter();
   const pathname = usePathname() ?? "";
   const [state, dispatch] = useReducer(reduce, undefined, initialState);
@@ -111,15 +114,15 @@ export function CommandPalette({
         setStatusShown(true);
         try {
           await navigator.clipboard.writeText(text);
-          settle(run, "Copied");
+          settle(run, labels.copied);
         } catch {
-          settle(run, "Couldn't copy");
+          settle(run, labels.copyFailed);
         }
       },
       pathname,
       commands,
     }),
-    [router, close, state.open, open, start, settle, pathname, commands],
+    [router, close, state.open, open, start, settle, pathname, commands, labels],
   );
 
   const frame = topFrame(state);
@@ -141,9 +144,10 @@ export function CommandPalette({
             calculator,
             arg: state.arg,
             ctx,
+            labels,
           })
         : [],
-    [frame, isRoot, recentsOn, recents, calculator, state.arg, ctx],
+    [frame, isRoot, recentsOn, recents, calculator, state.arg, ctx, labels],
   );
   const count = optionCount(rows);
   const active = state.arg ? state.arg.active : (frame?.active ?? 0);
@@ -180,9 +184,9 @@ export function CommandPalette({
     if (!arg || !spec) return;
     const trimmed = value.trim();
     if (spec.type !== "choice" && trimmed === "")
-      return dispatch({ type: "argError", message: "Required" });
+      return dispatch({ type: "argError", message: labels.required });
     if (spec.type === "number" && Number.isNaN(Number(trimmed)))
-      return dispatch({ type: "argError", message: "Enter a number" });
+      return dispatch({ type: "argError", message: labels.enterNumber });
     const message = spec.validate?.(trimmed);
     if (message) return dispatch({ type: "argError", message });
     dispatch({ type: "argAccept", value: trimmed });
@@ -329,7 +333,9 @@ export function CommandPalette({
           <PaletteInput
             ref={input}
             value={query}
-            placeholder={argSpec ? argSpec.label : (frame.page.placeholder ?? "Search…")}
+            placeholder={
+              argSpec ? argSpec.label : (frame.page.placeholder ?? labels.searchPlaceholder)
+            }
             label={label}
             crumbs={crumbs}
             listId={listId}
@@ -354,12 +360,14 @@ export function CommandPalette({
               dispatch({ type: "active", index, count });
             }}
             onSelect={select}
+            label={labels.list}
           />
           <PaletteFooter
             count={count}
             nested={depth > 0 || state.arg !== null}
             status={statusShown ? (status?.result ?? null) : null}
             statusRun={statusShown ? (status?.run ?? null) : null}
+            labels={labels}
           />
         </div>
       ) : null}

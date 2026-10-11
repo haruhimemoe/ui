@@ -51,6 +51,7 @@ import { ClientDialogs } from "./ClientDialogs";
 import { ClientSurfaces } from "./ClientSurfaces";
 import { Filters } from "./Filters";
 import { Foundations } from "./Foundations";
+import { Labels26 } from "./Labels26";
 import { MapsClientFixture } from "./MapsClientFixture";
 import { MapsFixture } from "./MapsFixture";
 import { MdxExports } from "./MdxExports";
@@ -169,6 +170,7 @@ export default function Page() {
       <Filters />
       <Foundations />
       <MdxExports />
+      <Labels26 />
       <Surfaces />
       <Bracket22 />
       <ClientSurfaces />

@@ -7,7 +7,7 @@
  *       Component; only `BrandSwatch` hydrates.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { ReactNode } from "react";
@@ -52,6 +52,43 @@ export type BrandPageProps = {
   fonts?: readonly BrandPageFont[] | undefined;
   /** Extra sections after Logo, after Colors, and at the end. */
   slots?: { afterLogo?: ReactNode; afterColors?: ReactNode; end?: ReactNode } | undefined;
+  /** Headings and fixed lines, merged over BRAND_PAGE_LABELS. */
+  labels?: Partial<BrandPageLabels> | undefined;
+};
+
+/** BrandPage's headings and fixed lines. */
+export type BrandPageLabels = {
+  name: string;
+  logo: string;
+  colors: string;
+  type: string;
+  dosAndDonts: string;
+  do: string;
+  dont: string;
+  osu: string;
+  osuNotice: string;
+  family: string;
+  contact: string;
+  /** A swatch's statuses after a copy. */
+  copied: string;
+  copyFailed: string;
+};
+
+/** The English defaults. */
+export const BRAND_PAGE_LABELS: BrandPageLabels = {
+  name: "Name",
+  logo: "Logo",
+  colors: "Colors",
+  type: "Type",
+  dosAndDonts: "Do's and don'ts",
+  do: "Do",
+  dont: "Don't",
+  osu: "osu!",
+  osuNotice: "Not affiliated with osu! or ppy. osu! is a trademark of ppy Pty Ltd.",
+  family: "Family",
+  contact: "Contact",
+  copied: "Copied",
+  copyFailed: "Couldn't copy",
 };
 
 const DEFAULT_FONTS: readonly BrandPageFont[] = [
@@ -80,10 +117,12 @@ export function BrandPage({
   familyLabel = "Part of the haruhime.moe family.",
   fonts = DEFAULT_FONTS,
   slots,
+  labels: labelsProp,
 }: BrandPageProps) {
+  const labels = { ...BRAND_PAGE_LABELS, ...labelsProp };
   return (
     <div className="flex flex-col gap-4">
-      <Card title="Name">
+      <Card title={labels.name}>
         <p className="font-bold text-c1 text-xl">{name}</p>
         <p>{tagline}</p>
         <p>{writing}</p>
@@ -93,7 +132,7 @@ export function BrandPage({
           </a>
         </p>
       </Card>
-      <Card title="Logo">
+      <Card title={labels.logo}>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {assets.map((asset) => (
             <li key={asset.href} className="flex flex-col gap-2">
@@ -114,17 +153,22 @@ export function BrandPage({
         </ul>
       </Card>
       {slots?.afterLogo}
-      <Card title="Colors">
+      <Card title={labels.colors}>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {Object.entries(palette).map(([token, hex]) => (
             <li key={token}>
-              <BrandSwatch token={token} hex={hex} />
+              <BrandSwatch
+                token={token}
+                hex={hex}
+                copiedLabel={labels.copied}
+                failedLabel={labels.copyFailed}
+              />
             </li>
           ))}
         </ul>
       </Card>
       {slots?.afterColors}
-      <Card title="Type">
+      <Card title={labels.type}>
         <ul className="flex flex-col gap-1">
           {fonts.map((font) => (
             <li key={font.name}>
@@ -133,10 +177,10 @@ export function BrandPage({
           ))}
         </ul>
       </Card>
-      <Card title="Do's and don'ts">
+      <Card title={labels.dosAndDonts}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <h3 className="mb-1 font-bold text-c1">Do</h3>
+            <h3 className="mb-1 font-bold text-c1">{labels.do}</h3>
             <ul className="list-disc pl-5">
               {dos.map((item) => (
                 <li key={item}>{item}</li>
@@ -144,7 +188,7 @@ export function BrandPage({
             </ul>
           </div>
           <div>
-            <h3 className="mb-1 font-bold text-c1">Don't</h3>
+            <h3 className="mb-1 font-bold text-c1">{labels.dont}</h3>
             <ul className="list-disc pl-5">
               {donts.map((item) => (
                 <li key={item}>{item}</li>
@@ -153,17 +197,17 @@ export function BrandPage({
           </div>
         </div>
       </Card>
-      <Card title="osu!">
-        <p>Not affiliated with osu! or ppy. osu! is a trademark of ppy Pty Ltd.</p>
+      <Card title={labels.osu}>
+        <p>{labels.osuNotice}</p>
       </Card>
       {familyHref ? (
-        <Card title="Family">
+        <Card title={labels.family}>
           <a className={LINK} href={familyHref}>
             {familyLabel}
           </a>
         </Card>
       ) : null}
-      <Card title="Contact">
+      <Card title={labels.contact}>
         <a className={LINK} href={`mailto:${contact}`}>
           {contact}
         </a>

@@ -6,7 +6,7 @@
  *       entries, label and count noun taken from props instead of a hardcoded docs shape.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 4, 2026
- * @modified Sun Oct 4, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -25,6 +25,8 @@ export type ContentSearchProps = {
   placeholder?: string;
   /** Singular and plural noun for the unfiltered count ("12 pages."). Default `["page", "pages"]`. */
   countNoun?: readonly [string, string];
+  /** The whole count line, overriding countNoun: matches is null when the query is empty. */
+  countText?: ((total: number, matches: number | null) => string) | undefined;
 };
 
 /**
@@ -38,13 +40,15 @@ export function ContentSearch({
   label,
   placeholder,
   countNoun = ["page", "pages"],
+  countText,
 }: ContentSearchProps) {
   const [query, setQuery] = useState("");
   const found = searchContent(items, query);
   const trimmed = query.trim();
   const [singular, plural] = countNoun;
-  const countText =
-    trimmed === ""
+  const count = countText
+    ? countText(items.length, trimmed === "" ? null : found.length)
+    : trimmed === ""
       ? `${items.length} ${items.length === 1 ? singular : plural}.`
       : `${found.length} ${found.length === 1 ? "match" : "matches"}.`;
   return (
@@ -59,7 +63,7 @@ export function ContentSearch({
         autoComplete="off"
       />
       <p className="text-c3 text-sm" aria-live="polite">
-        {countText}
+        {count}
       </p>
       <ContentIndex items={found} />
     </div>

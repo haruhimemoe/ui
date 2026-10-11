@@ -6,7 +6,7 @@
  *       only the heading. Server-safe.
  * @author David @dvhsh (https://dvh.sh)
  * @created Mon Oct 5, 2026
- * @modified Mon Oct 5, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { ComponentProps, ReactNode } from "react";
@@ -24,6 +24,8 @@ type SectionHeadingBase = Omit<ComponentProps<"h2">, "title"> & {
   actions?: ReactNode | undefined;
   /** Classes for the wrapper that holds the heading and actions or anchor. */
   wrapperClassName?: string | undefined;
+  /** The anchor's accessible name from the heading text. Default "Link to section: <text>". */
+  anchorLabel?: ((text: string) => string) | undefined;
 };
 
 /** Every native heading prop, plus level, detail, actions, and `anchor`, which needs an `id`. */
@@ -42,6 +44,7 @@ export function SectionHeading({
   actions,
   anchor,
   wrapperClassName,
+  anchorLabel,
   className,
   children,
   id,
@@ -64,7 +67,9 @@ export function SectionHeading({
     <div className={cx("flex flex-wrap items-baseline justify-between gap-2", wrapperClassName)}>
       <div className="flex items-baseline gap-2">
         {heading}
-        {anchor && id ? <HeadingAnchor id={id} text={textOf(children)} /> : null}
+        {anchor && id ? (
+          <HeadingAnchor id={id} text={textOf(children)} label={anchorLabel} />
+        ) : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </div>

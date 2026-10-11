@@ -26,6 +26,8 @@ export type PaletteListProps = {
   /** The pointer is over a row, at this position. */
   onActivate: (index: number, x: number, y: number) => void;
   onSelect: (command: Command) => void;
+  /** The listbox's accessible name. Default "Results". */
+  label?: string | undefined;
 };
 
 type Segment =
@@ -66,6 +68,7 @@ export function PaletteList({
   busy,
   onActivate,
   onSelect,
+  label = "Results",
 }: PaletteListProps) {
   // Runs for a new list too (its first row changes), so it scrolls back up when active stays 0.
   const first = rows[0]?.id;
@@ -77,7 +80,7 @@ export function PaletteList({
     <div
       id={id}
       role="listbox"
-      aria-label="Results"
+      aria-label={label}
       aria-busy={busy ? true : undefined}
       className="min-h-0 flex-1 overflow-y-auto p-2"
     >
