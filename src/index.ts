@@ -157,6 +157,12 @@ export { CopyField, type CopyFieldProps } from "./components/forms/CopyField.js"
 export type { FieldProps } from "./components/forms/FieldFrame.js";
 export { fieldClasses } from "./components/forms/fieldStyles.js";
 export {
+  LocaleSelect,
+  type LocaleSelectProps,
+  localeName,
+  writeLocaleCookie,
+} from "./components/forms/LocaleSelect.js";
+export {
   RadioGroup,
   type RadioGroupProps,
   type RadioOption,

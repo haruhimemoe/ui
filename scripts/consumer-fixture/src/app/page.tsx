@@ -48,6 +48,7 @@ import { Bracket22 } from "./Bracket22";
 import { ClientAdditions } from "./ClientAdditions";
 import { ClientAdditions05 } from "./ClientAdditions05";
 import { ClientDialogs } from "./ClientDialogs";
+import { ClientLocale27 } from "./ClientLocale27";
 import { ClientSurfaces } from "./ClientSurfaces";
 import { Filters } from "./Filters";
 import { Foundations } from "./Foundations";
@@ -162,6 +163,7 @@ export default function Page() {
       <MapsClientFixture />
       <ClientAdditions />
       <ClientAdditions05 />
+      <ClientLocale27 />
       <Sortable15 />
       <ol aria-label="Server sortable classes" className={SORTABLE_CONTAINER}>
         <li className={SORTABLE_ITEM}>{moveItem(["second", "first"], 1, 0).join(" then ")}</li>

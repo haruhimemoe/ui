@@ -602,6 +602,16 @@ With `live` (since 0.7.0) an `<output>` live region inside it announces "1,500 o
 | `unit` | `string` | `"characters"` | What is counted. |
 | `live` | `boolean` | `false` | Announce the over-limit text to screen readers (since 0.7.0). |
 
+#### `LocaleSelect` (client, since 0.27.0)
+
+A language picker for apps without locale prefixes in their URLs. It lists `locales`, each named in its own language (`localeName("ja")` is "日本語"). Picking one writes the `NEXT_LOCALE` cookie (on `cookieDomain` when set, like `".haruhime.moe"`, so every app follows), calls `onChange` and refreshes the page. With fewer than two locales it renders nothing, so an app can mount it before it has translations.
+
+```tsx
+<LocaleSelect locales={LOCALES} value={locale} label={t("language")} cookieDomain=".haruhime.moe" />
+```
+
+Props: `locales`, `value`, `label` (default "Language"), `hideLabel` (default true), `cookieDomain`, `onChange`, `className`. `writeLocaleCookie(locale, domain?)` is the cookie write on its own.
+
 #### `VisibilitySelect` (client)
 
 Since 0.5.0. Who can see something: private, unlisted or public, each with a line that says who that is. As radios (a `RadioGroup`, every line shown as its option's description) or as a native select (a `Select`, the picked option's line as the hint). Controlled. Also exported: `VISIBILITIES` (`["private", "unlisted", "public"]`), the `Visibility` type, `VisibilityText` (`{ label: string; hint?: ReactNode }`) and `VISIBILITY_TEXT`, the default words ("Only you can see it.", "Anyone with the link can see it. It isn't listed.", "Anyone can see it, and it's listed.").

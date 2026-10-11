@@ -105,6 +105,7 @@ describe("shipped source", () => {
       "src/components/filters/FilterPanel.tsx",
       "src/components/filters/RangeBox.tsx",
       "src/components/filters/RangeSlider.tsx",
+      "src/components/forms/LocaleSelect.tsx",
       "src/components/forms/ReportDisclosure.tsx",
       "src/components/forms/TypeToConfirm.tsx",
       "src/components/mdx/CodeCopyButton.tsx",
