@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-10-11
+
 ### Added
 
 - Every string a component writes can now be translated. `CommandPalette` and `siteCommands` take `labels` (`PALETTE_LABELS`, `SITE_COMMAND_LABELS`). `CodeBlock`, `ContentPage` and `BrandPage` do too (`CODE_BLOCK_LABELS`, `CONTENT_PAGE_LABELS`, `BRAND_PAGE_LABELS`). `ContentPage` also takes `locale` for its dates.
@@ -352,6 +354,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Shell: `SiteHeader` (brand slot, nav links as data with `aria-current`, actions slot), `NavLinks`, `SiteFooter` (link columns as data, fine print, the haruhime.moe wordmark and a GitHub link) and `PageShell` (skip link, header, main, footer).
 
 [unreleased]: https://github.com/haruhimemoe/ui/compare/v0.25.0...HEAD
+[0.26.0]: https://github.com/haruhimemoe/ui/compare/v0.25.0...v0.26.0
 [0.25.0]: https://github.com/haruhimemoe/ui/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/haruhimemoe/ui/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/haruhimemoe/ui/compare/v0.23.0...v0.24.0
