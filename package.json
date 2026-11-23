@@ -75,7 +75,7 @@
     "prepublishOnly": "bun run check && bun run typecheck && bun run test && bun run build"
   },
   "dependencies": {
-    "tailwind-merge": "3.7.0"
+    "tailwind-merge": "3.7.1"
   },
   "peerDependencies": {
     "next": ">=16.0.0 <17",
